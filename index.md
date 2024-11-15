@@ -1,6 +1,6 @@
 ---
 title: Home
-layout: "首页"
+layout: home
 nav_order: 1
 description: "Just the Docs is a responsive Jekyll theme with built-in search that is easily customizable and hosted on GitHub Pages."
 permalink: /
@@ -12,12 +12,10 @@ permalink: /
 数据安全、网络安全相关个人学习笔记
 {: .fs-6 .fw-300 }
 
-
 ---
 
 {: .warning }
 > 遵守网络安全法，数据安全法，个人信息安全保护法
-
 
 Browse the docs to learn more about how to use this theme.
 
