@@ -1,7 +1,7 @@
 ---
 title: Cyber03
 layout: default
-parent: laycyber
+parent: cyber
 grand_parent: Cyber02
 ---
 
