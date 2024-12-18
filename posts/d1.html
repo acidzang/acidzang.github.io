@@ -1,0 +1,807 @@
+
+<!DOCTYPE html><html lang="zh-CN" data-theme="light">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="hexo-theme" content="https://github.com/xaoxuu/hexo-theme-stellar/tree/1.29.1" theme-name="Stellar" theme-version="1.29.1">
+  
+  <meta name="generator" content="Hexo 7.3.0">
+  <meta http-equiv='x-dns-prefetch-control' content='on' />
+  
+  <meta name="renderer" content="webkit">
+  <meta name="force-rendering" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <meta name="HandheldFriendly" content="True" >
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000">
+  <meta name="theme-color" content="#f9fafb">
+  
+  <title>数据脱敏技术 - Famous's Sec</title>
+
+  
+    <meta name="description" content="1. 数据脱敏的概念1.1 数据脱敏的定义数据脱敏（Data Masking）指给重要的信息（敏感数据）套上马甲（屏蔽，仿真等方式），让数据看起来不是原来的样子，即时被看到，也不会暴露真实的敏感信息。如：  身份证号，电话号码这类个人隐私信息修改等公司商业秘密隐藏，防止被利用  1.2 数据脱敏原则1.2.1 安全性原则数据脱敏的核心目标是保障敏感数据的安全，防止未未授权的访问和使用。  确保数据">
+<meta property="og:type" content="article">
+<meta property="og:title" content="数据脱敏技术">
+<meta property="og:url" content="http://example.com/posts/d1.html">
+<meta property="og:site_name" content="Famous&#39;s Sec">
+<meta property="og:description" content="1. 数据脱敏的概念1.1 数据脱敏的定义数据脱敏（Data Masking）指给重要的信息（敏感数据）套上马甲（屏蔽，仿真等方式），让数据看起来不是原来的样子，即时被看到，也不会暴露真实的敏感信息。如：  身份证号，电话号码这类个人隐私信息修改等公司商业秘密隐藏，防止被利用  1.2 数据脱敏原则1.2.1 安全性原则数据脱敏的核心目标是保障敏感数据的安全，防止未未授权的访问和使用。  确保数据">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-11-21T01:46:37.000Z">
+<meta property="article:modified_time" content="2024-12-18T09:10:11.023Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="Security Capabilities">
+<meta name="twitter:card" content="summary">
+  
+  
+  
+  <meta name="keywords" content="Security Capabilities">
+
+  <!-- feed -->
+  
+    <link rel="alternate" href="/atom.xml" title="Famous's Sec" type="application/atom+xml">
+  
+
+  <link rel="stylesheet" href="/css/main.css?v=1.29.1">
+
+  
+    <link rel="shortcut icon" href="/favicon.ico">
+  
+
+  
+    
+<link rel="stylesheet" href="https://gcore.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-dark.min.css">
+
+  
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"><link rel="stylesheet" href="/css/custom.css"><link rel="stylesheet" href="/css/code-block.css"><link rel="stylesheet" href="https://npm.elemecdn.com/lxgw-wenkai-screen-webfont/style.css" media="print" onload="this.media='all'">
+<!-- hexo injector head_end start -->
+    <style>
+      @font-face {
+        font-family: 'hytmr';
+        font-style: normal;
+        font-weight: normal;
+        font-display: swap;
+        src: url(https://cdn.coolchong.cn/%E5%AD%97%E4%BD%93%E6%A0%B7%E5%BC%8F/hytmr55.woff) format('woff');
+      }    
+    </style>
+  
+    <style>
+    .medium-zoom-overlay {
+      z-index: 20;
+    }
+    
+    .medium-zoom-image {
+      z-index: 21;
+    }
+    </style>
+    <link href="https://cdn.jsdelivr.net/npm/medium-zoom@1.1.0/dist/style.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.1.0/dist/medium-zoom.min.js"></script>
+  <!-- hexo injector head_end end --></head>
+<body>
+
+<div class="l_body s:aa content tech" id="start" layout="post" ><aside class="l_left"><div class="leftbar-container">
+
+
+<header class="header"><div class="logo-wrap"><a class="avatar" href="/about/"><div class="bg" style="opacity:0;background-image:url(https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/rainbow64@3x.webp);"></div><img no-lazy class="avatar" src="/assets/images/avatar.jpg" onerror="javascript:this.classList.add('error');this.src='https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/image/2659360.svg';"></a><a class="title" href="/"><div class="main" ff="title">Famous's Sec</div><div class="sub cap">Data Cyber</div></a></div></header>
+
+<div class="nav-area">
+<div class="search-wrapper" id="search-wrapper"><form class="search-form"><a class="search-button" onclick="document.getElementById(&quot;search-input&quot;).focus();"><svg t="1705074644177" viewBox="0 0 1025 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1560" width="200" height="200"><path d="M1008.839137 935.96571L792.364903 719.491476a56.783488 56.783488 0 0 0-80.152866 0 358.53545 358.53545 0 1 1 100.857314-335.166073 362.840335 362.840335 0 0 1-3.689902 170.145468 51.248635 51.248635 0 1 0 99.217358 26.444296 462.057693 462.057693 0 1 0-158.255785 242.303546l185.930047 185.725053a51.248635 51.248635 0 0 0 72.568068 0 51.248635 51.248635 0 0 0 0-72.978056z" p-id="1561"></path><path d="M616.479587 615.969233a50.428657 50.428657 0 0 0-61.498362-5.534852 174.655348 174.655348 0 0 1-177.525271 3.484907 49.403684 49.403684 0 0 0-58.833433 6.76482l-3.074918 2.869923a49.403684 49.403684 0 0 0 8.609771 78.10292 277.767601 277.767601 0 0 0 286.992355-5.739847 49.403684 49.403684 0 0 0 8.404776-76.667958z" p-id="1562"></path></svg></a><input type="text" class="search-input" id="search-input" placeholder="站内搜索"></form><div id="search-result"></div><div class="search-no-result">没有找到内容！</div></div>
+
+
+<nav class="menu dis-select"><a class="nav-item active" title="首页" href="/" style="color:#1BCDFC"><span>首页</span></a><a class="nav-item" title="专栏" href="/topic/" style="color:#3DC550"><span>专栏</span></a><a class="nav-item" title="分类" href="/categories/" style="color:#FA6400"><span>分类</span></a><a class="nav-item" title="关于" href="/about/" style="color:#F44336"><span>关于</span></a></nav>
+</div>
+<div class="widgets">
+
+
+
+
+<widget class="widget-wrapper post-list"><div class="widget-header dis-select"><span class="name">最近更新</span></div><div class="widget-body fs14"><a class="item title" href="/posts/c4.html"><span class="title">抓包技术</span></a><a class="item title" href="/posts/c3.html"><span class="title">熟悉APP应用</span></a><a class="item title" href="/posts/c1.html"><span class="title">web基础架构</span></a><a class="item title" href="/posts/c2.html"><span class="title">web基础扩展</span></a><a class="item title" href="/posts/d2.html"><span class="title">数据审计技术</span></a><a class="item title" href="/posts/d1.html"><span class="title">数据脱敏技术</span></a></div></widget>
+</div>
+<footer class="footer dis-select"><div class="social-wrap"><a class="social" href="https://github.com" target="_blank" rel="external nofollow noopener noreferrer"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="#000000" d="M12 2A10 10 0 0 0 2 12c0 4.42 2.87 8.17 6.84 9.5c.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34c-.46-1.16-1.11-1.47-1.11-1.47c-.91-.62.07-.6.07-.6c1 .07 1.53 1.03 1.53 1.03c.87 1.52 2.34 1.07 2.91.83c.09-.65.35-1.09.63-1.34c-2.22-.25-4.55-1.11-4.55-4.92c0-1.11.38-2 1.03-2.71c-.1-.25-.45-1.29.1-2.64c0 0 .84-.27 2.75 1.02c.79-.22 1.65-.33 2.5-.33s1.71.11 2.5.33c1.91-1.29 2.75-1.02 2.75-1.02c.55 1.35.2 2.39.1 2.64c.65.71 1.03 1.6 1.03 2.71c0 3.82-2.34 4.66-4.57 4.91c.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0 0 12 2"/></svg></a><a class="social" href="/about/" rel="noopener noreferrer"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><g fill="none" stroke="#000000" stroke-linejoin="round"><path stroke-linecap="round" stroke-width="1.5" d="M12 21a9 9 0 1 0-8-4.873L3 21l4.873-1c1.236.639 2.64 1 4.127 1"/><path stroke-width="2.25" d="M7.5 12h.01v.01H7.5zm4.5 0h.01v.01H12zm4.5 0h.01v.01h-.01z"/></g></svg></a><a class="social" href="/atom.xml" rel="noopener noreferrer"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="none" stroke="#000000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M4 11a9 9 0 0 1 9 9M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/></g></svg></a><a class="social" href="javaScript:switchTheme();" rel="noopener noreferrer"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 256 256"><path fill="#000000" d="M233.54 142.23a8 8 0 0 0-8-2a88.08 88.08 0 0 1-109.8-109.8a8 8 0 0 0-10-10a104.84 104.84 0 0 0-52.91 37A104 104 0 0 0 136 224a103.1 103.1 0 0 0 62.52-20.88a104.84 104.84 0 0 0 37-52.91a8 8 0 0 0-1.98-7.98m-44.64 48.11A88 88 0 0 1 65.66 67.11a89 89 0 0 1 31.4-26A106 106 0 0 0 96 56a104.11 104.11 0 0 0 104 104a106 106 0 0 0 14.92-1.06a89 89 0 0 1-26.02 31.4"/></svg></a><a class="social" href="javaScript:toggleSnow();" rel="noopener noreferrer"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="none" stroke="#000000" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="m21 14.25l-.831-.659c-.946-.75-1.419-1.125-1.419-1.591s.473-.841 1.419-1.591L21 9.75m-18 0l.831.659c.946.75 1.419 1.125 1.419 1.591s-.473.841-1.419 1.591L3 14.25M14.572 21l.156-1.059c.178-1.205.267-1.807.674-2.042c.407-.236.972-.011 2.104.437l.994.394M9.428 3l-.156 1.059c-.178 1.205-.267 1.807-.674 2.042c-.407.236-.972.011-2.104-.437L5.5 5.27M5 18.732l1.07-.395c1.218-.448 1.827-.672 2.265-.438s.533.838.724 2.042L9.227 21M19 5.268l-1.07.394c-1.218.45-1.828.673-2.265.439s-.533-.838-.724-2.042L14.773 3M19 12H5m10.5 6l-7-12m7 0l-7 12" color="#000000"/></svg></a></div></footer>
+</div></aside><div class="l_main" id="main">
+
+
+
+
+
+<div class="article banner top">
+  <div class="content">
+    <div class="top bread-nav footnote"><div class="left"><div class="flex-row" id="breadcrumb"><a class="cap breadcrumb" href="/">主页</a>
+<span class="sep"></span><a class="cap breadcrumb" href="/">文章</a><span class="sep"></span><a class="cap breadcrumb-link" href="/categories/Data-Security/">Data Security</a></div><div id="tag"> <span>&nbsp标签：</span><a class="cap breadcrumb-link" href="/tags/Security-Capabilities/">Security Capabilities</a>&nbsp</div>
+<div class="flex-row" id="post-meta"><span class="text created">发布于：<time datetime="2024-11-21T01:46:37.000Z">2024-11-21</time></span><span class="sep updated"></span><span class="text updated">更新于：<time datetime="2024-12-18T09:10:11.023Z">2024-12-18</time></span></div></div></div>
+    
+    <div class="bottom only-title">
+      
+      <div class="text-area">
+        <h1 class="text title"><span>数据脱敏技术</span></h1>
+        
+      </div>
+    </div>
+    
+  </div>
+  </div><article class="md-text content"><h1 id="1-数据脱敏的概念"><a href="#1-数据脱敏的概念" class="headerlink" title="1. 数据脱敏的概念"></a>1. 数据脱敏的概念</h1><h2 id="1-1-数据脱敏的定义"><a href="#1-1-数据脱敏的定义" class="headerlink" title="1.1 数据脱敏的定义"></a>1.1 数据脱敏的定义</h2><p>数据脱敏（<strong>Data Masking</strong>）指给重要的信息（<strong>敏感数据</strong>）套上马甲（<strong>屏蔽</strong>，<strong>仿真等方式</strong>），让数据看起来不是原来的样子，即时被看到，也不会暴露真实的敏感信息。<br>如：</p>
+<blockquote>
+<p>身份证号，电话号码这类个人隐私信息修改等<br>公司商业秘密隐藏，防止被利用</p>
+</blockquote>
+<h2 id="1-2-数据脱敏原则"><a href="#1-2-数据脱敏原则" class="headerlink" title="1.2 数据脱敏原则"></a>1.2 数据脱敏原则</h2><h3 id="1-2-1-安全性原则"><a href="#1-2-1-安全性原则" class="headerlink" title="1.2.1 安全性原则"></a>1.2.1 安全性原则</h3><p>数据脱敏的核心目标是<code>保障敏感数据的安全</code>，<code>防止未未授权的访问和使用</code>。</p>
+<ul>
+<li>确保数据不可还原：脱敏后的数据无法通过简单手法还原为原始数据</li>
+<li>避免副作用：脱敏操作不会引入新漏洞，如通过其他字段推测真实信息</li>
+<li>严格权限管控：只有授权用户可以访问脱敏规则或真实数据</li>
+</ul>
+<h3 id="1-2-2-适用性原则"><a href="#1-2-2-适用性原则" class="headerlink" title="1.2.2 适用性原则"></a>1.2.2 适用性原则</h3><p>数据脱敏必须满足业务和场景的实际需求，不能影响数据的正常使用</p>
+<ul>
+<li>适应不同场景：如开发测试、数据共享、统计分析等场景对数据的可用性要求不同</li>
+<li>保持数据特性：脱敏后的数据需保持原始数据的部分特征（如长度、格式、统计分布），以便在分析中使用<br>如：<blockquote>
+<p>身份证号脱敏后依然符合<code>18位数据+校验位</code>的格式</p>
+</blockquote>
+</li>
+</ul>
+<h3 id="1-2-3-最小化原则"><a href="#1-2-3-最小化原则" class="headerlink" title="1.2.3 最小化原则"></a>1.2.3 最小化原则</h3><p>脱敏操作仅对敏感数据实施，不应对非敏感数据或无关数据进行处理</p>
+<ul>
+<li>精准识别敏感数据：通过算法或规则、仅对涉及隐私、业务关键的信息进行脱敏</li>
+<li>减少冗余处理：避免对无需脱敏的数据进行冗余处理</li>
+</ul>
+<h3 id="1-2-4-不可逆性原则"><a href="#1-2-4-不可逆性原则" class="headerlink" title="1.2.4 不可逆性原则"></a>1.2.4 不可逆性原则</h3><p>脱敏后的数据在设计上应具备不可逆性，以防数据被轻易还原</p>
+<ul>
+<li>防止推测性还原：随机替换的种子应加密存储，避免被逆向推</li>
+<li>保障加密轻度：采用可靠的加密算法（如AES、SHA-256）确敏感信息无法破解</li>
+</ul>
+<h3 id="1-2-5-数据一致性原则"><a href="#1-2-5-数据一致性原则" class="headerlink" title="1.2.5 数据一致性原则"></a>1.2.5 数据一致性原则</h3><p>脱敏数据应在不同系统、场景中保持一致性，确保数据逻辑正确</p>
+<ul>
+<li>字段内一致性：一个字段的脱敏前后特性应一致（如手机号）</li>
+<li>跨字段一致性：同一用户在不同表中的脱敏结果应保持统一（身份证）</li>
+<li>业务逻辑一致性：脱敏操作不能破坏数据间的业务关联性（如用户ID与订单的关联关系）</li>
+</ul>
+<h3 id="1-2-6-合规性原则"><a href="#1-2-6-合规性原则" class="headerlink" title="1.2.6 合规性原则"></a>1.2.6 合规性原则</h3><p>脱敏操作应符合法律法规和行业数据安全与隐私保护法规</p>
+<ul>
+<li>遵守法律法规：《个人信息保护法》等</li>
+<li>满足行业标准：银行、电信等行业合规要求，</li>
+<li>审计与溯源：脱敏实施过程需可追溯，保证操作透明性和合规性</li>
+</ul>
+<h3 id="1-2-7-性能效率原则"><a href="#1-2-7-性能效率原则" class="headerlink" title="1.2.7 性能效率原则"></a>1.2.7 性能效率原则</h3><p>脱敏过程应在保障数据安全的前提下，尽可能降低对性能的影响</p>
+<ul>
+<li>优化处理效率：对大规模数据的脱敏需求需保证高效性，避免影响系统运行<ul>
+<li>静态脱敏：使用批量处理技术，提高离线脱敏效率</li>
+<li>动态脱敏：采用内存级别的实时处理优化</li>
+</ul>
+</li>
+<li>最小化存储开销：脱敏数据应避免因重复存储或冗余加密增加过多成本</li>
+</ul>
+<h3 id="1-2-8-可审计性原则"><a href="#1-2-8-可审计性原则" class="headerlink" title="1.2.8 可审计性原则"></a>1.2.8 可审计性原则</h3><p>脱敏操作应具备可审计性，确保在问题发生时可以追溯其来源和责任</p>
+<ul>
+<li>记录脱敏规则日志：包括谁定制了规则，何时执行了操作</li>
+<li>定期检测与验证：定期检查脱敏策略是否正确实施，数据是否依然满足安全要求</li>
+</ul>
+<h3 id="1-2-9-动态适应性原则"><a href="#1-2-9-动态适应性原则" class="headerlink" title="1.2.9 动态适应性原则"></a>1.2.9 动态适应性原则</h3><p>随着业务需求和技术环境的变化，脱敏策略和方法需要灵活调整</p>
+<ul>
+<li>敏感数据更新：敏感数据的定义可能因法律法规或业务变更而更新</li>
+<li>技术更新：随着算法进步和攻击手段演变，需要省级脱敏技术</li>
+</ul>
+<h3 id="1-2-10-易用性原则"><a href="#1-2-10-易用性原则" class="headerlink" title="1.2.10 易用性原则"></a>1.2.10 易用性原则</h3><p>脱敏技术的实施应尽量简化，降低业务团队和技术团队的理解和操作成本</p>
+<ul>
+<li>统一管理规则：通过集中管理平台配置脱敏规则，避免分散处理带来混乱</li>
+<li>用户友好性：工具界面直观，脱敏规则配置简洁易懂</li>
+</ul>
+<h2 id="1-3-数据脱敏的流程"><a href="#1-3-数据脱敏的流程" class="headerlink" title="1.3 数据脱敏的流程"></a>1.3 数据脱敏的流程</h2><p>数据脱敏整个过程可分为三个步骤：</p>
+<blockquote>
+<p>识别敏感信息 –&gt; 处理敏感信息 –&gt; 检查脱敏结果</p>
+</blockquote>
+<h2 id="1-4-数据脱敏与数据匿名化、数据去标识化之间的关系"><a href="#1-4-数据脱敏与数据匿名化、数据去标识化之间的关系" class="headerlink" title="1.4 数据脱敏与数据匿名化、数据去标识化之间的关系"></a>1.4 数据脱敏与数据匿名化、数据去标识化之间的关系</h2><table>
+<thead>
+<tr>
+<th align="center">区别项</th>
+<th align="center">数据脱敏</th>
+<th align="center">数据匿名化</th>
+<th align="center">数据去标识化</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">术语定义不同</td>
+<td align="center">改写数据，让敏感数据不暴露</td>
+<td align="center">对个人数据进行处理，让人无法识别出是谁，且处理后的数据不能还原</td>
+<td align="center">对个人数据进行处理，让人在不使用其他额外信息的情况下，无法识别出是谁</td>
+</tr>
+<tr>
+<td align="center">适用领域不同</td>
+<td align="center">技术领域术语</td>
+<td align="center">技术、法律和公众领域都常用</td>
+<td align="center">技术、法律和公众领域都常用</td>
+</tr>
+<tr>
+<td align="center">应用对象不同</td>
+<td align="center">可以用于各种数据，如数据库，音频视频等</td>
+<td align="center">主要用在个人敏感数据上，比如指纹、身份证号、健康记录等</td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center">处理效果不同</td>
+<td align="center">脱敏后数据，不一定让人完全无法识别</td>
+<td align="center">处理后数据不能还原，确保隐私保护</td>
+<td align="center">处理后不用额外信息无法识别，但可能有条件可识别</td>
+</tr>
+</tbody></table>
+<h1 id="2-数据脱敏的类别"><a href="#2-数据脱敏的类别" class="headerlink" title="2. 数据脱敏的类别"></a>2. 数据脱敏的类别</h1><h2 id="2-1-数据脱敏类别"><a href="#2-1-数据脱敏类别" class="headerlink" title="2.1 数据脱敏类别"></a>2.1 数据脱敏类别</h2><blockquote>
+<p>结构化数据：<br>数据库脱敏（静态脱敏、动态脱敏）、文本脱敏<br>非结构化数据：<br>图像脱敏、视频脱敏、文本脱敏</p>
+</blockquote>
+<h2 id="2-2-结构化数据脱敏"><a href="#2-2-结构化数据脱敏" class="headerlink" title="2.2 结构化数据脱敏"></a>2.2 结构化数据脱敏</h2><h3 id="2-2-1-结构化数据概念"><a href="#2-2-1-结构化数据概念" class="headerlink" title="2.2.1 结构化数据概念"></a>2.2.1 结构化数据概念</h3><p>结构化数据也叫<code>行数据</code>，使用<code>二维表结构来表示和实现的数据</code>，格式和长度严格遵守规范<br>在二维表中，每行记录对应一个数据主体，每列则对应一个属性。<br>结构化数据脱敏按照一些规则，对二维表结构中的敏感字段的数据进行变形、屏蔽或仿真处理。<br>结构化数据脱敏对象为各种<code>关系性数据库</code>，例如Oracle、SQL Server、Informix、Mysql、DB2、PostgreSQL、Sybase、MongoDB等，以及国产数据库GBase、达梦、巨杉、等</p>
+<h3 id="2-2-2-数据库脱敏"><a href="#2-2-2-数据库脱敏" class="headerlink" title="2.2.2 数据库脱敏"></a>2.2.2 数据库脱敏</h3><p>从脱敏模式来看，可以分为<code>静态脱敏</code>和<code>动态脱敏</code></p>
+<p>静态脱敏逻辑：<br>保证数据间关联关系的前提下，对数据文件进行脱敏处理。处理后的文件里没有敏感字段数据，而且不会影响数据分析结果。<br>使用ETL技术，先从源数据库把数据抽取出来，再用特定算法对抽取的数据进行变形，然后把变形后的数据加载到目标数据库，形成脱敏后的数据文件（也就是脱敏文件）。<br>主要应用场景：测试、开发、培训、数据分析、数据交易等。<br>主要特征：可以理解为“搬移并仿真替换”。就是说，业务系统开发、测试、培训、分析等相关人员能随便调用、读写脱敏文件里的数据，就像在仿真业务系统和做数据分析一样。同时，脱敏数据文件和生产环境是物理隔离的。</p>
+<p>动态脱敏逻辑：<br>在不脱离生产环境的情况下，对后台数据库里敏感数据的查询和调用结果进行实时脱敏，脱敏后的数据能在用户前端显示出来。<br>用SQL技术，先找到包含敏感字段的查询语句，再用函数运算处理这些查询语句，然后数据库自动返回修改后不含敏感数据的结果。<br>主要应用场景：数据库系统的使用人员和运维人员。<br>主要特征：可以概括为“边脱敏，边使用”。对于数据库系统使用人员来说，先根据不同角色、职责确定不同的身份特征，然后对敏感数据进行隐藏、屏蔽、加密和审计。不同级别的用户按照自己的身份特征去查询、访问敏感数据，而且不能修改敏感数据。数据库系统运维人员的权限只是维护表结构、进行系统调优，没有权限检索数据或者导出真实数据。</p>
+<h3 id="2-2-3-结构化文本脱敏"><a href="#2-2-3-结构化文本脱敏" class="headerlink" title="2.2.3 结构化文本脱敏"></a>2.2.3 结构化文本脱敏</h3><p>结构化文本，也叫结构文本，如txt、csv、xls、python、xml、dbf、dmp等文本文件都属于结构化文本，结构化文本也可以简称为文件。<br>结构化文本脱敏逻辑：<br>在不脱离生产环境的情况下，对生产数据源的文本文件进行脱敏，处理后的文件里没有敏感数据，而且不会影响数据分析结果。<br>先设置好脱敏规则，然后把文本文件输入，再用相关技术（像加密、替换、偏移等）对文本文件进行脱敏，最后输出脱敏结果（脱敏后的文本文件或者脱敏后的关系数据库）。<br>主要应用场景：测试、开发、培训、数据分析等。<br>主要特征：和静态数据脱敏相似，也是“搬移并仿真替换”。</p>
+<h2 id="2-3-非结构化数据脱敏"><a href="#2-3-非结构化数据脱敏" class="headerlink" title="2.3 非结构化数据脱敏"></a>2.3 非结构化数据脱敏</h2><p>非结构化数据是没有明确结构限制的（或者说数据结构不规整、不完整），也没有预先定好的数据模型，很难用二维逻辑表来呈现的数据。像图像数据、视频数据、非结构化的文本数据都属于非结构化数据。</p>
+<h3 id="2-3-1-图像数据脱敏"><a href="#2-3-1-图像数据脱敏" class="headerlink" title="2.3.1 图像数据脱敏"></a>2.3.1 图像数据脱敏</h3><p>图像数据脱敏是利用相关技术，对图像里的文字、图形做一些处理，像去掉标识、给它遮罩或者添加噪声等。<br>AI技术（比如深度学习）、差分隐私技术等。去掉标识是把图像里的敏感文字信息去掉，像自然人的隐私数据；遮罩像是给图像“打马赛克”；添加噪声是让原来的图像变得很不一样，从而达到脱敏的目的。</p>
+<h3 id="2-3-2-视频数据脱敏"><a href="#2-3-2-视频数据脱敏" class="headerlink" title="2.3.2 视频数据脱敏"></a>2.3.2 视频数据脱敏</h3><p>视频数据由很多相关联的图像帧数据组成，每个图像帧是一个静态的图像数据，简单说视频数据等于图像数据1加图像数据2一直加到图像数据N。视频数据脱敏是用相关技术对图像数据1到N里的文字、图形进行去掉标识、遮罩、添加噪声等处理。</p>
+<h3 id="2-3-1-文本脱敏"><a href="#2-3-1-文本脱敏" class="headerlink" title="2.3.1 文本脱敏"></a>2.3.1 文本脱敏</h3><p>非结构化文本脱敏是采用技术手段，对非结构化文本里的文字进行去掉标识的处理，从而可靠地保护这些文本。AI技术（深度学习）、差分隐私技术等，去掉标识就是把文本里像自然人隐私数据这样的敏感文字信息去掉。</p>
+<h1 id="3-敏感数据识别策略"><a href="#3-敏感数据识别策略" class="headerlink" title="3. 敏感数据识别策略"></a>3. 敏感数据识别策略</h1><h2 id="3-1-敏感数据识别的定义"><a href="#3-1-敏感数据识别的定义" class="headerlink" title="3.1 敏感数据识别的定义"></a>3.1 敏感数据识别的定义</h2><p>使用专业的数据脱敏软件来自动找出数据库或其他数据中的敏感信息，比如个人信息、公司机密等</p>
+<h2 id="3-2-敏感数据识别的作用"><a href="#3-2-敏感数据识别的作用" class="headerlink" title="3.2 敏感数据识别的作用"></a>3.2 敏感数据识别的作用</h2><p>帮助用户梳理清楚自己的哪些数据为敏感数据，以及这些数据的位置。<br>为数据脱敏工作提供指导，梳理清楚哪些数据需要被处理</p>
+<h2 id="3-3-敏感数据源识别策略"><a href="#3-3-敏感数据源识别策略" class="headerlink" title="3.3 敏感数据源识别策略"></a>3.3 敏感数据源识别策略</h2><p>让软件自动识别有敏感信息的数据库或其他数据源，包括不同的识别方法、策略等<br>比如：<br>数据库脱敏产品，常见是通过字段来识别，或者通过字段里的内容来识别<br>敏感数据源指包含敏感信息的数据来源，常见的是<code>数据库</code>、<code>文件</code>、<code>大数据平台</code>、<code>动态数据流</code></p>
+<h2 id="3-4-敏感数据识别策略"><a href="#3-4-敏感数据识别策略" class="headerlink" title="3.4 敏感数据识别策略"></a>3.4 敏感数据识别策略</h2><p>全量识别、抽样识别、增量识别</p>
+<h1 id="4-数据脱敏方法"><a href="#4-数据脱敏方法" class="headerlink" title="4. 数据脱敏方法"></a>4. 数据脱敏方法</h1><h2 id="4-1-数据脱敏方法的类别"><a href="#4-1-数据脱敏方法的类别" class="headerlink" title="4.1 数据脱敏方法的类别"></a>4.1 数据脱敏方法的类别</h2><blockquote>
+<p>传统类型：泛化类（截断、取整、归类）、抑制类（屏蔽）、扰乱类（加密、散列、混淆）、仿真类（仿真）<br>新型：匿名化、多样化、接近化、差分隐私</p>
+</blockquote>
+<h2 id="4-2-经典数据脱敏方法"><a href="#4-2-经典数据脱敏方法" class="headerlink" title="4.2 经典数据脱敏方法"></a>4.2 经典数据脱敏方法</h2><h3 id="4-2-1-泛化类方法"><a href="#4-2-1-泛化类方法" class="headerlink" title="4.2.1 泛化类方法"></a>4.2.1 泛化类方法</h3><p>让敏感数据不那么具体，不那么精确，但还能保留一些基本信息</p>
+<ul>
+<li>截断方法：砍掉一部分数据，只留下最重要的数据</li>
+<li>取整方法：对数字或时间进行简化，只保留大概的数值</li>
+<li>归类方法：把数据分类，按照一定的标准归类到不同的组里</li>
+</ul>
+<h3 id="4-2-2-抑制方法"><a href="#4-2-2-抑制方法" class="headerlink" title="4.2.2 抑制方法"></a>4.2.2 抑制方法</h3><p>保留敏感数据长度不变，但是把数据的一部分或全部转化成没有具体意义的符号，<code>138********</code></p>
+<h3 id="4-2-3-扰乱方法"><a href="#4-2-3-扰乱方法" class="headerlink" title="4.2.3 扰乱方法"></a>4.2.3 扰乱方法</h3><p>通过添加干扰或改变数据方式来保护敏感数据</p>
+<ul>
+<li>加密方法：用特殊加密算法把敏感数据转换成别人看不懂的形式，可以反过来把数据变成原样，但是很难破解</li>
+<li>散列方法：一种算法，变为一个固定长度的数据，结果不可逆</li>
+<li>混淆方法：数据顺序打乱</li>
+</ul>
+<h3 id="4-2-4-仿真方法"><a href="#4-2-4-仿真方法" class="headerlink" title="4.2.4 仿真方法"></a>4.2.4 仿真方法</h3><p>创建一个看起来很像真实数据，但实际上完全不同的新数据集。在做一些数据测试或分析的时候，能够用到这些数据，但又不泄露真实的敏感信息。</p>
+<ul>
+<li>名字脱敏后，看起来还是一个名字</li>
+<li>地址脱敏后，看起来还是一个地址</li>
+</ul>
+<h2 id="4-3-新型数据脱敏方法"><a href="#4-3-新型数据脱敏方法" class="headerlink" title="4.3 新型数据脱敏方法"></a>4.3 新型数据脱敏方法</h2><h3 id="4-3-1-K-匿名化（K-anonymity）"><a href="#4-3-1-K-匿名化（K-anonymity）" class="headerlink" title="4.3.1 K-匿名化（K-anonymity）"></a>4.3.1 K-匿名化（K-anonymity）</h3><p>让数据库里的信息看起来不那么具体</p>
+<ul>
+<li>把一些信息模糊化，邮编一部分换成特殊符号，年龄减小扩大</li>
+<li>确保数据库里每一条记录至少有K个其他记录看起来一样，至少有<code>K条记录是相似的</code></li>
+</ul>
+<h3 id="4-3-2-L-多样化（L-diversity）"><a href="#4-3-2-L-多样化（L-diversity）" class="headerlink" title="4.3.2 L-多样化（L-diversity）"></a>4.3.2 L-多样化（L-diversity）</h3><p>在匿名化的基础上再加一条保险，在哪些看起来相似的数据中，至少有L种不同的信息</p>
+<h3 id="4-3-3-T-接近性（T-closeness）"><a href="#4-3-3-T-接近性（T-closeness）" class="headerlink" title="4.3.3. T-接近性（T-closeness）"></a>4.3.3. T-接近性（T-closeness）</h3><p>在保证数据多样性的同时，还要确保每个小组里的敏感信息和整个库里边的信息分布差距不大</p>
+<h3 id="4-3-4-差分隐私（s-dincrentialprivacy）"><a href="#4-3-4-差分隐私（s-dincrentialprivacy）" class="headerlink" title="4.3.4 差分隐私（s-dincrentialprivacy）"></a>4.3.4 差分隐私（s-dincrentialprivacy）</h3><p>即使有人在数据集中删除或新增了一条记录，通过查询得到的结果影响也不会有太大变化</p>
+
+<div class="article-footer fs14">
+    <section id="license">
+      <div class="header"><span>许可协议</span></div>
+      <div class="body"><p>本文采用 <a target="_blank" rel="noopener external nofollow noreferrer" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">署名-非商业性使用-相同方式共享 4.0 国际</a> 许可协议，转载请注明出处。</p>
+</div>
+    </section>
+    </div>
+</article>
+<div class="related-wrap" id="read-next"><section class="body"><div class="item" id="prev"><div class="note">较新文章</div><a href="/posts/c1.html">web基础架构</a></div><div class="item" id="next"></div></section></div>
+
+<div class="related-wrap" id="related-posts">
+    <section class='header'>
+      <div class='title cap theme'>您可能感兴趣的文章</div>
+    </section>
+    <section class='body'>
+    <div class="related-posts"><a class="item" href="/posts/d2.html" title="数据审计技术"><span class="title">数据审计技术</span></a></div></section></div>
+
+
+
+
+<footer class="page-footer footnote"><hr><div class="text"><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="/assets/images/keyboard.jpg" alt="描述文字" style="float: right; width: 60px; margin-left: 20px;">
+<center>
+  <div>
+    <div>
+      © 2024
+      Famous's Sec
+      站点运行第<span id="runtime_span"></span>
+    </div>
+    <script type="text/javascript">
+      function show_runtime() {
+          window.setTimeout("show_runtime()", 1000);
+          X = new Date("11/18/2024 00:00:00");
+          Y = new Date();
+          T = (Y.getTime() - X.getTime());
+          M = 24 * 60 * 60 * 1000;
+          a = T / M;
+          A = Math.floor(a);
+          runtime_span.innerHTML = A + "天"
+      }
+      show_runtime();
+    </script>
+  </div>
+</center>
+</div></footer>
+<div class="main-mask" onclick="sidebar.dismiss()"></div></div><aside class="l_right">
+<div class="widgets">
+
+<widget class="widget-wrapper toc" id="data-toc" collapse="true"><div class="widget-header dis-select"><span class="name">本文目录</span><a class="cap-action" onclick="sidebar.toggleTOC()" ><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg></a></div><div class="widget-body"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-1-%E6%95%B0%E6%8D%AE%E8%84%B1%E6%95%8F%E7%9A%84%E5%AE%9A%E4%B9%89"><span class="toc-text">1.1 数据脱敏的定义</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-2-%E6%95%B0%E6%8D%AE%E8%84%B1%E6%95%8F%E5%8E%9F%E5%88%99"><span class="toc-text">1.2 数据脱敏原则</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-1-%E5%AE%89%E5%85%A8%E6%80%A7%E5%8E%9F%E5%88%99"><span class="toc-text">1.2.1 安全性原则</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-2-%E9%80%82%E7%94%A8%E6%80%A7%E5%8E%9F%E5%88%99"><span class="toc-text">1.2.2 适用性原则</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-3-%E6%9C%80%E5%B0%8F%E5%8C%96%E5%8E%9F%E5%88%99"><span class="toc-text">1.2.3 最小化原则</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-4-%E4%B8%8D%E5%8F%AF%E9%80%86%E6%80%A7%E5%8E%9F%E5%88%99"><span class="toc-text">1.2.4 不可逆性原则</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-5-%E6%95%B0%E6%8D%AE%E4%B8%80%E8%87%B4%E6%80%A7%E5%8E%9F%E5%88%99"><span class="toc-text">1.2.5 数据一致性原则</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-6-%E5%90%88%E8%A7%84%E6%80%A7%E5%8E%9F%E5%88%99"><span class="toc-text">1.2.6 合规性原则</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-7-%E6%80%A7%E8%83%BD%E6%95%88%E7%8E%87%E5%8E%9F%E5%88%99"><span class="toc-text">1.2.7 性能效率原则</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-8-%E5%8F%AF%E5%AE%A1%E8%AE%A1%E6%80%A7%E5%8E%9F%E5%88%99"><span class="toc-text">1.2.8 可审计性原则</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-9-%E5%8A%A8%E6%80%81%E9%80%82%E5%BA%94%E6%80%A7%E5%8E%9F%E5%88%99"><span class="toc-text">1.2.9 动态适应性原则</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-10-%E6%98%93%E7%94%A8%E6%80%A7%E5%8E%9F%E5%88%99"><span class="toc-text">1.2.10 易用性原则</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-3-%E6%95%B0%E6%8D%AE%E8%84%B1%E6%95%8F%E7%9A%84%E6%B5%81%E7%A8%8B"><span class="toc-text">1.3 数据脱敏的流程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-4-%E6%95%B0%E6%8D%AE%E8%84%B1%E6%95%8F%E4%B8%8E%E6%95%B0%E6%8D%AE%E5%8C%BF%E5%90%8D%E5%8C%96%E3%80%81%E6%95%B0%E6%8D%AE%E5%8E%BB%E6%A0%87%E8%AF%86%E5%8C%96%E4%B9%8B%E9%97%B4%E7%9A%84%E5%85%B3%E7%B3%BB"><span class="toc-text">1.4 数据脱敏与数据匿名化、数据去标识化之间的关系</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-1-%E6%95%B0%E6%8D%AE%E8%84%B1%E6%95%8F%E7%B1%BB%E5%88%AB"><span class="toc-text">2.1 数据脱敏类别</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-2-%E7%BB%93%E6%9E%84%E5%8C%96%E6%95%B0%E6%8D%AE%E8%84%B1%E6%95%8F"><span class="toc-text">2.2 结构化数据脱敏</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-1-%E7%BB%93%E6%9E%84%E5%8C%96%E6%95%B0%E6%8D%AE%E6%A6%82%E5%BF%B5"><span class="toc-text">2.2.1 结构化数据概念</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-2-%E6%95%B0%E6%8D%AE%E5%BA%93%E8%84%B1%E6%95%8F"><span class="toc-text">2.2.2 数据库脱敏</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-3-%E7%BB%93%E6%9E%84%E5%8C%96%E6%96%87%E6%9C%AC%E8%84%B1%E6%95%8F"><span class="toc-text">2.2.3 结构化文本脱敏</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-3-%E9%9D%9E%E7%BB%93%E6%9E%84%E5%8C%96%E6%95%B0%E6%8D%AE%E8%84%B1%E6%95%8F"><span class="toc-text">2.3 非结构化数据脱敏</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-1-%E5%9B%BE%E5%83%8F%E6%95%B0%E6%8D%AE%E8%84%B1%E6%95%8F"><span class="toc-text">2.3.1 图像数据脱敏</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-2-%E8%A7%86%E9%A2%91%E6%95%B0%E6%8D%AE%E8%84%B1%E6%95%8F"><span class="toc-text">2.3.2 视频数据脱敏</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-1-%E6%96%87%E6%9C%AC%E8%84%B1%E6%95%8F"><span class="toc-text">2.3.1 文本脱敏</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-1-%E6%95%8F%E6%84%9F%E6%95%B0%E6%8D%AE%E8%AF%86%E5%88%AB%E7%9A%84%E5%AE%9A%E4%B9%89"><span class="toc-text">3.1 敏感数据识别的定义</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-2-%E6%95%8F%E6%84%9F%E6%95%B0%E6%8D%AE%E8%AF%86%E5%88%AB%E7%9A%84%E4%BD%9C%E7%94%A8"><span class="toc-text">3.2 敏感数据识别的作用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-3-%E6%95%8F%E6%84%9F%E6%95%B0%E6%8D%AE%E6%BA%90%E8%AF%86%E5%88%AB%E7%AD%96%E7%95%A5"><span class="toc-text">3.3 敏感数据源识别策略</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-4-%E6%95%8F%E6%84%9F%E6%95%B0%E6%8D%AE%E8%AF%86%E5%88%AB%E7%AD%96%E7%95%A5"><span class="toc-text">3.4 敏感数据识别策略</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-1-%E6%95%B0%E6%8D%AE%E8%84%B1%E6%95%8F%E6%96%B9%E6%B3%95%E7%9A%84%E7%B1%BB%E5%88%AB"><span class="toc-text">4.1 数据脱敏方法的类别</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-2-%E7%BB%8F%E5%85%B8%E6%95%B0%E6%8D%AE%E8%84%B1%E6%95%8F%E6%96%B9%E6%B3%95"><span class="toc-text">4.2 经典数据脱敏方法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-1-%E6%B3%9B%E5%8C%96%E7%B1%BB%E6%96%B9%E6%B3%95"><span class="toc-text">4.2.1 泛化类方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-2-%E6%8A%91%E5%88%B6%E6%96%B9%E6%B3%95"><span class="toc-text">4.2.2 抑制方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-3-%E6%89%B0%E4%B9%B1%E6%96%B9%E6%B3%95"><span class="toc-text">4.2.3 扰乱方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-4-%E4%BB%BF%E7%9C%9F%E6%96%B9%E6%B3%95"><span class="toc-text">4.2.4 仿真方法</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-3-%E6%96%B0%E5%9E%8B%E6%95%B0%E6%8D%AE%E8%84%B1%E6%95%8F%E6%96%B9%E6%B3%95"><span class="toc-text">4.3 新型数据脱敏方法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-3-1-K-%E5%8C%BF%E5%90%8D%E5%8C%96%EF%BC%88K-anonymity%EF%BC%89"><span class="toc-text">4.3.1 K-匿名化（K-anonymity）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-3-2-L-%E5%A4%9A%E6%A0%B7%E5%8C%96%EF%BC%88L-diversity%EF%BC%89"><span class="toc-text">4.3.2 L-多样化（L-diversity）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-3-3-T-%E6%8E%A5%E8%BF%91%E6%80%A7%EF%BC%88T-closeness%EF%BC%89"><span class="toc-text">4.3.3. T-接近性（T-closeness）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-3-4-%E5%B7%AE%E5%88%86%E9%9A%90%E7%A7%81%EF%BC%88s-dincrentialprivacy%EF%BC%89"><span class="toc-text">4.3.4 差分隐私（s-dincrentialprivacy）</span></a></li></ol></li></ol></div><div class="widget-footer">
+
+<a class="top" onclick="util.scrollTop()"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 12c0-4.714 0-7.071 1.464-8.536C4.93 2 7.286 2 12 2c4.714 0 7.071 0 8.535 1.464C22 4.93 22 7.286 22 12c0 4.714 0 7.071-1.465 8.535C19.072 22 16.714 22 12 22s-7.071 0-8.536-1.465C2 19.072 2 16.714 2 12Z"/><path stroke-linecap="round" stroke-linejoin="round" d="m9 15.5l3-3l3 3m-6-4l3-3l3 3"/></g></svg><span>回到顶部</span></a></div></widget>
+
+
+  <widget class="widget-wrapper categories-widget">
+    <div class="widget-header categories-header dis-select">
+      <span class="name">分类索引</span>
+    </div>
+    <div class='post-list'>
+      <article class='' id='cats'>
+        
+          <div>
+            <a class="cat" href="/categories/Cyber-Security/">
+              <span class='name'><svg style="margin-bottom:1px" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M2 6.95c0-.883 0-1.324.07-1.692A4 4 0 0 1 5.257 2.07C5.626 2 6.068 2 6.95 2c.386 0 .58 0 .766.017a4 4 0 0 1 2.18.904c.144.119.28.255.554.529L11 4c.816.816 1.224 1.224 1.712 1.495a4 4 0 0 0 .848.352C14.098 6 14.675 6 15.828 6h.374c2.632 0 3.949 0 4.804.77c.079.07.154.145.224.224c.77.855.77 2.172.77 4.804V14c0 3.771 0 5.657-1.172 6.828C19.657 22 17.771 22 14 22h-4c-3.771 0-5.657 0-6.828-1.172C2 19.657 2 17.771 2 14z" opacity=".5"/><path fill="currentColor" d="M20 6.238c0-.298-.005-.475-.025-.63a3 3 0 0 0-2.583-2.582C17.197 3 16.965 3 16.5 3H9.988c.116.104.247.234.462.45L11 4c.816.816 1.224 1.224 1.712 1.495a4 4 0 0 0 .849.352C14.098 6 14.675 6 15.829 6h.373c1.78 0 2.957 0 3.798.238"/><path fill="currentColor" fill-rule="evenodd" d="M12.25 10a.75.75 0 0 1 .75-.75h5a.75.75 0 0 1 0 1.5h-5a.75.75 0 0 1-.75-.75" clip-rule="evenodd"/></svg>Cyber Security</span>
+              <span class='badge'>(4)</span>
+            </a>
+          </div>
+        
+          <div>
+            <a class="cat" href="/categories/Data-Security/">
+              <span class='name'><svg style="margin-bottom:1px" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M2 6.95c0-.883 0-1.324.07-1.692A4 4 0 0 1 5.257 2.07C5.626 2 6.068 2 6.95 2c.386 0 .58 0 .766.017a4 4 0 0 1 2.18.904c.144.119.28.255.554.529L11 4c.816.816 1.224 1.224 1.712 1.495a4 4 0 0 0 .848.352C14.098 6 14.675 6 15.828 6h.374c2.632 0 3.949 0 4.804.77c.079.07.154.145.224.224c.77.855.77 2.172.77 4.804V14c0 3.771 0 5.657-1.172 6.828C19.657 22 17.771 22 14 22h-4c-3.771 0-5.657 0-6.828-1.172C2 19.657 2 17.771 2 14z" opacity=".5"/><path fill="currentColor" d="M20 6.238c0-.298-.005-.475-.025-.63a3 3 0 0 0-2.583-2.582C17.197 3 16.965 3 16.5 3H9.988c.116.104.247.234.462.45L11 4c.816.816 1.224 1.224 1.712 1.495a4 4 0 0 0 .849.352C14.098 6 14.675 6 15.829 6h.373c1.78 0 2.957 0 3.798.238"/><path fill="currentColor" fill-rule="evenodd" d="M12.25 10a.75.75 0 0 1 .75-.75h5a.75.75 0 0 1 0 1.5h-5a.75.75 0 0 1-.75-.75" clip-rule="evenodd"/></svg>Data Security</span>
+              <span class='badge'>(2)</span>
+            </a>
+          </div>
+        
+      </article>
+    </div>
+  </widget>
+
+
+</div></aside><div class='float-panel blur'>
+  <button type='button' style='display:none' class='laptop-only rightbar-toggle mobile' onclick='sidebar.rightbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>
+  </button>
+  <button type='button' style='display:none' class='mobile-only leftbar-toggle mobile' onclick='sidebar.leftbar()'>
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 11c0-3.771 0-5.657 1.172-6.828C4.343 3 6.229 3 10 3h4c3.771 0 5.657 0 6.828 1.172C22 5.343 22 7.229 22 11v2c0 3.771 0 5.657-1.172 6.828C19.657 21 17.771 21 14 21h-4c-3.771 0-5.657 0-6.828-1.172C2 18.657 2 16.771 2 13z"/><path id="sep" stroke-linecap="round" d="M5.5 10h6m-5 4h4m4.5 7V3"/></g></svg>
+  </button>
+</div>
+</div><div class="scripts">
+<script type="text/javascript">
+  const ctx = {
+    date_suffix: {
+      just: `刚刚`,
+      min: `分钟前`,
+      hour: `小时前`,
+      day: `天前`,
+    },
+    root : `/`,
+  };
+
+  // required plugins (only load if needs)
+  if (`local_search`) {
+    ctx.search = {};
+    ctx.search.service = `local_search`;
+    if (ctx.search.service == 'local_search') {
+      let service_obj = Object.assign({}, `{"field":"all","path":"/search.json","content":true,"codeblock":true,"sort":"-date"}`);
+      ctx.search[ctx.search.service] = service_obj;
+    }
+  }
+  const def = {
+    avatar: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/3442075.svg`,
+    cover: `https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg`,
+  };
+  const deps = {
+    jquery: `https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js`,
+    marked: `https://cdn.jsdelivr.net/npm/marked@13.0.1/lib/marked.umd.min.js`
+  }
+  
+
+</script>
+
+<script type="text/javascript">
+  const utils = {
+    // 懒加载 css https://github.com/filamentgroup/loadCSS
+    css: (href, before, media, attributes) => {
+      var doc = window.document;
+      var ss = doc.createElement("link");
+      var ref;
+      if (before) {
+        ref = before;
+      } else {
+        var refs = (doc.body || doc.getElementsByTagName("head")[0]).childNodes;
+        ref = refs[refs.length - 1];
+      }
+      var sheets = doc.styleSheets;
+      if (attributes) {
+        for (var attributeName in attributes) {
+          if (attributes.hasOwnProperty(attributeName)) {
+            ss.setAttribute(attributeName, attributes[attributeName]);
+          }
+        }
+      }
+      ss.rel = "stylesheet";
+      ss.href = href;
+      ss.media = "only x";
+      function ready(cb) {
+        if (doc.body) {
+          return cb();
+        }
+        setTimeout(function () {
+          ready(cb);
+        });
+      }
+      ready(function () {
+        ref.parentNode.insertBefore(ss, before ? ref : ref.nextSibling);
+      });
+      var onloadcssdefined = function (cb) {
+        var resolvedHref = ss.href;
+        var i = sheets.length;
+        while (i--) {
+          if (sheets[i].href === resolvedHref) {
+            return cb();
+          }
+        }
+        setTimeout(function () {
+          onloadcssdefined(cb);
+        });
+      };
+      function loadCB() {
+        if (ss.addEventListener) {
+          ss.removeEventListener("load", loadCB);
+        }
+        ss.media = media || "all";
+      }
+      if (ss.addEventListener) {
+        ss.addEventListener("load", loadCB);
+      }
+      ss.onloadcssdefined = onloadcssdefined;
+      onloadcssdefined(loadCB);
+      return ss;
+    },
+
+    js: (src, opt) => new Promise((resolve, reject) => {
+      var script = document.createElement('script');
+      if (src.startsWith('/')){
+        src = ctx.root + src.substring(1);
+      }
+      script.src = src;
+      if (opt) {
+        for (let key of Object.keys(opt)) {
+          script[key] = opt[key]
+        }
+      } else {
+        // 默认异步，如果需要同步，第二个参数传入 {} 即可
+        script.async = true
+      }
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    }),
+
+    jq: (fn) => {
+      if (typeof jQuery === 'undefined') {
+        utils.js(deps.jquery).then(fn)
+      } else {
+        fn()
+      }
+    },
+    
+    onLoading: (el) => {
+      if (el) {
+        $(el).append('<div class="loading-wrap"><svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2"><path stroke-dasharray="60" stroke-dashoffset="60" stroke-opacity=".3" d="M12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="1.3s" values="60;0"/></path><path stroke-dasharray="15" stroke-dashoffset="15" d="M12 3C16.9706 3 21 7.02944 21 12"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.3s" values="15;0"/><animateTransform attributeName="transform" dur="1.5s" repeatCount="indefinite" type="rotate" values="0 12 12;360 12 12"/></path></g></svg></div>');
+      }
+    },
+    onLoadSuccess: (el) => {
+      if (el) {
+        $(el).find('.loading-wrap').remove();
+      }
+    },
+    onLoadFailure: (el) => {
+      if (el) {
+        $(el).find('.loading-wrap svg').remove();
+        $(el).find('.loading-wrap').append('<svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path stroke-dasharray="60" stroke-dashoffset="60" d="M12 3L21 20H3L12 3Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.5s" values="60;0"/></path><path stroke-dasharray="6" stroke-dashoffset="6" d="M12 10V14"><animate fill="freeze" attributeName="stroke-dashoffset" begin="0.6s" dur="0.2s" values="6;0"/></path></g><circle cx="12" cy="17" r="1" fill="currentColor" fill-opacity="0"><animate fill="freeze" attributeName="fill-opacity" begin="0.8s" dur="0.4s" values="0;1"/></circle></svg>');
+        $(el).find('.loading-wrap').addClass('error');
+      }
+    },
+    request: (el, url, callback, onFailure) => {
+      let retryTimes = 3;
+      utils.onLoading(el);
+      function req() {
+        return new Promise((resolve, reject) => {
+          let status = 0; // 0 等待 1 完成 2 超时
+          let timer = setTimeout(() => {
+            if (status === 0) {
+              status = 2;
+              timer = null;
+              reject('请求超时');
+              if (retryTimes == 0) {
+                onFailure();
+              }
+            }
+          }, 5000);
+          fetch(url).then(function(response) {
+            if (status !== 2) {
+              clearTimeout(timer);
+              resolve(response);
+              timer = null;
+              status = 1;
+            }
+            if (response.ok) {
+              return response.json();
+            }
+            throw new Error('Network response was not ok.');
+          }).then(function(data) {
+            retryTimes = 0;
+            utils.onLoadSuccess(el);
+            callback(data);
+          }).catch(function(error) {
+            if (retryTimes > 0) {
+              retryTimes -= 1;
+              setTimeout(() => {
+                req();
+              }, 5000);
+            } else {
+              utils.onLoadFailure(el);
+              onFailure();
+            }
+          });
+        });
+      }
+      req();
+    },
+  };
+</script>
+
+<script>
+  const sidebar = {
+    leftbar: () => {
+      if (l_body) {
+        l_body.toggleAttribute('leftbar');
+        l_body.removeAttribute('rightbar');
+      }
+    },
+    rightbar: () => {
+      if (l_body) {
+        l_body.toggleAttribute('rightbar');
+        l_body.removeAttribute('leftbar');
+      }
+    },
+    dismiss: () => {
+      if (l_body) {
+        l_body.removeAttribute('leftbar');
+        l_body.removeAttribute('rightbar');
+      }
+    },
+    toggleTOC: () => {
+      document.querySelector('#data-toc').classList.toggle('collapse');
+    }
+  }
+</script>
+<script type="text/javascript">
+  (() => {
+    const tagSwitchers = document.querySelectorAll('.tag-subtree.parent-tag > a > .tag-switcher-wrapper')
+    for (const tagSwitcher of tagSwitchers) {
+      tagSwitcher.addEventListener('click', (e) => {
+        const parent = e.target.closest('.tag-subtree.parent-tag')
+        parent.classList.toggle('expanded')
+        e.preventDefault()
+      })
+    }
+
+    // Get active tag from query string, then activate it.
+    const urlParams = new URLSearchParams(window.location.search)
+    const activeTag = urlParams.get('tag')
+    if (activeTag) {
+      let tag = document.querySelector(`.tag-subtree[data-tag="${activeTag}"]`)
+      if (tag) {
+        tag.querySelector('a').classList.add('active')
+        
+        while (tag) {
+          tag.classList.add('expanded')
+          tag = tag.parentElement.closest('.tag-subtree.parent-tag')
+        }
+      }
+    }
+  })()
+</script>
+
+
+<!-- required -->
+<script src="/js/main.js?v=1.29.1" defer></script>
+
+<script type="text/javascript">
+  const applyTheme = (theme) => {
+    if (theme === 'auto') {
+      document.documentElement.removeAttribute('data-theme')
+    } else {
+      document.documentElement.setAttribute('data-theme', theme)
+    }
+
+    applyThemeToGiscus(theme)
+  }
+
+  const applyThemeToGiscus = (theme) => {
+    theme = theme === 'auto' ? 'preferred_color_scheme' : theme
+
+    const cmt = document.getElementById('giscus')
+    if (cmt) {
+      // This works before giscus load.
+      cmt.setAttribute('data-theme', theme)
+    }
+
+    const iframe = document.querySelector('#comments > section.giscus > iframe')
+    if (iframe) {
+      // This works after giscus loaded.
+      const src = iframe.src
+      const newSrc = src.replace(/theme=[\w]+/, `theme=${theme}`)
+      iframe.src = newSrc
+    }
+  }
+
+  const switchTheme = () => {
+    // light -> dark -> auto -> light -> ...
+    const currentTheme = document.documentElement.getAttribute('data-theme')
+    let newTheme;
+    switch (currentTheme) {
+      case 'light':
+        newTheme = 'dark'
+        break
+      case 'dark':
+        newTheme = 'light'
+        break
+      default:
+        newTheme = 'light'
+    }
+    applyTheme(newTheme)
+    window.localStorage.setItem('Stellar.theme', newTheme)
+
+    const messages = {
+      light: `切换到浅色模式`,
+      dark: `切换到深色模式`,
+      auto: `切换到跟随系统配色`,
+    }
+    hud?.toast?.(messages[newTheme])
+  }
+
+  (() => {
+    // Apply user's preferred theme, if any.
+    const theme = window.localStorage.getItem('Stellar.theme')
+    if (theme !== null) {
+      applyTheme(theme)
+    }
+  })()
+</script>
+
+
+<!-- optional -->
+
+
+
+<script defer>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    ctx.services = Object.assign({}, JSON.parse(`{"mdrender":{"js":"/js/services/mdrender.js"},"siteinfo":{"js":"/js/services/siteinfo.js","api":null},"ghinfo":{"js":"/js/services/ghinfo.js"},"sites":{"js":"/js/services/sites.js"},"friends":{"js":"/js/services/friends.js"},"timeline":{"js":"/js/services/timeline.js"},"fcircle":{"js":"/js/services/fcircle.js"},"weibo":{"js":"/js/services/weibo.js"},"memos":{"js":"/js/services/memos.js"},"twikoo":{"js":"/js/services/twikoo_new.js"}}`));
+    for (let id of Object.keys(ctx.services)) {
+      const js = ctx.services[id].js;
+      if (id == 'siteinfo') {
+        ctx.cardlinks = document.querySelectorAll('a.link-card[cardlink]');
+        if (ctx.cardlinks?.length > 0) {
+          utils.js(js, { defer: true }).then(function () {
+            setCardLink(ctx.cardlinks);
+          });
+        }
+      } else {
+        const els = document.getElementsByClassName(`ds-${id}`);
+        if (els?.length > 0) {
+          utils.jq(() => {
+            if (id == 'timeline' || 'memos' || 'marked') {
+              utils.js(deps.marked).then(function () {
+                utils.js(js, { defer: true });
+              });
+            } else {
+              utils.js(js, { defer: true });
+            }
+          });
+        }
+      }
+    }
+  });
+</script>
+
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    ctx.search = {
+      path: `/search.json`,
+    }
+    utils.js('/js/search/local-search.js', { defer: true });
+  });
+</script><script>
+  window.FPConfig = {
+    delay: 0,
+    ignoreKeywords: [],
+    maxRPS: 5,
+    hoverDelay: 25
+  };
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/flying-pages@2/flying-pages.min.js"></script><script defer src="https://cdn.jsdelivr.net/npm/vanilla-lazyload@19.1.3/dist/lazyload.min.js"></script>
+<script>
+  // https://www.npmjs.com/package/vanilla-lazyload
+  // Set the options globally
+  // to make LazyLoad self-initialize
+  window.lazyLoadOptions = {
+    elements_selector: ".lazy",
+  };
+  // Listen to the initialization event
+  // and get the instance of LazyLoad
+  window.addEventListener(
+    "LazyLoad::Initialized",
+    function (event) {
+      window.lazyLoadInstance = event.detail.instance;
+    },
+    false
+  );
+  document.addEventListener('DOMContentLoaded', function () {
+    window.lazyLoadInstance?.update();
+  });
+</script><script>
+  ctx.fancybox = {
+    selector: `.timenode p>img`,
+    css: `https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css`,
+    js: `https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js`
+  };
+  var selector = '[data-fancybox]:not(.error)';
+  if (ctx.fancybox.selector) {
+    selector += `, ${ctx.fancybox.selector}`
+  }
+  var needFancybox = document.querySelectorAll(selector).length !== 0;
+  if (!needFancybox) {
+    const els = document.getElementsByClassName('ds-memos');
+    if (els != undefined && els.length > 0) {
+      needFancybox = true;
+    }
+  }
+  if (needFancybox) {
+    utils.css(ctx.fancybox.css);
+    utils.js(ctx.fancybox.js, { defer: true }).then(function () {
+      Fancybox.bind(selector, {
+        hideScrollbar: false,
+        Thumbs: {
+          autoStart: false,
+        },
+        caption: (fancybox, slide) => {
+          return slide.triggerEl.alt || slide.triggerEl.dataset.caption || null
+        }
+      });
+    })
+  }
+</script>
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    const swiper_api = document.getElementById('swiper-api');
+    if (swiper_api != undefined) {
+      utils.css(`https://unpkg.com/swiper@10.3.1/swiper-bundle.min.css`);
+      utils.js(`https://unpkg.com/swiper@10.3.1/swiper-bundle.min.js`, { defer: true }).then(function () {
+        const effect = swiper_api.getAttribute('effect') || '';
+        var swiper = new Swiper('.swiper#swiper-api', {
+          slidesPerView: 'auto',
+          spaceBetween: 8,
+          centeredSlides: true,
+          effect: effect,
+          rewind: true,
+          pagination: {
+            el: '.swiper-pagination',
+            clickable: true,
+          },
+          navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+          },
+        });
+      })
+    }
+  });
+</script>
+
+
+
+<!-- inject -->
+<script src="/js/custom.js"></script><script src="/js/code-block.js"></script><script src="https://cdn.jsdelivr.net/gh/huangwb8/bloghelper@latest/js/input-with-fire.js"></script><script src="https://cdn.staticfile.org/jquery/3.6.3/jquery.min.js"></script><script src="/static/js/snow.js"></script>
+</div><!-- hexo injector body_end start -->
+  <script>
+    mediumZoom(".l_body .content p img", { background: "var(--site-bg)" })
+  </script>
+  <!-- hexo injector body_end end --></body></html>
+<script>var posts=["/posts/c4.html","/posts/c3.html","/posts/c1.html","/posts/c2.html","/posts/d2.html","/posts/d1.html"];function toRandomPost(){ window.location.href = window.location.origin + posts[Math.floor(Math.random()*posts.length)]; };</script>

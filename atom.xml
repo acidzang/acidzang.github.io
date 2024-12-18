@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Famous&#39;s Sec</title>
+  
+  <subtitle>Data Cyber</subtitle>
+  <link href="http://example.com/atom.xml" rel="self"/>
+  
+  <link href="http://example.com/"/>
+  <updated>2024-12-18T09:10:11.023Z</updated>
+  <id>http://example.com/</id>
+  
+  <author>
+    <name>John Doe</name>
+    
+  </author>
+  
+  <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>抓包技术</title>
+    <link href="http://example.com/posts/c4.html"/>
+    <id>http://example.com/posts/c4.html</id>
+    <published>2024-12-03T08:44:31.000Z</published>
+    <updated>2024-12-18T09:10:11.023Z</updated>
+    
+    <content type="html"><![CDATA[<p>前置：浏览器、模拟器、真机证书安装，解决抓HTTPS问题</p><h2 id="1-Fiddler"><a href="#1-Fiddler" class="headerlink" title="1. Fiddler"></a>1. Fiddler</h2><p><code>https://www.telerik.com/fiddler</code><br>Http协议调试代理工具，记录并检查电脑和互联网之间的http通讯，设置断点，查看所有的进出Fiddler的数据（指cookie,html,js,css等文件）。</p><h2 id="2-Charles"><a href="#2-Charles" class="headerlink" title="2. Charles"></a>2. Charles</h2><p><code>https://www.charlesproxy.com/</code><br>HTTP代理服务器,HTTP监视器,反转代理服务器，当浏览器连接Charles的代理访问互联网时，Charles可以监控浏览器发送和接收的所有数据。查看所有连接互联网的HTTP通信，这些包括<code>request</code>, <code>response</code>和<code>HTTP headers</code> （包含cookies与caching信息）。</p><h2 id="3-BurpSuite"><a href="#3-BurpSuite" class="headerlink" title="3. BurpSuite"></a>3. BurpSuite</h2><p>用于攻击web 应用程序的集成平台，包含了许多工具。Burp Suite为这些工具设计了许多接口，以加快攻击应用程序的过程。所有工具都共享一个请求，并能处理对应的HTTP 消息、持久性、认证、代理、日志、警报。</p><h2 id="4-Reqable"><a href="#4-Reqable" class="headerlink" title="4. Reqable"></a>4. Reqable</h2><p><code>https://reqable.com/</code><br>一款跨平台的专业HTTP开发和调试工具，在全平台支持 HTTP1、HTTP2 和 HTTP3(QUIC)协议，简单易用、功能强大、性能高效，助力程序开发和测试人员提高生产力！抓包工具 + Postman的合体，既可以抓包，又可以测试接口。</p><h2 id="5-Yakit"><a href="#5-Yakit" class="headerlink" title="5. Yakit"></a>5. Yakit</h2><p><code>https://www.yaklang.com</code><br>一个基于Yak语言的安全领域工具，它提供了一个图形化用户界面（GUI）来操控 Yak 引擎的能力。Yakit 旨在降低使用安全工具的门槛，使得安全从业者即使没有编程技能也能轻松地进行安全测试和分析。</p><h2 id="6-Proxifier"><a href="#6-Proxifier" class="headerlink" title="6. Proxifier"></a>6. Proxifier</h2><p><code>https://www.proxifier.com/</code><br>一款功能强大的网络代理工具，它可以让你将网络应用程序通过代理服务器进行连接。它提供了一个简单而灵活的方式，让你能够将任何应用程序的网络流量路由到指定的代理服务器上，从而实现匿名浏览、绕过网络封锁、访问受限网站等功能。</p><h2 id="7-PC端应用"><a href="#7-PC端应用" class="headerlink" title="7. PC端应用"></a>7. PC端应用</h2><p>应用本省有代理设置走代理设置，没有代理设置走联动转发</p><h2 id="8-APP应用"><a href="#8-APP应用" class="headerlink" title="8. APP应用"></a>8. APP应用</h2><ul><li>无防护：模拟器直接抓包</li><li>有防护：真机绕过&amp;更改内核</li><li>有防护：证书绕过&amp;代理绕过<br>注意：<code>真机抓包要保证手机和电脑在同一网络</code></li></ul><h2 id="9-Wireshark"><a href="#9-Wireshark" class="headerlink" title="9. Wireshark"></a>9. Wireshark</h2><p><code>https://www.wireshark.org/</code><br>网络封包分析软件。网络封包分析软件的功能是截取网络封包，并尽可能显示出最为详细的网络封包资料。Wireshark使用WinPCAP作为接口，直接与网卡进行数据报文交换。</p><h2 id="10-科来网络分析系统"><a href="#10-科来网络分析系统" class="headerlink" title="10. 科来网络分析系统"></a>10. 科来网络分析系统</h2><p><code>https://www.colasoft.com.cn/</code><br>具有行业领先的专家分析技术，通过捕获并分析网络中传输的底层数据包，对网络故障、网络安全以及网络性能进行全面分析，从而快速排查网络中出现或潜在的故障、安全及性能问题。</p><h2 id="11-抓包工具联动"><a href="#11-抓包工具联动" class="headerlink" title="11. 抓包工具联动"></a>11. 抓包工具联动</h2><figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs txt">意义：让一个数据包同时经过不同安全测试工具进行扫描<br>Burp-&gt;Yakit <br>1、Burp 127.0.0.1:8080<br>2、Yakit 127.0.0.1:8083<br>3、让Burp将给到Yakit<br>4、系统的代理设置：127.0.0.1:8080<br><br>Yakit-&gt;Burp<br>1、Yakit 127.0.0.1:8083 <br>2、设置下游 127.0.0.1:8080<br>3、Burp 127.0.0.1:8080 <br>4、系统的代理设置：127.0.0.1:8083<br><br>Burp-&gt;Yakit-&gt;Reqable<br>1、Burp 127.0.0.1:8080<br>2、Yakit 127.0.0.1:8083<br>3、让Burp将给到Yakit<br>4、系统的代理设置：127.0.0.1:8080<br>5、Yakit设置下游 127.0.0.1:9000<br></code></pre></td></tr></table></figure><h2 id="12-科学上网抓包"><a href="#12-科学上网抓包" class="headerlink" title="12. 科学上网抓包"></a>12. 科学上网抓包</h2><p>Clash+Burp Clash+Yakit<br>解决：<br>1、目标需要采用梯子才能访问<br>2、IP隐藏去访问并要进行抓包</p>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;p&gt;前置：浏览器、模拟器、真机证书安装，解决抓HTTPS问题&lt;/p&gt;
+&lt;h2 id=&quot;1-Fiddler&quot;&gt;&lt;a href=&quot;#1-Fiddler&quot; class=&quot;headerlink&quot; title=&quot;1. Fiddler&quot;&gt;&lt;/a&gt;1. Fiddler&lt;/h2&gt;&lt;p&gt;&lt;cod</summary>
+      
+    
+    
+    
+    <category term="Cyber Security" scheme="http://example.com/categories/Cyber-Security/"/>
+    
+    
+    <category term="PacketCapture Basics" scheme="http://example.com/tags/PacketCapture-Basics/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>熟悉APP应用</title>
+    <link href="http://example.com/posts/c3.html"/>
+    <id>http://example.com/posts/c3.html</id>
+    <published>2024-12-03T08:20:19.000Z</published>
+    <updated>2024-12-18T09:10:11.023Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="1-APP-应用开发架构"><a href="#1-APP-应用开发架构" class="headerlink" title="1. APP 应用开发架构"></a>1. APP 应用开发架构</h2><ul><li>原生开发：安卓一般数用JAVA开发，使用一系列控件或自定义控件开实现</li><li>H5语言开发：多端复用，ios，web，Android，体验不如原生</li><li>flutter开发：谷歌推出的UI框架，使用dart语言进行开发，支持跨平台，weight渲染直接操作硬件层，体验可媲美原生。但是flutter技术比较新，生态还不完善，开发起来效率相对偏低。</li><li>web开发：开发一个网站，加入app的壳。Web App一般非常小，内容是app内的网页展示，受制于网页技术本身，可实现功能少，而且每次打开，几乎所有的内容都需要重新加载，所以反应速度慢，内容加载过多就容易卡死，用户体验差，而且app内的交互设计等非常有效。</li></ul><h2 id="2-渗透思路"><a href="#2-渗透思路" class="headerlink" title="2. 渗透思路"></a>2. 渗透思路</h2><h3 id="2-1-APP-开发架构-原生态"><a href="#2-1-APP-开发架构-原生态" class="headerlink" title="2.1 APP-开发架构-原生态"></a>2.1 APP-开发架构-原生态</h3><p>NP管理器：<br><code>http://normalplayer.top/</code><br>HttpCanary：<code>https://github.com/mingww64/HttpCanary-SSL-Magisk</code><br>安全影响：反编译&amp;流量抓包&amp;常规测试<br>安全影响：逆向的角度去分析逻辑设计安全</p><h3 id="2-2-APP-开发架构–Web封装"><a href="#2-2-APP-开发架构–Web封装" class="headerlink" title="2.2 APP-开发架构–Web封装"></a>2.2 APP-开发架构–Web封装</h3><p><code>https://shopxo.net/</code><br><code>https://www.ofcms.com/</code><br>安全影响：常Web安全测试</p><h3 id="2-3-APP-开发架构-H5-Vue"><a href="#2-3-APP-开发架构-H5-Vue" class="headerlink" title="2.3 APP-开发架构-H5&amp;Vue"></a>2.3 APP-开发架构-H5&amp;Vue</h3><p><code>https://www.dcloud.io/</code><br>安全影响：API&amp;JS框架安全问题&amp;JS前端测试</p><h2 id="3-小程序开发架构"><a href="#3-小程序开发架构" class="headerlink" title="3. 小程序开发架构"></a>3. 小程序开发架构</h2><p>微信小程序，支付宝、百度、头条、飞书、QQ、快手、钉钉、淘宝等个各种平台的小程序。在微信小程序开发中，开发者可以根据自身情况和项目需要，选择不同的开发方式，包括：原生开发、WebView开发、框架开发和低代码开发等。<br>参考：<code>https://mp.weixin.qq.com/s/dXTb0wk57-bLA3tUuvOFSw</code></p><h3 id="3-1-WX小程序-开发架构-Web封装"><a href="#3-1-WX小程序-开发架构-Web封装" class="headerlink" title="3.1 WX小程序-开发架构-Web封装"></a>3.1 WX小程序-开发架构-Web封装</h3><p><code>https://shopxo.net/</code><br><code>https://www.ofcms.com/</code><br>安全影响：常规Web安全测试</p><h3 id="3-2-WX小程序-开发架构-H5-Vue"><a href="#3-2-WX小程序-开发架构-H5-Vue" class="headerlink" title="3.2 WX小程序-开发架构-H5&amp;Vue"></a>3.2 WX小程序-开发架构-H5&amp;Vue</h3><p><code>https://www.dcloud.io/</code><br><code>https://mp.weixin.qq.com/s/SIWBZv_vZ6AGtHrl3hpR9A</code><br>安全影响：API&amp;JS框架安全问题&amp;前端测试<br>安全影响：反编译小程序-提取小程序源码泄漏的信息</p><h2 id="4-通用"><a href="#4-通用" class="headerlink" title="4. 通用"></a>4. 通用</h2><ul><li>反编译-源码-提取资产（泄漏的配置信息）-安全测试</li><li>抓包-资产-安全测试</li></ul>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;h2 id=&quot;1-APP-应用开发架构&quot;&gt;&lt;a href=&quot;#1-APP-应用开发架构&quot; class=&quot;headerlink&quot; title=&quot;1. APP 应用开发架构&quot;&gt;&lt;/a&gt;1. APP 应用开发架构&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;原生开发：安卓一般数用JAVA开发，使用一系</summary>
+      
+    
+    
+    
+    <category term="Cyber Security" scheme="http://example.com/categories/Cyber-Security/"/>
+    
+    
+    <category term="APP Basics" scheme="http://example.com/tags/APP-Basics/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>web基础扩展</title>
+    <link href="http://example.com/posts/c2.html"/>
+    <id>http://example.com/posts/c2.html</id>
+    <published>2024-12-03T06:54:42.000Z</published>
+    <updated>2024-12-18T09:10:11.023Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="1-Web-WAF"><a href="#1-Web-WAF" class="headerlink" title="1. Web + WAF"></a>1. Web + WAF</h2><p>原理：web应用防火墙，提供保护<br>影响：常规web测试手段会受到拦截<br>雷池社区版：<code>https://waf-ce.chaitin.cn/</code></p><h2 id="2-Web-CDN"><a href="#2-Web-CDN" class="headerlink" title="2. Web + CDN"></a>2. Web + CDN</h2><p>原理：内容分发服务，提高访问速度<br>影响：隐藏真实源IP</p><h2 id="3-Web-OSS"><a href="#3-Web-OSS" class="headerlink" title="3. Web + OSS"></a>3. Web + OSS</h2><p>原理：云存储服务，提高访问速度<br>影响：上传和解析文件来自OSS，只提供存储服务，其他不解析</p><ul><li>修复上传安全</li><li>文件解析不一样</li><li><strong>存在AK&#x2F;Sk泄漏等风险</strong></li></ul><h2 id="4-Web-反向代理"><a href="#4-Web-反向代理" class="headerlink" title="4. Web + 反向代理"></a>4. Web + 反向代理</h2><p>正代理为客户端服务,客户端主动建立代理访问目标（不代理不可达）<br>反向代理为服务端服务,服务端主动转发数据给可访问地址（不主动不可达）<br>原理：通过网络反向代理转发真实服务达到访问目的<br>影响：访问目标只是一个代理，非真实应用服务器<br>注意：正向代理和反向代理都是解决访问不可达的问题，但由于反向代理中多出一个可以重定向解析的功能操作，导致反代理出的站点指向和真实应用毫无关系！</p><h2 id="5-Web-负载均衡"><a href="#5-Web-负载均衡" class="headerlink" title="5. Web + 负载均衡"></a>5. Web + 负载均衡</h2><p>原理：分摊到多个操作单元上进行执行，共同完成工作任务<br>影响：有多个服务器加载服务，测试过程中存在多个目标情况</p><figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs txt">#定义负载设置<br>upstream fzjh&#123;<br>  server 120.26.70.72:80 weight=1;<br>  server 47.75.212.155:80 weight=2;<br>&#125;<br><br>#定义访问路径 访问策略<br>location / &#123;<br>    proxy_pass http://fzjh/;<br>&#125;<br></code></pre></td></tr></table></figure><h2 id="6-蜜罐"><a href="#6-蜜罐" class="headerlink" title="6. 蜜罐"></a>6. 蜜罐</h2><p>原理：用来钓鱼或诱惑测试人员的防护系统<br>开源：<code>https://hfish.net/#/</code></p><h2 id="7-堡垒机"><a href="#7-堡垒机" class="headerlink" title="7. 堡垒机"></a>7. 堡垒机</h2><p>原理：运维，跳板机，记录操作日志<br>开源：<code>https://www.jumpserver.org/</code></p><h2 id="8-API接口"><a href="#8-API接口" class="headerlink" title="8. API接口"></a>8. API接口</h2><p>原理：允许不同软件应用程序之间进行通信和数据交换的接口。API定义了一组规则和协议，软件开发者可以使用这些规则和协议来访问操作系统、库、服务或其他应用程序的功能。</p><ul><li>Web API：通过HTTP协议进行通信的API，常用于Web服务和应用程序。如：<code>RESTful API</code>、<code>GraphQL API</code></li><li>库和框架API：提供特定编程语言或框架功能的API，供开发者在应用程序中使用。如：<code>Java</code> 、<code>API</code>、<code>Python</code>标准库</li><li>操作系统API：提供操作系统功能访问的API。如：<code>Windows API</code>、<code>POSIX API</code></li><li>远程API：允许在网络上远程访问服务的API。如：<code>SOAP API</code>、<code>XML-RPC API</code><br>如：<br>内部API：自己开发了一个收银系统，使用API接口可以查询到顾客数据，收入支付，销售提成等<br>外部API：自己搭建了一个网站应用，功能需求有要借助到外部的资源，如地图，归属地，短信收发等<br>有利影响：</li><li>内部API：Web应用提供给测试人员一个能获取到价值信息的接口</li><li>外部API：可以借助提供的API获取到当前网站不想让你获取的信息</li><li>分析API的目录结构、接口命名规则、参数命名规则、功能和业务逻辑等</li><li>根据这些信息可以进行接口枚举和参数枚举，进而可以进行相关的漏洞测试</li></ul><h2 id="9-其他"><a href="#9-其他" class="headerlink" title="9. 其他"></a>9. 其他</h2><p>防火墙、分布式、消息队列等<br>ActiveMQ Redis Memcache Jenkins<br><code>https://mp.weixin.qq.com/s/SEjxrUgiIIK2bveSBz6mTg</code><br>有利影响：搭建越多应用即方便了运维也提供给测试人员更多机会</p>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;h2 id=&quot;1-Web-WAF&quot;&gt;&lt;a href=&quot;#1-Web-WAF&quot; class=&quot;headerlink&quot; title=&quot;1. Web + WAF&quot;&gt;&lt;/a&gt;1. Web + WAF&lt;/h2&gt;&lt;p&gt;原理：web应用防火墙，提供保护&lt;br&gt;影响：常规web测试手段会受到拦</summary>
+      
+    
+    
+    
+    <category term="Cyber Security" scheme="http://example.com/categories/Cyber-Security/"/>
+    
+    
+    <category term="Web Basics" scheme="http://example.com/tags/Web-Basics/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>数据审计技术</title>
+    <link href="http://example.com/posts/d2.html"/>
+    <id>http://example.com/posts/d2.html</id>
+    <published>2024-11-28T02:19:53.000Z</published>
+    <updated>2024-12-18T09:10:11.023Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="1-数据审计的概念与作用"><a href="#1-数据审计的概念与作用" class="headerlink" title="1. 数据审计的概念与作用"></a>1. 数据审计的概念与作用</h1><h2 id="1-1-数据审计的概念"><a href="#1-1-数据审计的概念" class="headerlink" title="1.1 数据审计的概念"></a>1.1 数据审计的概念</h2><h3 id="1-1-1-什么是数据审计"><a href="#1-1-1-什么是数据审计" class="headerlink" title="1.1.1 什么是数据审计"></a>1.1.1 什么是数据审计</h3><p>数据审计就像是给数据做安全体检，通过收集和分析ICT设备（电脑、网络、数据库等）的操作记录，找出安全漏洞，入侵行为或者改进系统的地方</p><h3 id="1-1-2-数据审计有哪些类型"><a href="#1-1-2-数据审计有哪些类型" class="headerlink" title="1.1.2 数据审计有哪些类型"></a>1.1.2 数据审计有哪些类型</h3><ul><li>数据库审计：对达梦，Oracle，MySQL，等数据库的数据安全事件进行数据采集，数据审计，统计分析，来发现和控制数据库操作行为；</li><li>主机审计（终端审计）：采集计算机运行状态或敏感操作的数据，进行事件审计、统计分析，发现主机漏洞并控制主机操作行为；</li><li>网络审计：采集用户上网行为数据，进行事件审计、统计分析，发现并控制上网操作行为；</li><li>应用审计：对应用系统的数据安全事件进行数据采集、事件设计、统计分析，发现应用系统漏洞并控制应用系统操作行为。</li></ul>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;h1 id=&quot;1-数据审计的概念与作用&quot;&gt;&lt;a href=&quot;#1-数据审计的概念与作用&quot; class=&quot;headerlink&quot; title=&quot;1. 数据审计的概念与作用&quot;&gt;&lt;/a&gt;1. 数据审计的概念与作用&lt;/h1&gt;&lt;h2 id=&quot;1-1-数据审计的概念&quot;&gt;&lt;a href=&quot;#</summary>
+      
+    
+    
+    
+    <category term="Data Security" scheme="http://example.com/categories/Data-Security/"/>
+    
+    
+    <category term="Security Capabilities" scheme="http://example.com/tags/Security-Capabilities/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>web基础架构</title>
+    <link href="http://example.com/posts/c1.html"/>
+    <id>http://example.com/posts/c1.html</id>
+    <published>2024-11-22T06:17:26.000Z</published>
+    <updated>2024-12-18T09:10:11.023Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="1-域名差异"><a href="#1-域名差异" class="headerlink" title="1. 域名差异"></a>1. 域名差异</h2><figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs txt"># 主站：<br>www.baidu.com<br><br># 分站：<br>fanyi.baidu.com<br><br># 端口站<br>www.baidu.com:88<br><br># 目录站<br>www.baidu.com/bbs/<br><br># 子站<br>123.fanyi.baidu.com<br></code></pre></td></tr></table></figure><h2 id="2-源码差异"><a href="#2-源码差异" class="headerlink" title="2. 源码差异"></a>2. 源码差异</h2><h3 id="2-1-源码目录结构对应"><a href="#2-1-源码目录结构对应" class="headerlink" title="2.1 源码目录结构对应"></a>2.1 源码目录结构对应</h3><p>后台目录、文件目录、逻辑目录、前端目录、数据目录、配置文件等</p><h3 id="2-2-源码开发语言类型"><a href="#2-2-源码开发语言类型" class="headerlink" title="2.2 源码开发语言类型"></a>2.2 源码开发语言类型</h3><p>ASP、ASPX、PHP、JAVA、Python、Go、Javascript等</p><h3 id="2-3-语言开发框架组件"><a href="#2-3-语言开发框架组件" class="headerlink" title="2.3 语言开发框架组件"></a>2.3 语言开发框架组件</h3><p>PHP：Thinkphp、Laravel、YII、CodeIgniter、CakePHP、Zend等<br>JAVA：Spring、MyBatis、Hibernate、Struts2、Springboot等<br>Python：Django、Flask、Bottle、Turbobars、Tornado、web2py等<br>Javascript：Vue、nodejs、Bootstrap、JQuery、Angular等</p><h3 id="2-4-开源闭源加密类型"><a href="#2-4-开源闭源加密类型" class="headerlink" title="2.4 开源闭源加密类型"></a>2.4 开源闭源加密类型</h3><p>开源——Zblog<br>闭源——内部开发<br>加密——通达OA</p><h2 id="3-数据差异"><a href="#3-数据差异" class="headerlink" title="3. 数据差异"></a>3. 数据差异</h2><figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs txt">数据库类型：Access、MYSQL、SqlServer、Oracle、Redis、DB2、Postgresql、MongoDB等<br>本地数据库：本地服务器搭建<br>分离数据库：非本地服务器<br>云数据库：RDS等<br></code></pre></td></tr></table></figure><h2 id="4-平台差异"><a href="#4-平台差异" class="headerlink" title="4. 平台差异"></a>4. 平台差异</h2><figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs txt">系统：windows,Linux,MAC等<br>容器：Docker,K8s,VMware,VirtualBox等<br>中间件：Apache,Nginx,IIS,Lighttpd,Tomcat,Jboss,Weblogic,Websphere,jetty等<br></code></pre></td></tr></table></figure><h2 id="5-解析差异"><a href="#5-解析差异" class="headerlink" title="5. 解析差异"></a>5. 解析差异</h2><figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs txt">URL路由：URL访问对应文件，MVC模型等<br>相对绝对路径：相对当前目录，完整的目录路径<br>格式权限：后门解析格式，代码正常执行，脚本执行权限等<br></code></pre></td></tr></table></figure><h2 id="6-web架构"><a href="#6-web架构" class="headerlink" title="6. web架构"></a>6. web架构</h2><h3 id="6-1-套用模板"><a href="#6-1-套用模板" class="headerlink" title="6.1 套用模板"></a>6.1 套用模板</h3><p>CSDN，cnblog，github等建站系统<br><strong>测试思路：</strong>基本模版无漏洞，大部分测试用户管理权限为主</p><h3 id="6-2-前后端分离"><a href="#6-2-前后端分离" class="headerlink" title="6.2 前后端分离"></a>6.2 前后端分离</h3><p>例子：<code>https://www.rxthink.cn/</code><br>思路：<code>https://mp.weixin.qq.com/s/HtLU_EBXWcbq-lt10oPYwA</code><br><strong>测试思路：</strong>前端以JS（Vue,NodeJS等）安全问题，主要以API接口测试，前端漏洞（如XSS）为主，后端隐蔽难度加大。</p><h3 id="6-3-集成软件包"><a href="#6-3-集成软件包" class="headerlink" title="6.3 集成软件包"></a>6.3 集成软件包</h3><p>宝塔、Phpstudy，xamp等<br><strong>测试思路：</strong>防护体系，权限差异为主</p><h3 id="6-4-自主环境镜像"><a href="#6-4-自主环境镜像" class="headerlink" title="6.4 自主环境镜像"></a>6.4 自主环境镜像</h3><p>云镜像等<br><strong>测试思路：</strong>防护体系，权限差异为主</p><h3 id="6-5-容器架构"><a href="#6-5-容器架构" class="headerlink" title="6.5 容器架构"></a>6.5 容器架构</h3><p>Docker<br><strong>测试思路：</strong>虚拟化技术，逃逸提权</p><h3 id="6-6-纯静态页面"><a href="#6-6-纯静态页面" class="headerlink" title="6.6 纯静态页面"></a>6.6 纯静态页面</h3><p>HTML+CSS+JS<br><strong>测试思路：</strong>无web漏洞，找资产，域名，客户端等</p><h2 id="7-源码"><a href="#7-源码" class="headerlink" title="7. 源码"></a>7. 源码</h2><figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs txt">单纯简易源码<br>MVC框架源码<br>编译调用源码——NET-DLL封装，Java-jar打包等<br>前后端分离源码<br>加密形源码等<br></code></pre></td></tr></table></figure>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;h2 id=&quot;1-域名差异&quot;&gt;&lt;a href=&quot;#1-域名差异&quot; class=&quot;headerlink&quot; title=&quot;1. 域名差异&quot;&gt;&lt;/a&gt;1. 域名差异&lt;/h2&gt;&lt;figure class=&quot;highlight txt&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gut</summary>
+      
+    
+    
+    
+    <category term="Cyber Security" scheme="http://example.com/categories/Cyber-Security/"/>
+    
+    
+    <category term="Web Basics" scheme="http://example.com/tags/Web-Basics/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>数据脱敏技术</title>
+    <link href="http://example.com/posts/d1.html"/>
+    <id>http://example.com/posts/d1.html</id>
+    <published>2024-11-21T01:46:37.000Z</published>
+    <updated>2024-12-18T09:10:11.023Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="1-数据脱敏的概念"><a href="#1-数据脱敏的概念" class="headerlink" title="1. 数据脱敏的概念"></a>1. 数据脱敏的概念</h1><h2 id="1-1-数据脱敏的定义"><a href="#1-1-数据脱敏的定义" class="headerlink" title="1.1 数据脱敏的定义"></a>1.1 数据脱敏的定义</h2><p>数据脱敏（<strong>Data Masking</strong>）指给重要的信息（<strong>敏感数据</strong>）套上马甲（<strong>屏蔽</strong>，<strong>仿真等方式</strong>），让数据看起来不是原来的样子，即时被看到，也不会暴露真实的敏感信息。<br>如：</p><blockquote><p>身份证号，电话号码这类个人隐私信息修改等<br>公司商业秘密隐藏，防止被利用</p></blockquote><h2 id="1-2-数据脱敏原则"><a href="#1-2-数据脱敏原则" class="headerlink" title="1.2 数据脱敏原则"></a>1.2 数据脱敏原则</h2><h3 id="1-2-1-安全性原则"><a href="#1-2-1-安全性原则" class="headerlink" title="1.2.1 安全性原则"></a>1.2.1 安全性原则</h3><p>数据脱敏的核心目标是<code>保障敏感数据的安全</code>，<code>防止未未授权的访问和使用</code>。</p><ul><li>确保数据不可还原：脱敏后的数据无法通过简单手法还原为原始数据</li><li>避免副作用：脱敏操作不会引入新漏洞，如通过其他字段推测真实信息</li><li>严格权限管控：只有授权用户可以访问脱敏规则或真实数据</li></ul><h3 id="1-2-2-适用性原则"><a href="#1-2-2-适用性原则" class="headerlink" title="1.2.2 适用性原则"></a>1.2.2 适用性原则</h3><p>数据脱敏必须满足业务和场景的实际需求，不能影响数据的正常使用</p><ul><li>适应不同场景：如开发测试、数据共享、统计分析等场景对数据的可用性要求不同</li><li>保持数据特性：脱敏后的数据需保持原始数据的部分特征（如长度、格式、统计分布），以便在分析中使用<br>如：<blockquote><p>身份证号脱敏后依然符合<code>18位数据+校验位</code>的格式</p></blockquote></li></ul><h3 id="1-2-3-最小化原则"><a href="#1-2-3-最小化原则" class="headerlink" title="1.2.3 最小化原则"></a>1.2.3 最小化原则</h3><p>脱敏操作仅对敏感数据实施，不应对非敏感数据或无关数据进行处理</p><ul><li>精准识别敏感数据：通过算法或规则、仅对涉及隐私、业务关键的信息进行脱敏</li><li>减少冗余处理：避免对无需脱敏的数据进行冗余处理</li></ul><h3 id="1-2-4-不可逆性原则"><a href="#1-2-4-不可逆性原则" class="headerlink" title="1.2.4 不可逆性原则"></a>1.2.4 不可逆性原则</h3><p>脱敏后的数据在设计上应具备不可逆性，以防数据被轻易还原</p><ul><li>防止推测性还原：随机替换的种子应加密存储，避免被逆向推</li><li>保障加密轻度：采用可靠的加密算法（如AES、SHA-256）确敏感信息无法破解</li></ul><h3 id="1-2-5-数据一致性原则"><a href="#1-2-5-数据一致性原则" class="headerlink" title="1.2.5 数据一致性原则"></a>1.2.5 数据一致性原则</h3><p>脱敏数据应在不同系统、场景中保持一致性，确保数据逻辑正确</p><ul><li>字段内一致性：一个字段的脱敏前后特性应一致（如手机号）</li><li>跨字段一致性：同一用户在不同表中的脱敏结果应保持统一（身份证）</li><li>业务逻辑一致性：脱敏操作不能破坏数据间的业务关联性（如用户ID与订单的关联关系）</li></ul><h3 id="1-2-6-合规性原则"><a href="#1-2-6-合规性原则" class="headerlink" title="1.2.6 合规性原则"></a>1.2.6 合规性原则</h3><p>脱敏操作应符合法律法规和行业数据安全与隐私保护法规</p><ul><li>遵守法律法规：《个人信息保护法》等</li><li>满足行业标准：银行、电信等行业合规要求，</li><li>审计与溯源：脱敏实施过程需可追溯，保证操作透明性和合规性</li></ul><h3 id="1-2-7-性能效率原则"><a href="#1-2-7-性能效率原则" class="headerlink" title="1.2.7 性能效率原则"></a>1.2.7 性能效率原则</h3><p>脱敏过程应在保障数据安全的前提下，尽可能降低对性能的影响</p><ul><li>优化处理效率：对大规模数据的脱敏需求需保证高效性，避免影响系统运行<ul><li>静态脱敏：使用批量处理技术，提高离线脱敏效率</li><li>动态脱敏：采用内存级别的实时处理优化</li></ul></li><li>最小化存储开销：脱敏数据应避免因重复存储或冗余加密增加过多成本</li></ul><h3 id="1-2-8-可审计性原则"><a href="#1-2-8-可审计性原则" class="headerlink" title="1.2.8 可审计性原则"></a>1.2.8 可审计性原则</h3><p>脱敏操作应具备可审计性，确保在问题发生时可以追溯其来源和责任</p><ul><li>记录脱敏规则日志：包括谁定制了规则，何时执行了操作</li><li>定期检测与验证：定期检查脱敏策略是否正确实施，数据是否依然满足安全要求</li></ul><h3 id="1-2-9-动态适应性原则"><a href="#1-2-9-动态适应性原则" class="headerlink" title="1.2.9 动态适应性原则"></a>1.2.9 动态适应性原则</h3><p>随着业务需求和技术环境的变化，脱敏策略和方法需要灵活调整</p><ul><li>敏感数据更新：敏感数据的定义可能因法律法规或业务变更而更新</li><li>技术更新：随着算法进步和攻击手段演变，需要省级脱敏技术</li></ul><h3 id="1-2-10-易用性原则"><a href="#1-2-10-易用性原则" class="headerlink" title="1.2.10 易用性原则"></a>1.2.10 易用性原则</h3><p>脱敏技术的实施应尽量简化，降低业务团队和技术团队的理解和操作成本</p><ul><li>统一管理规则：通过集中管理平台配置脱敏规则，避免分散处理带来混乱</li><li>用户友好性：工具界面直观，脱敏规则配置简洁易懂</li></ul><h2 id="1-3-数据脱敏的流程"><a href="#1-3-数据脱敏的流程" class="headerlink" title="1.3 数据脱敏的流程"></a>1.3 数据脱敏的流程</h2><p>数据脱敏整个过程可分为三个步骤：</p><blockquote><p>识别敏感信息 –&gt; 处理敏感信息 –&gt; 检查脱敏结果</p></blockquote><h2 id="1-4-数据脱敏与数据匿名化、数据去标识化之间的关系"><a href="#1-4-数据脱敏与数据匿名化、数据去标识化之间的关系" class="headerlink" title="1.4 数据脱敏与数据匿名化、数据去标识化之间的关系"></a>1.4 数据脱敏与数据匿名化、数据去标识化之间的关系</h2><table><thead><tr><th align="center">区别项</th><th align="center">数据脱敏</th><th align="center">数据匿名化</th><th align="center">数据去标识化</th></tr></thead><tbody><tr><td align="center">术语定义不同</td><td align="center">改写数据，让敏感数据不暴露</td><td align="center">对个人数据进行处理，让人无法识别出是谁，且处理后的数据不能还原</td><td align="center">对个人数据进行处理，让人在不使用其他额外信息的情况下，无法识别出是谁</td></tr><tr><td align="center">适用领域不同</td><td align="center">技术领域术语</td><td align="center">技术、法律和公众领域都常用</td><td align="center">技术、法律和公众领域都常用</td></tr><tr><td align="center">应用对象不同</td><td align="center">可以用于各种数据，如数据库，音频视频等</td><td align="center">主要用在个人敏感数据上，比如指纹、身份证号、健康记录等</td><td align="center"></td></tr><tr><td align="center">处理效果不同</td><td align="center">脱敏后数据，不一定让人完全无法识别</td><td align="center">处理后数据不能还原，确保隐私保护</td><td align="center">处理后不用额外信息无法识别，但可能有条件可识别</td></tr></tbody></table><h1 id="2-数据脱敏的类别"><a href="#2-数据脱敏的类别" class="headerlink" title="2. 数据脱敏的类别"></a>2. 数据脱敏的类别</h1><h2 id="2-1-数据脱敏类别"><a href="#2-1-数据脱敏类别" class="headerlink" title="2.1 数据脱敏类别"></a>2.1 数据脱敏类别</h2><blockquote><p>结构化数据：<br>数据库脱敏（静态脱敏、动态脱敏）、文本脱敏<br>非结构化数据：<br>图像脱敏、视频脱敏、文本脱敏</p></blockquote><h2 id="2-2-结构化数据脱敏"><a href="#2-2-结构化数据脱敏" class="headerlink" title="2.2 结构化数据脱敏"></a>2.2 结构化数据脱敏</h2><h3 id="2-2-1-结构化数据概念"><a href="#2-2-1-结构化数据概念" class="headerlink" title="2.2.1 结构化数据概念"></a>2.2.1 结构化数据概念</h3><p>结构化数据也叫<code>行数据</code>，使用<code>二维表结构来表示和实现的数据</code>，格式和长度严格遵守规范<br>在二维表中，每行记录对应一个数据主体，每列则对应一个属性。<br>结构化数据脱敏按照一些规则，对二维表结构中的敏感字段的数据进行变形、屏蔽或仿真处理。<br>结构化数据脱敏对象为各种<code>关系性数据库</code>，例如Oracle、SQL Server、Informix、Mysql、DB2、PostgreSQL、Sybase、MongoDB等，以及国产数据库GBase、达梦、巨杉、等</p><h3 id="2-2-2-数据库脱敏"><a href="#2-2-2-数据库脱敏" class="headerlink" title="2.2.2 数据库脱敏"></a>2.2.2 数据库脱敏</h3><p>从脱敏模式来看，可以分为<code>静态脱敏</code>和<code>动态脱敏</code></p><p>静态脱敏逻辑：<br>保证数据间关联关系的前提下，对数据文件进行脱敏处理。处理后的文件里没有敏感字段数据，而且不会影响数据分析结果。<br>使用ETL技术，先从源数据库把数据抽取出来，再用特定算法对抽取的数据进行变形，然后把变形后的数据加载到目标数据库，形成脱敏后的数据文件（也就是脱敏文件）。<br>主要应用场景：测试、开发、培训、数据分析、数据交易等。<br>主要特征：可以理解为“搬移并仿真替换”。就是说，业务系统开发、测试、培训、分析等相关人员能随便调用、读写脱敏文件里的数据，就像在仿真业务系统和做数据分析一样。同时，脱敏数据文件和生产环境是物理隔离的。</p><p>动态脱敏逻辑：<br>在不脱离生产环境的情况下，对后台数据库里敏感数据的查询和调用结果进行实时脱敏，脱敏后的数据能在用户前端显示出来。<br>用SQL技术，先找到包含敏感字段的查询语句，再用函数运算处理这些查询语句，然后数据库自动返回修改后不含敏感数据的结果。<br>主要应用场景：数据库系统的使用人员和运维人员。<br>主要特征：可以概括为“边脱敏，边使用”。对于数据库系统使用人员来说，先根据不同角色、职责确定不同的身份特征，然后对敏感数据进行隐藏、屏蔽、加密和审计。不同级别的用户按照自己的身份特征去查询、访问敏感数据，而且不能修改敏感数据。数据库系统运维人员的权限只是维护表结构、进行系统调优，没有权限检索数据或者导出真实数据。</p><h3 id="2-2-3-结构化文本脱敏"><a href="#2-2-3-结构化文本脱敏" class="headerlink" title="2.2.3 结构化文本脱敏"></a>2.2.3 结构化文本脱敏</h3><p>结构化文本，也叫结构文本，如txt、csv、xls、python、xml、dbf、dmp等文本文件都属于结构化文本，结构化文本也可以简称为文件。<br>结构化文本脱敏逻辑：<br>在不脱离生产环境的情况下，对生产数据源的文本文件进行脱敏，处理后的文件里没有敏感数据，而且不会影响数据分析结果。<br>先设置好脱敏规则，然后把文本文件输入，再用相关技术（像加密、替换、偏移等）对文本文件进行脱敏，最后输出脱敏结果（脱敏后的文本文件或者脱敏后的关系数据库）。<br>主要应用场景：测试、开发、培训、数据分析等。<br>主要特征：和静态数据脱敏相似，也是“搬移并仿真替换”。</p><h2 id="2-3-非结构化数据脱敏"><a href="#2-3-非结构化数据脱敏" class="headerlink" title="2.3 非结构化数据脱敏"></a>2.3 非结构化数据脱敏</h2><p>非结构化数据是没有明确结构限制的（或者说数据结构不规整、不完整），也没有预先定好的数据模型，很难用二维逻辑表来呈现的数据。像图像数据、视频数据、非结构化的文本数据都属于非结构化数据。</p><h3 id="2-3-1-图像数据脱敏"><a href="#2-3-1-图像数据脱敏" class="headerlink" title="2.3.1 图像数据脱敏"></a>2.3.1 图像数据脱敏</h3><p>图像数据脱敏是利用相关技术，对图像里的文字、图形做一些处理，像去掉标识、给它遮罩或者添加噪声等。<br>AI技术（比如深度学习）、差分隐私技术等。去掉标识是把图像里的敏感文字信息去掉，像自然人的隐私数据；遮罩像是给图像“打马赛克”；添加噪声是让原来的图像变得很不一样，从而达到脱敏的目的。</p><h3 id="2-3-2-视频数据脱敏"><a href="#2-3-2-视频数据脱敏" class="headerlink" title="2.3.2 视频数据脱敏"></a>2.3.2 视频数据脱敏</h3><p>视频数据由很多相关联的图像帧数据组成，每个图像帧是一个静态的图像数据，简单说视频数据等于图像数据1加图像数据2一直加到图像数据N。视频数据脱敏是用相关技术对图像数据1到N里的文字、图形进行去掉标识、遮罩、添加噪声等处理。</p><h3 id="2-3-1-文本脱敏"><a href="#2-3-1-文本脱敏" class="headerlink" title="2.3.1 文本脱敏"></a>2.3.1 文本脱敏</h3><p>非结构化文本脱敏是采用技术手段，对非结构化文本里的文字进行去掉标识的处理，从而可靠地保护这些文本。AI技术（深度学习）、差分隐私技术等，去掉标识就是把文本里像自然人隐私数据这样的敏感文字信息去掉。</p><h1 id="3-敏感数据识别策略"><a href="#3-敏感数据识别策略" class="headerlink" title="3. 敏感数据识别策略"></a>3. 敏感数据识别策略</h1><h2 id="3-1-敏感数据识别的定义"><a href="#3-1-敏感数据识别的定义" class="headerlink" title="3.1 敏感数据识别的定义"></a>3.1 敏感数据识别的定义</h2><p>使用专业的数据脱敏软件来自动找出数据库或其他数据中的敏感信息，比如个人信息、公司机密等</p><h2 id="3-2-敏感数据识别的作用"><a href="#3-2-敏感数据识别的作用" class="headerlink" title="3.2 敏感数据识别的作用"></a>3.2 敏感数据识别的作用</h2><p>帮助用户梳理清楚自己的哪些数据为敏感数据，以及这些数据的位置。<br>为数据脱敏工作提供指导，梳理清楚哪些数据需要被处理</p><h2 id="3-3-敏感数据源识别策略"><a href="#3-3-敏感数据源识别策略" class="headerlink" title="3.3 敏感数据源识别策略"></a>3.3 敏感数据源识别策略</h2><p>让软件自动识别有敏感信息的数据库或其他数据源，包括不同的识别方法、策略等<br>比如：<br>数据库脱敏产品，常见是通过字段来识别，或者通过字段里的内容来识别<br>敏感数据源指包含敏感信息的数据来源，常见的是<code>数据库</code>、<code>文件</code>、<code>大数据平台</code>、<code>动态数据流</code></p><h2 id="3-4-敏感数据识别策略"><a href="#3-4-敏感数据识别策略" class="headerlink" title="3.4 敏感数据识别策略"></a>3.4 敏感数据识别策略</h2><p>全量识别、抽样识别、增量识别</p><h1 id="4-数据脱敏方法"><a href="#4-数据脱敏方法" class="headerlink" title="4. 数据脱敏方法"></a>4. 数据脱敏方法</h1><h2 id="4-1-数据脱敏方法的类别"><a href="#4-1-数据脱敏方法的类别" class="headerlink" title="4.1 数据脱敏方法的类别"></a>4.1 数据脱敏方法的类别</h2><blockquote><p>传统类型：泛化类（截断、取整、归类）、抑制类（屏蔽）、扰乱类（加密、散列、混淆）、仿真类（仿真）<br>新型：匿名化、多样化、接近化、差分隐私</p></blockquote><h2 id="4-2-经典数据脱敏方法"><a href="#4-2-经典数据脱敏方法" class="headerlink" title="4.2 经典数据脱敏方法"></a>4.2 经典数据脱敏方法</h2><h3 id="4-2-1-泛化类方法"><a href="#4-2-1-泛化类方法" class="headerlink" title="4.2.1 泛化类方法"></a>4.2.1 泛化类方法</h3><p>让敏感数据不那么具体，不那么精确，但还能保留一些基本信息</p><ul><li>截断方法：砍掉一部分数据，只留下最重要的数据</li><li>取整方法：对数字或时间进行简化，只保留大概的数值</li><li>归类方法：把数据分类，按照一定的标准归类到不同的组里</li></ul><h3 id="4-2-2-抑制方法"><a href="#4-2-2-抑制方法" class="headerlink" title="4.2.2 抑制方法"></a>4.2.2 抑制方法</h3><p>保留敏感数据长度不变，但是把数据的一部分或全部转化成没有具体意义的符号，<code>138********</code></p><h3 id="4-2-3-扰乱方法"><a href="#4-2-3-扰乱方法" class="headerlink" title="4.2.3 扰乱方法"></a>4.2.3 扰乱方法</h3><p>通过添加干扰或改变数据方式来保护敏感数据</p><ul><li>加密方法：用特殊加密算法把敏感数据转换成别人看不懂的形式，可以反过来把数据变成原样，但是很难破解</li><li>散列方法：一种算法，变为一个固定长度的数据，结果不可逆</li><li>混淆方法：数据顺序打乱</li></ul><h3 id="4-2-4-仿真方法"><a href="#4-2-4-仿真方法" class="headerlink" title="4.2.4 仿真方法"></a>4.2.4 仿真方法</h3><p>创建一个看起来很像真实数据，但实际上完全不同的新数据集。在做一些数据测试或分析的时候，能够用到这些数据，但又不泄露真实的敏感信息。</p><ul><li>名字脱敏后，看起来还是一个名字</li><li>地址脱敏后，看起来还是一个地址</li></ul><h2 id="4-3-新型数据脱敏方法"><a href="#4-3-新型数据脱敏方法" class="headerlink" title="4.3 新型数据脱敏方法"></a>4.3 新型数据脱敏方法</h2><h3 id="4-3-1-K-匿名化（K-anonymity）"><a href="#4-3-1-K-匿名化（K-anonymity）" class="headerlink" title="4.3.1 K-匿名化（K-anonymity）"></a>4.3.1 K-匿名化（K-anonymity）</h3><p>让数据库里的信息看起来不那么具体</p><ul><li>把一些信息模糊化，邮编一部分换成特殊符号，年龄减小扩大</li><li>确保数据库里每一条记录至少有K个其他记录看起来一样，至少有<code>K条记录是相似的</code></li></ul><h3 id="4-3-2-L-多样化（L-diversity）"><a href="#4-3-2-L-多样化（L-diversity）" class="headerlink" title="4.3.2 L-多样化（L-diversity）"></a>4.3.2 L-多样化（L-diversity）</h3><p>在匿名化的基础上再加一条保险，在哪些看起来相似的数据中，至少有L种不同的信息</p><h3 id="4-3-3-T-接近性（T-closeness）"><a href="#4-3-3-T-接近性（T-closeness）" class="headerlink" title="4.3.3. T-接近性（T-closeness）"></a>4.3.3. T-接近性（T-closeness）</h3><p>在保证数据多样性的同时，还要确保每个小组里的敏感信息和整个库里边的信息分布差距不大</p><h3 id="4-3-4-差分隐私（s-dincrentialprivacy）"><a href="#4-3-4-差分隐私（s-dincrentialprivacy）" class="headerlink" title="4.3.4 差分隐私（s-dincrentialprivacy）"></a>4.3.4 差分隐私（s-dincrentialprivacy）</h3><p>即使有人在数据集中删除或新增了一条记录，通过查询得到的结果影响也不会有太大变化</p>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;h1 id=&quot;1-数据脱敏的概念&quot;&gt;&lt;a href=&quot;#1-数据脱敏的概念&quot; class=&quot;headerlink&quot; title=&quot;1. 数据脱敏的概念&quot;&gt;&lt;/a&gt;1. 数据脱敏的概念&lt;/h1&gt;&lt;h2 id=&quot;1-1-数据脱敏的定义&quot;&gt;&lt;a href=&quot;#1-1-数据脱敏的定义&quot;</summary>
+      
+    
+    
+    
+    <category term="Data Security" scheme="http://example.com/categories/Data-Security/"/>
+    
+    
+    <category term="Security Capabilities" scheme="http://example.com/tags/Security-Capabilities/"/>
+    
+  </entry>
+  
+</feed>
