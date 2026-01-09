@@ -1,0 +1,808 @@
+<!DOCTYPE html><html lang="zh-CN" class="bg-[var(--page-bg)] transition text-[14px] md:text-[16px]" data-overlayscrollbars-initialize data-astro-cid-sckkx6r4 style="--bannerOffset: 15vh;--banner-height-home: 65vh;--banner-height: 35vh;--configHue: 250;--page-width: 75rem;"> <head><title>工业和信息化领域数据安全风险评估 - Frank</title><meta charset="UTF-8"><meta name="description" content="工业和信息化领域数据安全风险评估文件解读"><meta name="author" content="Frank"><meta property="og:site_name" content="Frank"><meta property="og:url" content="https://acidzang.github.io/posts/sjaqfxpg/"><meta property="og:title" content="工业和信息化领域数据安全风险评估 - Frank"><meta property="og:description" content="工业和信息化领域数据安全风险评估文件解读"><meta property="og:type" content="article"><meta name="twitter:card" content="summary_large_image"><meta property="twitter:url" content="https://acidzang.github.io/posts/sjaqfxpg/"><meta name="twitter:title" content="工业和信息化领域数据安全风险评估 - Frank"><meta name="twitter:description" content="工业和信息化领域数据安全风险评估文件解读"><meta name="viewport" content="width=device-width"><meta name="generator" content="Astro v5.13.10"><link rel="icon" href="/favicon/favicon-light-32.png" sizes="32x32" media="(prefers-color-scheme: light)"><link rel="icon" href="/favicon/favicon-light-128.png" sizes="128x128" media="(prefers-color-scheme: light)"><link rel="icon" href="/favicon/favicon-light-180.png" sizes="180x180" media="(prefers-color-scheme: light)"><link rel="icon" href="/favicon/favicon-light-192.png" sizes="192x192" media="(prefers-color-scheme: light)"><link rel="icon" href="/favicon/favicon-dark-32.png" sizes="32x32" media="(prefers-color-scheme: dark)"><link rel="icon" href="/favicon/favicon-dark-128.png" sizes="128x128" media="(prefers-color-scheme: dark)"><link rel="icon" href="/favicon/favicon-dark-180.png" sizes="180x180" media="(prefers-color-scheme: dark)"><link rel="icon" href="/favicon/favicon-dark-192.png" sizes="192x192" media="(prefers-color-scheme: dark)"><!-- Set the theme before the page is rendered to avoid a flash --><script>(function(){const DEFAULT_THEME = "auto";
+const LIGHT_MODE = "light";
+const DARK_MODE = "dark";
+const AUTO_MODE = "auto";
+const BANNER_HEIGHT_EXTEND = 30;
+const PAGE_WIDTH = 75;
+const configHue = 250;
+
+			// Load the theme from local storage
+			const theme = localStorage.getItem('theme') || DEFAULT_THEME;
+			switch (theme) {
+				case LIGHT_MODE:
+					document.documentElement.classList.remove('dark');
+					break
+				case DARK_MODE:
+					document.documentElement.classList.add('dark');
+					break
+				case AUTO_MODE:
+					if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+						document.documentElement.classList.add('dark');
+					} else {
+						document.documentElement.classList.remove('dark');
+					}
+			}
+
+			// Load the hue from local storage
+			const hue = localStorage.getItem('hue') || configHue;
+			document.documentElement.style.setProperty('--hue', hue);
+
+			// calculate the --banner-height-extend, which needs to be a multiple of 4 to avoid blurry text
+			let offset = Math.floor(window.innerHeight * (BANNER_HEIGHT_EXTEND / 100));
+			offset = offset - offset % 4;
+			document.documentElement.style.setProperty('--banner-height-extend', `${offset}px`);
+		})();</script><!-- defines global css variables. This will be applied to <html> <body> and some other elements idk why --><script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"工业和信息化领域数据安全风险评估","description":"工业和信息化领域数据安全风险评估文件解读","keywords":["datasec","法律法规","解读","风险评估"],"author":{"@type":"Person","name":"Frank","url":"https://acidzang.github.io/"},"datePublished":"2025-10-30","inLanguage":"zh-CN"}</script><link rel="alternate" type="application/rss+xml" title="Frank" href="https://acidzang.github.io/rss.xml"><link rel="stylesheet" href="/_astro/Layout.DSulWsr7.css">
+<link rel="stylesheet" href="/_astro/Layout.y4KPJ9hc.css">
+<link rel="stylesheet" href="/_astro/_page_.UA-yiryq.css">
+<link rel="stylesheet" href="/_astro/_page_.B08li1OA.css">
+<link rel="stylesheet" href="/_astro/about.BtniRLn_.css">
+<style>input.svelte-1wah7ro:focus{outline:0}.search-panel.svelte-1wah7ro{max-height:calc(100vh - 100px);overflow-y:auto}#display-setting.svelte-d7tq3k input[type=range]:where(.svelte-d7tq3k){-webkit-appearance:none;height:1.5rem;background-image:var(--color-selection-bar);transition:background-image .15s ease-in-out}#display-setting.svelte-d7tq3k input[type=range]:where(.svelte-d7tq3k)::-webkit-slider-thumb{-webkit-appearance:none;height:1rem;width:.5rem;border-radius:.125rem;background:#ffffffb3;box-shadow:none}#display-setting.svelte-d7tq3k input[type=range]:where(.svelte-d7tq3k)::-webkit-slider-thumb:hover{background:#fffc}#display-setting.svelte-d7tq3k input[type=range]:where(.svelte-d7tq3k)::-webkit-slider-thumb:active{background:#fff9}#display-setting.svelte-d7tq3k input[type=range]:where(.svelte-d7tq3k)::-moz-range-thumb{-webkit-appearance:none;height:1rem;width:.5rem;border-radius:.125rem;border-width:0;background:#ffffffb3;box-shadow:none}#display-setting.svelte-d7tq3k input[type=range]:where(.svelte-d7tq3k)::-moz-range-thumb:hover{background:#fffc}#display-setting.svelte-d7tq3k input[type=range]:where(.svelte-d7tq3k)::-moz-range-thumb:active{background:#fff9}#display-setting.svelte-d7tq3k input[type=range]:where(.svelte-d7tq3k)::-ms-thumb{-webkit-appearance:none;height:1rem;width:.5rem;border-radius:.125rem;background:#ffffffb3;box-shadow:none}#display-setting.svelte-d7tq3k input[type=range]:where(.svelte-d7tq3k)::-ms-thumb:hover{background:#fffc}#display-setting.svelte-d7tq3k input[type=range]:where(.svelte-d7tq3k)::-ms-thumb:active{background:#fff9}
+</style><script type="module" src="/_astro/page.Z8IJTFqj.js"></script></head> <body class=" min-h-screen transition  enable-banner" data-overlayscrollbars-initialize data-astro-cid-sckkx6r4 style="--bannerOffset: 15vh;--banner-height-home: 65vh;--banner-height: 35vh;--configHue: 250;--page-width: 75rem;"> <div id="config-carrier" data-hue="250"></div>    <div id="top-row" class="z-50 pointer-events-none relative transition-all duration-700 max-w-[var(--page-width)] px-0 md:px-4 mx-auto"> <div id="navbar-wrapper" class="pointer-events-auto sticky top-0 transition-all"> <div id="navbar" class="z-50 onload-animation"> <div class="absolute h-8 left-0 right-0 -top-8 bg-[var(--card-bg)] transition"></div> <!-- used for onload animation --> <div class="card-base !overflow-visible max-w-[var(--page-width)] h-[4.5rem] !rounded-t-none mx-auto flex items-center justify-between px-4"> <a href="/" class="btn-plain scale-animation rounded-lg h-[3.25rem] px-5 font-bold active:scale-95"> <div class="flex flex-row text-[var(--primary)] items-center text-md"> <svg width="1em" height="1em" class="text-[1.75rem] mb-1 mr-2" data-icon="material-symbols:home-outline-rounded">   <symbol id="ai:material-symbols:home-outline-rounded" viewBox="0 0 24 24"><path fill="currentColor" d="M6 19h3v-5q0-.425.288-.712T10 13h4q.425 0 .713.288T15 14v5h3v-9l-6-4.5L6 10zm-2 0v-9q0-.475.213-.9t.587-.7l6-4.5q.525-.4 1.2-.4t1.2.4l6 4.5q.375.275.588.7T20 10v9q0 .825-.588 1.413T18 21h-4q-.425 0-.712-.288T13 20v-5h-2v5q0 .425-.288.713T10 21H6q-.825 0-1.412-.587T4 19m8-6.75"/></symbol><use href="#ai:material-symbols:home-outline-rounded"></use>  </svg> Frank </div> </a> <div class="hidden md:flex"> <a aria-label="主页" href="/" class="btn-plain scale-animation rounded-lg h-11 font-bold px-5 active:scale-95"> <div class="flex items-center"> 主页  </div> </a><a aria-label="归档" href="/archive/" class="btn-plain scale-animation rounded-lg h-11 font-bold px-5 active:scale-95"> <div class="flex items-center"> 归档  </div> </a><a aria-label="关于" href="/about/" class="btn-plain scale-animation rounded-lg h-11 font-bold px-5 active:scale-95"> <div class="flex items-center"> 关于  </div> </a> </div> <div class="flex"> <!--<SearchPanel client:load>--> <style>astro-island,astro-slot,astro-static-slot{display:contents}</style><script>(()=>{var e=async t=>{await(await t())()};(self.Astro||(self.Astro={})).only=e;window.dispatchEvent(new Event("astro:only"));})();</script><script>(()=>{var A=Object.defineProperty;var g=(i,o,a)=>o in i?A(i,o,{enumerable:!0,configurable:!0,writable:!0,value:a}):i[o]=a;var d=(i,o,a)=>g(i,typeof o!="symbol"?o+"":o,a);{let i={0:t=>m(t),1:t=>a(t),2:t=>new RegExp(t),3:t=>new Date(t),4:t=>new Map(a(t)),5:t=>new Set(a(t)),6:t=>BigInt(t),7:t=>new URL(t),8:t=>new Uint8Array(t),9:t=>new Uint16Array(t),10:t=>new Uint32Array(t),11:t=>1/0*t},o=t=>{let[l,e]=t;return l in i?i[l](e):void 0},a=t=>t.map(o),m=t=>typeof t!="object"||t===null?t:Object.fromEntries(Object.entries(t).map(([l,e])=>[l,o(e)]));class y extends HTMLElement{constructor(){super(...arguments);d(this,"Component");d(this,"hydrator");d(this,"hydrate",async()=>{var b;if(!this.hydrator||!this.isConnected)return;let e=(b=this.parentElement)==null?void 0:b.closest("astro-island[ssr]");if(e){e.addEventListener("astro:hydrate",this.hydrate,{once:!0});return}let c=this.querySelectorAll("astro-slot"),n={},h=this.querySelectorAll("template[data-astro-template]");for(let r of h){let s=r.closest(this.tagName);s!=null&&s.isSameNode(this)&&(n[r.getAttribute("data-astro-template")||"default"]=r.innerHTML,r.remove())}for(let r of c){let s=r.closest(this.tagName);s!=null&&s.isSameNode(this)&&(n[r.getAttribute("name")||"default"]=r.innerHTML)}let p;try{p=this.hasAttribute("props")?m(JSON.parse(this.getAttribute("props"))):{}}catch(r){let s=this.getAttribute("component-url")||"<unknown>",v=this.getAttribute("component-export");throw v&&(s+=` (export ${v})`),console.error(`[hydrate] Error parsing props for component ${s}`,this.getAttribute("props"),r),r}let u;await this.hydrator(this)(this.Component,p,n,{client:this.getAttribute("client")}),this.removeAttribute("ssr"),this.dispatchEvent(new CustomEvent("astro:hydrate"))});d(this,"unmount",()=>{this.isConnected||this.dispatchEvent(new CustomEvent("astro:unmount"))})}disconnectedCallback(){document.removeEventListener("astro:after-swap",this.unmount),document.addEventListener("astro:after-swap",this.unmount,{once:!0})}connectedCallback(){if(!this.hasAttribute("await-children")||document.readyState==="interactive"||document.readyState==="complete")this.childrenConnectedCallback();else{let e=()=>{document.removeEventListener("DOMContentLoaded",e),c.disconnect(),this.childrenConnectedCallback()},c=new MutationObserver(()=>{var n;((n=this.lastChild)==null?void 0:n.nodeType)===Node.COMMENT_NODE&&this.lastChild.nodeValue==="astro:end"&&(this.lastChild.remove(),e())});c.observe(this,{childList:!0}),document.addEventListener("DOMContentLoaded",e)}}async childrenConnectedCallback(){let e=this.getAttribute("before-hydration-url");e&&await import(e),this.start()}async start(){let e=JSON.parse(this.getAttribute("opts")),c=this.getAttribute("client");if(Astro[c]===void 0){window.addEventListener(`astro:${c}`,()=>this.start(),{once:!0});return}try{await Astro[c](async()=>{let n=this.getAttribute("renderer-url"),[h,{default:p}]=await Promise.all([import(this.getAttribute("component-url")),n?import(n):()=>()=>{}]),u=this.getAttribute("component-export")||"default";if(!u.includes("."))this.Component=h[u];else{this.Component=h;for(let f of u.split("."))this.Component=this.Component[f]}return this.hydrator=p,this.hydrate},e,this)}catch(n){console.error(`[astro-island] Error hydrating ${this.getAttribute("component-url")}`,n)}}attributeChangedCallback(){this.hydrate()}}d(y,"observedAttributes",["props"]),customElements.get("astro-island")||customElements.define("astro-island",y)}})();</script><astro-island uid="2wmcRW" component-url="/_astro/Search.nm3Aht0w.js" component-export="default" renderer-url="/_astro/client.svelte.BtEbdPyR.js" props="{}" ssr client="only" opts="{&quot;name&quot;:&quot;Search&quot;,&quot;value&quot;:&quot;svelte&quot;}"></astro-island> <button aria-label="Display Settings" class="btn-plain scale-animation rounded-lg h-11 w-11 active:scale-90" id="display-settings-switch"> <svg width="1em" height="1em" class="text-[1.25rem]" data-icon="material-symbols:palette-outline">   <symbol id="ai:material-symbols:palette-outline" viewBox="0 0 24 24"><path fill="currentColor" d="M12 22q-2.05 0-3.875-.788t-3.187-2.15t-2.15-3.187T2 12q0-2.075.813-3.9t2.2-3.175T8.25 2.788T12.2 2q2 0 3.775.688t3.113 1.9t2.125 2.875T22 11.05q0 2.875-1.75 4.413T16 17h-1.85q-.225 0-.312.125t-.088.275q0 .3.375.863t.375 1.287q0 1.25-.687 1.85T12 22m-5.5-9q.65 0 1.075-.425T8 11.5t-.425-1.075T6.5 10t-1.075.425T5 11.5t.425 1.075T6.5 13m3-4q.65 0 1.075-.425T11 7.5t-.425-1.075T9.5 6t-1.075.425T8 7.5t.425 1.075T9.5 9m5 0q.65 0 1.075-.425T16 7.5t-.425-1.075T14.5 6t-1.075.425T13 7.5t.425 1.075T14.5 9m3 4q.65 0 1.075-.425T19 11.5t-.425-1.075T17.5 10t-1.075.425T16 11.5t.425 1.075T17.5 13M12 20q.225 0 .363-.125t.137-.325q0-.35-.375-.825T11.75 17.3q0-1.05.725-1.675T14.25 15H16q1.65 0 2.825-.962T20 11.05q0-3.025-2.312-5.038T12.2 4Q8.8 4 6.4 6.325T4 12q0 3.325 2.338 5.663T12 20"/></symbol><use href="#ai:material-symbols:palette-outline"></use>  </svg> </button> <astro-island uid="zyNnS" component-url="/_astro/LightDarkSwitch.Css4FTsg.js" component-export="default" renderer-url="/_astro/client.svelte.BtEbdPyR.js" props="{}" ssr client="only" opts="{&quot;name&quot;:&quot;LightDarkSwitch&quot;,&quot;value&quot;:&quot;svelte&quot;}"></astro-island> <button aria-label="Menu" name="Nav Menu" class="btn-plain scale-animation rounded-lg w-11 h-11 active:scale-90 md:!hidden" id="nav-menu-switch"> <svg width="1em" height="1em" class="text-[1.25rem]" data-icon="material-symbols:menu-rounded">   <symbol id="ai:material-symbols:menu-rounded" viewBox="0 0 24 24"><path fill="currentColor" d="M4 18q-.425 0-.712-.288T3 17t.288-.712T4 16h16q.425 0 .713.288T21 17t-.288.713T20 18zm0-5q-.425 0-.712-.288T3 12t.288-.712T4 11h16q.425 0 .713.288T21 12t-.288.713T20 13zm0-5q-.425 0-.712-.288T3 7t.288-.712T4 6h16q.425 0 .713.288T21 7t-.288.713T20 8z"/></symbol><use href="#ai:material-symbols:menu-rounded"></use>  </svg> </button> </div> <div id="nav-menu-panel" class="float-panel float-panel-closed absolute transition-all fixed right-4 px-2 py-2"> <a href="/" class="group flex justify-between items-center py-2 pl-3 pr-1 rounded-lg gap-8
+            hover:bg-[var(--btn-plain-bg-hover)] active:bg-[var(--btn-plain-bg-active)] transition
+        "> <div class="transition text-black/75 dark:text-white/75 font-bold group-hover:text-[var(--primary)] group-active:text-[var(--primary)]"> 主页 </div> <svg width="1em" height="1em" class="transition text-[1.25rem] text-[var(--primary)]" data-icon="material-symbols:chevron-right-rounded">   <symbol id="ai:material-symbols:chevron-right-rounded" viewBox="0 0 24 24"><path fill="currentColor" d="M12.6 12L8.7 8.1q-.275-.275-.275-.7t.275-.7t.7-.275t.7.275l4.6 4.6q.15.15.213.325t.062.375t-.062.375t-.213.325l-4.6 4.6q-.275.275-.7.275t-.7-.275t-.275-.7t.275-.7z"/></symbol><use href="#ai:material-symbols:chevron-right-rounded"></use>  </svg>  </a><a href="/archive/" class="group flex justify-between items-center py-2 pl-3 pr-1 rounded-lg gap-8
+            hover:bg-[var(--btn-plain-bg-hover)] active:bg-[var(--btn-plain-bg-active)] transition
+        "> <div class="transition text-black/75 dark:text-white/75 font-bold group-hover:text-[var(--primary)] group-active:text-[var(--primary)]"> 归档 </div> <svg width="1em" height="1em" viewBox="0 0 24 24" class="transition text-[1.25rem] text-[var(--primary)]" data-icon="material-symbols:chevron-right-rounded">   <use href="#ai:material-symbols:chevron-right-rounded"></use>  </svg>  </a><a href="/about/" class="group flex justify-between items-center py-2 pl-3 pr-1 rounded-lg gap-8
+            hover:bg-[var(--btn-plain-bg-hover)] active:bg-[var(--btn-plain-bg-active)] transition
+        "> <div class="transition text-black/75 dark:text-white/75 font-bold group-hover:text-[var(--primary)] group-active:text-[var(--primary)]"> 关于 </div> <svg width="1em" height="1em" viewBox="0 0 24 24" class="transition text-[1.25rem] text-[var(--primary)]" data-icon="material-symbols:chevron-right-rounded">   <use href="#ai:material-symbols:chevron-right-rounded"></use>  </svg>  </a> </div> <astro-island uid="10cuO0" component-url="/_astro/DisplaySettings.CEoHIn-R.js" component-export="default" renderer-url="/_astro/client.svelte.BtEbdPyR.js" props="{}" ssr client="only" opts="{&quot;name&quot;:&quot;DisplaySettings&quot;,&quot;value&quot;:&quot;svelte&quot;}"></astro-island> </div> </div> <script type="module">function c(){localStorage.theme==="dark"?(document.documentElement.classList.remove("dark"),localStorage.theme="light"):(document.documentElement.classList.add("dark"),localStorage.theme="dark")}function o(){let t=document.getElementById("scheme-switch");t&&(t.onclick=function(){c()});let n=document.getElementById("display-settings-switch");n&&(n.onclick=function(){let e=document.getElementById("display-setting");e&&e.classList.toggle("float-panel-closed")});let l=document.getElementById("nav-menu-switch");l&&(l.onclick=function(){let e=document.getElementById("nav-menu-panel");e&&e.classList.toggle("float-panel-closed")})}o();</script> <script>(function(){const scriptUrl = "/pagefind/pagefind.js";
+
+async function loadPagefind() {
+    try {
+        const response = await fetch(scriptUrl, { method: 'HEAD' });
+        if (!response.ok) {
+            throw new Error(`Pagefind script not found: ${response.status}`);
+        }
+
+        const pagefind = await import(scriptUrl);
+
+        await pagefind.options({
+            excerptLength: 20
+        });
+
+        window.pagefind = pagefind;
+
+        document.dispatchEvent(new CustomEvent('pagefindready'));
+        console.log('Pagefind loaded and initialized successfully, event dispatched.');
+    } catch (error) {
+        console.error('Failed to load Pagefind:', error);
+        window.pagefind = {
+            search: () => Promise.resolve({ results: [] }),
+            options: () => Promise.resolve(),
+        };
+        document.dispatchEvent(new CustomEvent('pagefindloaderror'));
+        console.log('Pagefind load error, event dispatched.');
+    }
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', loadPagefind);
+} else {
+    loadPagefind();
+}
+})();</script> </div> </div>  <div id="banner-wrapper" class="absolute z-10 w-full transition duration-700 overflow-hidden" style="top: -30vh"> <div id="banner" class="object-cover h-full transition duration-700 opacity-0 scale-105 overflow-hidden relative"> <div class="transition absolute inset-0 dark:bg-black/10 bg-opacity-50 pointer-events-none"></div> <img src="/_astro/frank-banner.D4N9JVSd_1X1aFG.webp" alt="Banner image of the blog" style="object-position: center" loading="lazy" decoding="async" fetchpriority="auto" width="1344" height="896" class="w-full h-full object-cover">  </div> </div> <div class="absolute w-full z-30 pointer-events-none" style="top: calc(35vh - 3.5rem)"> <!-- The pointer-events-none here prevent blocking the click event of the TOC --> <div class="relative max-w-[var(--page-width)] mx-auto pointer-events-auto"> <div id="main-grid" class="transition duration-700 w-full left-0 right-0 grid grid-cols-[17.5rem_auto] grid-rows-[auto_1fr_auto] lg:grid-rows-[auto]
+    mx-auto gap-4 px-0 md:px-4"> <!-- Banner image credit -->  <div id="sidebar" class="mb-4 row-start-2 row-end-3 col-span-2 lg:row-start-1 lg:row-end-2 lg:col-span-1 lg:max-w-[17.5rem] onload-animation w-full"> <div class="flex flex-col w-full gap-4 mb-4"> <div class="card-base p-3"> <a aria-label="Go to About Page" href="/about/" class="group block relative mx-auto mt-1 lg:mx-0 lg:mt-0 mb-3
+       max-w-[12rem] lg:max-w-none overflow-hidden rounded-xl active:scale-95"> <div class="absolute transition pointer-events-none group-hover:bg-black/30 group-active:bg-black/50
+        w-full h-full z-50 flex items-center justify-center"> <svg width="1.13em" height="1em" class="transition opacity-0 scale-90 group-hover:scale-100 group-hover:opacity-100 text-white text-5xl" data-icon="fa6-regular:address-card">   <symbol id="ai:fa6-regular:address-card" viewBox="0 0 576 512"><path fill="currentColor" d="M512 80c8.8 0 16 7.2 16 16v320c0 8.8-7.2 16-16 16H64c-8.8 0-16-7.2-16-16V96c0-8.8 7.2-16 16-16zM64 32C28.7 32 0 60.7 0 96v320c0 35.3 28.7 64 64 64h448c35.3 0 64-28.7 64-64V96c0-35.3-28.7-64-64-64zm144 224a64 64 0 1 0 0-128a64 64 0 1 0 0 128m-32 32c-44.2 0-80 35.8-80 80c0 8.8 7.2 16 16 16h192c8.8 0 16-7.2 16-16c0-44.2-35.8-80-80-80zm200-144c-13.3 0-24 10.7-24 24s10.7 24 24 24h80c13.3 0 24-10.7 24-24s-10.7-24-24-24zm0 96c-13.3 0-24 10.7-24 24s10.7 24 24 24h80c13.3 0 24-10.7 24-24s-10.7-24-24-24z"/></symbol><use href="#ai:fa6-regular:address-card"></use>  </svg> </div> <div class="mx-auto lg:w-full h-full lg:mt-0  overflow-hidden relative"> <div class="transition absolute inset-0 dark:bg-black/10 bg-opacity-50 pointer-events-none"></div> <img src="/_astro/demo-avatar.CxcI0ivM_1nbuVe.webp" alt="Profile Image of the Author" style="object-position: center" loading="lazy" decoding="async" fetchpriority="auto" width="512" height="512" class="w-full h-full object-cover">  </div> </a> <div class="px-2"> <div class="font-bold text-xl text-center mb-1 dark:text-neutral-50 transition">Frank</div> <div class="h-1 w-5 bg-[var(--primary)] mx-auto rounded-full mb-2 transition"></div> <div class="text-center text-neutral-400 mb-2.5 transition">玄学不渡菜鸡</div> <div class="flex flex-wrap gap-2 justify-center mb-1"> <a rel="me" aria-label="Twitter" href="https://twitter.com" target="_blank" class="btn-regular rounded-lg h-10 w-10 active:scale-90"> <svg width="1em" height="1em" class="text-[1.5rem]" data-icon="fa6-brands:twitter">   <symbol id="ai:fa6-brands:twitter" viewBox="0 0 512 512"><path fill="currentColor" d="M459.37 151.716c.325 4.548.325 9.097.325 13.645c0 138.72-105.583 298.558-298.558 298.558c-59.452 0-114.68-17.219-161.137-47.106c8.447.974 16.568 1.299 25.34 1.299c49.055 0 94.213-16.568 130.274-44.832c-46.132-.975-84.792-31.188-98.112-72.772c6.498.974 12.995 1.624 19.818 1.624c9.421 0 18.843-1.3 27.614-3.573c-48.081-9.747-84.143-51.98-84.143-102.985v-1.299c13.969 7.797 30.214 12.67 47.431 13.319c-28.264-18.843-46.781-51.005-46.781-87.391c0-19.492 5.197-37.36 14.294-52.954c51.655 63.675 129.3 105.258 216.365 109.807c-1.624-7.797-2.599-15.918-2.599-24.04c0-57.828 46.782-104.934 104.934-104.934c30.213 0 57.502 12.67 76.67 33.137c23.715-4.548 46.456-13.32 66.599-25.34c-7.798 24.366-24.366 44.833-46.132 57.827c21.117-2.273 41.584-8.122 60.426-16.243c-14.292 20.791-32.161 39.308-52.628 54.253"/></symbol><use href="#ai:fa6-brands:twitter"></use>  </svg> </a><a rel="me" aria-label="Steam" href="https://store.steampowered.com" target="_blank" class="btn-regular rounded-lg h-10 w-10 active:scale-90"> <svg width="0.97em" height="1em" class="text-[1.5rem]" data-icon="fa6-brands:steam">   <symbol id="ai:fa6-brands:steam" viewBox="0 0 496 512"><path fill="currentColor" d="M496 256c0 137-111.2 248-248.4 248c-113.8 0-209.6-76.3-239-180.4l95.2 39.3c6.4 32.1 34.9 56.4 68.9 56.4c39.2 0 71.9-32.4 70.2-73.5l84.5-60.2c52.1 1.3 95.8-40.9 95.8-93.5c0-51.6-42-93.5-93.7-93.5s-93.7 42-93.7 93.5v1.2L176.6 279c-15.5-.9-30.7 3.4-43.5 12.1L0 236.1C10.2 108.4 117.1 8 247.6 8C384.8 8 496 119 496 256M155.7 384.3l-30.5-12.6a52.8 52.8 0 0 0 27.2 25.8c26.9 11.2 57.8-1.6 69-28.4c5.4-13 5.5-27.3.1-40.3S206 305.6 193 300.2c-12.9-5.4-26.7-5.2-38.9-.6l31.5 13c19.8 8.2 29.2 30.9 20.9 50.7c-8.3 19.9-31 29.2-50.8 21m173.8-129.9c-34.4 0-62.4-28-62.4-62.3s28-62.3 62.4-62.3s62.4 28 62.4 62.3s-27.9 62.3-62.4 62.3m.1-15.6c25.9 0 46.9-21 46.9-46.8c0-25.9-21-46.8-46.9-46.8s-46.9 21-46.9 46.8c.1 25.8 21.1 46.8 46.9 46.8"/></symbol><use href="#ai:fa6-brands:steam"></use>  </svg> </a><a rel="me" aria-label="GitHub" href="https://github.com" target="_blank" class="btn-regular rounded-lg h-10 w-10 active:scale-90"> <svg width="0.97em" height="1em" class="text-[1.5rem]" data-icon="fa6-brands:github">   <symbol id="ai:fa6-brands:github" viewBox="0 0 496 512"><path fill="currentColor" d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6c-3.3.3-5.6-1.3-5.6-3.6c0-2 2.3-3.6 5.2-3.6c3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9c2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9c.3 2 2.9 3.3 5.9 2.6c2.9-.7 4.9-2.6 4.6-4.6c-.3-1.9-3-3.2-5.9-2.9M244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2c12.8 2.3 17.3-5.6 17.3-12.1c0-6.2-.3-40.4-.3-61.4c0 0-70 15-84.7-29.8c0 0-11.4-29.1-27.8-36.6c0 0-22.9-15.7 1.6-15.4c0 0 24.9 2 38.6 25.8c21.9 38.6 58.6 27.5 72.9 20.9c2.3-16 8.8-27.1 16-33.7c-55.9-6.2-112.3-14.3-112.3-110.5c0-27.5 7.6-41.3 23.6-58.9c-2.6-6.5-11.1-33.3 2.6-67.9c20.9-6.5 69 27 69 27c20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27c13.7 34.7 5.2 61.4 2.6 67.9c16 17.7 25.8 31.5 25.8 58.9c0 96.5-58.9 104.2-114.8 110.5c9.2 7.9 17 22.9 17 46.4c0 33.7-.3 75.4-.3 83.6c0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252C496 113.3 383.5 8 244.8 8M97.2 352.9c-1.3 1-1 3.3.7 5.2c1.6 1.6 3.9 2.3 5.2 1c1.3-1 1-3.3-.7-5.2c-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9c1.6 1 3.6.7 4.3-.7c.7-1.3-.3-2.9-2.3-3.9c-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2c2.3 2.3 5.2 2.6 6.5 1c1.3-1.3.7-4.3-1.3-6.2c-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2c-1.4-2.3-4-3.3-5.6-2"/></symbol><use href="#ai:fa6-brands:github"></use>  </svg> </a><a rel="me" aria-label="Youtube" href="https://www.youtube.com/" target="_blank" class="btn-regular rounded-lg h-10 w-10 active:scale-90"> <svg width="1.13em" height="1em" class="text-[1.5rem]" data-icon="fa6-brands:youtube">   <symbol id="ai:fa6-brands:youtube" viewBox="0 0 576 512"><path fill="currentColor" d="M549.655 124.083c-6.281-23.65-24.787-42.276-48.284-48.597C458.781 64 288 64 288 64S117.22 64 74.629 75.486c-23.497 6.322-42.003 24.947-48.284 48.597c-11.412 42.867-11.412 132.305-11.412 132.305s0 89.438 11.412 132.305c6.281 23.65 24.787 41.5 48.284 47.821C117.22 448 288 448 288 448s170.78 0 213.371-11.486c23.497-6.321 42.003-24.171 48.284-47.821c11.412-42.867 11.412-132.305 11.412-132.305s0-89.438-11.412-132.305m-317.51 213.508V175.185l142.739 81.205z"/></symbol><use href="#ai:fa6-brands:youtube"></use>  </svg> </a>  </div> </div> </div> </div> <div id="sidebar-sticky" class="transition-all duration-700 flex flex-col w-full gap-4 top-4 sticky top-4"> <widget-layout data-id="categories" data-is-collapsed="false" class="pb-4 card-base onload-animation" style="animation-delay: 150ms; --collapsedHeight: 7.5rem;" data-astro-cid-ucso7hve="true"> <div class="font-bold transition text-lg text-neutral-900 dark:text-neutral-100 relative ml-8 mt-4 mb-2
+        before:w-1 before:h-4 before:rounded-md before:bg-[var(--primary)]
+        before:absolute before:left-[-16px] before:top-[5.5px]" data-astro-cid-ucso7hve style="--collapsedHeight: 7.5rem;">分类</div> <div id="categories" class="collapse-wrapper px-4 overflow-hidden" data-astro-cid-ucso7hve style="--collapsedHeight: 7.5rem;"> <a href="/archive/?category=CTF" aria-label="View all posts in the CTF category"> <button class="
+            w-full
+            h-10
+            rounded-lg
+            bg-none
+            hover:bg-[var(--btn-plain-bg-hover)]
+            active:bg-[var(--btn-plain-bg-active)]
+            transition-all
+            pl-2
+            hover:pl-3
+            
+            text-neutral-700
+            hover:text-[var(--primary)]
+            dark:text-neutral-300
+            dark:hover:text-[var(--primary)]
+        "> <div class="flex items-center justify-between relative mr-2"> <div class="overflow-hidden text-left whitespace-nowrap overflow-ellipsis  "> CTF </div> <div class="transition px-2 h-7 ml-4 min-w-[2rem] rounded-lg text-sm font-bold
+                    text-[var(--btn-content)] dark:text-[var(--deep-text)]
+                    bg-[var(--btn-regular-bg)] dark:bg-[var(--primary)]
+                    flex items-center justify-center"> 1 </div> </div> </button> </a><a href="/archive/?category=CyberSec" aria-label="View all posts in the CyberSec category"> <button class="
+            w-full
+            h-10
+            rounded-lg
+            bg-none
+            hover:bg-[var(--btn-plain-bg-hover)]
+            active:bg-[var(--btn-plain-bg-active)]
+            transition-all
+            pl-2
+            hover:pl-3
+            
+            text-neutral-700
+            hover:text-[var(--primary)]
+            dark:text-neutral-300
+            dark:hover:text-[var(--primary)]
+        "> <div class="flex items-center justify-between relative mr-2"> <div class="overflow-hidden text-left whitespace-nowrap overflow-ellipsis  "> CyberSec </div> <div class="transition px-2 h-7 ml-4 min-w-[2rem] rounded-lg text-sm font-bold
+                    text-[var(--btn-content)] dark:text-[var(--deep-text)]
+                    bg-[var(--btn-regular-bg)] dark:bg-[var(--primary)]
+                    flex items-center justify-center"> 1 </div> </div> </button> </a><a href="/archive/?category=DataSec" aria-label="View all posts in the DataSec category"> <button class="
+            w-full
+            h-10
+            rounded-lg
+            bg-none
+            hover:bg-[var(--btn-plain-bg-hover)]
+            active:bg-[var(--btn-plain-bg-active)]
+            transition-all
+            pl-2
+            hover:pl-3
+            
+            text-neutral-700
+            hover:text-[var(--primary)]
+            dark:text-neutral-300
+            dark:hover:text-[var(--primary)]
+        "> <div class="flex items-center justify-between relative mr-2"> <div class="overflow-hidden text-left whitespace-nowrap overflow-ellipsis  "> DataSec </div> <div class="transition px-2 h-7 ml-4 min-w-[2rem] rounded-lg text-sm font-bold
+                    text-[var(--btn-content)] dark:text-[var(--deep-text)]
+                    bg-[var(--btn-regular-bg)] dark:bg-[var(--primary)]
+                    flex items-center justify-center"> 2 </div> </div> </button> </a><a href="/archive/?category=Other" aria-label="View all posts in the Other category"> <button class="
+            w-full
+            h-10
+            rounded-lg
+            bg-none
+            hover:bg-[var(--btn-plain-bg-hover)]
+            active:bg-[var(--btn-plain-bg-active)]
+            transition-all
+            pl-2
+            hover:pl-3
+            
+            text-neutral-700
+            hover:text-[var(--primary)]
+            dark:text-neutral-300
+            dark:hover:text-[var(--primary)]
+        "> <div class="flex items-center justify-between relative mr-2"> <div class="overflow-hidden text-left whitespace-nowrap overflow-ellipsis  "> Other </div> <div class="transition px-2 h-7 ml-4 min-w-[2rem] rounded-lg text-sm font-bold
+                    text-[var(--btn-content)] dark:text-[var(--deep-text)]
+                    bg-[var(--btn-regular-bg)] dark:bg-[var(--primary)]
+                    flex items-center justify-center"> 1 </div> </div> </button> </a> </div>  </widget-layout>  <script type="module">class d extends HTMLElement{constructor(){if(super(),this.dataset.isCollapsed!=="true")return;const e=this.dataset.id,t=this.querySelector(".expand-btn"),s=this.querySelector(`#${e}`);t.addEventListener("click",()=>{s.classList.remove("collapsed"),t.classList.add("hidden")})}}customElements.get("widget-layout")||customElements.define("widget-layout",d);</script> <widget-layout data-id="tags" data-is-collapsed="false" class="pb-4 card-base onload-animation" style="animation-delay: 200ms; --collapsedHeight: 7.5rem;" data-astro-cid-ucso7hve="true"> <div class="font-bold transition text-lg text-neutral-900 dark:text-neutral-100 relative ml-8 mt-4 mb-2
+        before:w-1 before:h-4 before:rounded-md before:bg-[var(--primary)]
+        before:absolute before:left-[-16px] before:top-[5.5px]" data-astro-cid-ucso7hve style="--collapsedHeight: 7.5rem;">标签</div> <div id="tags" class="collapse-wrapper px-4 overflow-hidden" data-astro-cid-ucso7hve style="--collapsedHeight: 7.5rem;">  <div class="flex gap-2 flex-wrap"> <a href="/archive/?tag=code" aria-label="View all posts with the code tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  code </a><a href="/archive/?tag=ctf" aria-label="View all posts with the ctf tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  ctf </a><a href="/archive/?tag=cybersec" aria-label="View all posts with the cybersec tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  cybersec </a><a href="/archive/?tag=datasec" aria-label="View all posts with the datasec tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  datasec </a><a href="/archive/?tag=git" aria-label="View all posts with the git tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  git </a><a href="/archive/?tag=sqlinjection" aria-label="View all posts with the sqlinjection tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  sqlinjection </a><a href="/archive/?tag=web%E6%94%BB%E9%98%B2" aria-label="View all posts with the web攻防 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  web攻防 </a><a href="/archive/?tag=%E5%8E%BB%E6%A0%87%E8%AF%86%E5%8C%96" aria-label="View all posts with the 去标识化 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  去标识化 </a><a href="/archive/?tag=%E6%B3%95%E5%BE%8B%E6%B3%95%E8%A7%84" aria-label="View all posts with the 法律法规 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  法律法规 </a><a href="/archive/?tag=%E8%84%B1%E6%95%8F" aria-label="View all posts with the 脱敏 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  脱敏 </a><a href="/archive/?tag=%E8%A7%A3%E8%AF%BB" aria-label="View all posts with the 解读 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  解读 </a><a href="/archive/?tag=%E9%A3%8E%E9%99%A9%E8%AF%84%E4%BC%B0" aria-label="View all posts with the 风险评估 tag" class="btn-regular h-8 text-sm px-3 rounded-lg">  风险评估 </a> </div>  </div>  </widget-layout>   </div> </div> <main id="swup-container" class="transition-swup-fade col-span-2 lg:col-span-1 overflow-hidden"> <div id="content-wrapper" class="onload-animation"> <!-- the overflow-hidden here prevent long text break the layout--> <!-- make id different from windows.swup global property -->   <div class="flex w-full rounded-[var(--radius-large)] overflow-hidden relative mb-4"> <div id="post-container" class="card-base z-10 px-6 md:px-9 pt-6 pb-4 relative w-full "> <!-- word count and reading time --> <div class="flex flex-row text-black/30 dark:text-white/30 gap-5 mb-3 transition onload-animation"> <div class="flex flex-row items-center"> <div class="transition h-6 w-6 rounded-md bg-black/5 dark:bg-white/10 text-black/50 dark:text-white/50 flex items-center justify-center mr-2"> <svg width="1em" height="1em" data-icon="material-symbols:notes-rounded">   <symbol id="ai:material-symbols:notes-rounded" viewBox="0 0 24 24"><path fill="currentColor" d="M4 18q-.425 0-.712-.288T3 17t.288-.712T4 16h10q.425 0 .713.288T15 17t-.288.713T14 18zm0-5q-.425 0-.712-.288T3 12t.288-.712T4 11h16q.425 0 .713.288T21 12t-.288.713T20 13zm0-5q-.425 0-.712-.288T3 7t.288-.712T4 6h16q.425 0 .713.288T21 7t-.288.713T20 8z"/></symbol><use href="#ai:material-symbols:notes-rounded"></use>  </svg> </div> <div class="text-sm">13138  字</div> </div> <div class="flex flex-row items-center"> <div class="transition h-6 w-6 rounded-md bg-black/5 dark:bg-white/10 text-black/50 dark:text-white/50 flex items-center justify-center mr-2"> <svg width="1em" height="1em" data-icon="material-symbols:schedule-outline-rounded">   <symbol id="ai:material-symbols:schedule-outline-rounded" viewBox="0 0 24 24"><path fill="currentColor" d="M13 11.6V8q0-.425-.288-.712T12 7t-.712.288T11 8v3.975q0 .2.075.388t.225.337l3.3 3.3q.275.275.7.275T16 16t.275-.7t-.275-.7zM12 22q-2.075 0-3.9-.788t-3.175-2.137T2.788 15.9T2 12t.788-3.9t2.137-3.175T8.1 2.788T12 2t3.9.788t3.175 2.137T21.213 8.1T22 12t-.788 3.9t-2.137 3.175t-3.175 2.138T12 22m0-2q3.325 0 5.663-2.337T20 12t-2.337-5.663T12 4T6.337 6.338T4 12t2.338 5.663T12 20"/></symbol><use href="#ai:material-symbols:schedule-outline-rounded"></use>  </svg> </div> <div class="text-sm"> 66  分钟 </div> </div> </div> <!-- title --> <div class="relative onload-animation"> <div data-pagefind-body data-pagefind-weight="10" data-pagefind-meta="title" class="transition w-full block font-bold mb-3
+                    text-3xl md:text-[2.25rem]/[2.75rem]
+                    text-black/90 dark:text-white/90
+                    md:before:w-1 before:h-5 before:rounded-md before:bg-[var(--primary)]
+                    before:absolute before:top-[0.75rem] before:left-[-1.125rem]
+                "> 工业和信息化领域数据安全风险评估 </div> </div> <!-- metadata --> <div class="onload-animation"> <div class="flex flex-wrap text-neutral-500 dark:text-neutral-400 items-center gap-4 gap-x-4 gap-y-2 mb-5"> <!-- publish date --> <div class="flex items-center"> <div class="meta-icon"> <svg width="1em" height="1em" class="text-xl" data-icon="material-symbols:calendar-today-outline-rounded">   <symbol id="ai:material-symbols:calendar-today-outline-rounded" viewBox="0 0 24 24"><path fill="currentColor" d="M5 22q-.825 0-1.412-.587T3 20V6q0-.825.588-1.412T5 4h1V3q0-.425.288-.712T7 2t.713.288T8 3v1h8V3q0-.425.288-.712T17 2t.713.288T18 3v1h1q.825 0 1.413.588T21 6v14q0 .825-.587 1.413T19 22zm0-2h14V10H5zM5 8h14V6H5zm0 0V6z"/></symbol><use href="#ai:material-symbols:calendar-today-outline-rounded"></use>  </svg> </div> <span class="text-50 text-sm font-medium">2025-10-30</span> </div> <!-- update date -->  <!-- categories --> <div class="flex items-center"> <div class="meta-icon"> <svg width="1em" height="1em" class="text-xl" data-icon="material-symbols:book-2-outline-rounded">   <symbol id="ai:material-symbols:book-2-outline-rounded" viewBox="0 0 24 24"><path fill="currentColor" d="M6 15.325q.35-.175.725-.25T7.5 15H8V4h-.5q-.625 0-1.062.438T6 5.5zM10 15h8V4h-8zm-4 .325V4zM7.5 22q-1.45 0-2.475-1.025T4 18.5v-13q0-1.45 1.025-2.475T7.5 2H18q.825 0 1.413.587T20 4v12.525q0 .2-.162.363t-.588.362q-.35.175-.55.5t-.2.75t.2.763t.55.487t.55.413t.2.562v.25q0 .425-.288.725T19 22zm0-2h9.325q-.15-.35-.237-.712T16.5 18.5q0-.4.075-.775t.25-.725H7.5q-.65 0-1.075.438T6 18.5q0 .65.425 1.075T7.5 20"/></symbol><use href="#ai:material-symbols:book-2-outline-rounded"></use>  </svg> </div> <div class="flex flex-row flex-nowrap items-center"> <a href="/archive/?category=DataSec" aria-label="View all posts in the DataSec category" class="link-lg transition text-50 text-sm font-medium
+                            hover:text-[var(--primary)] dark:hover:text-[var(--primary)] whitespace-nowrap"> DataSec </a> </div> </div> <!-- tags --> <div class="items-center flex"> <div class="meta-icon"> <svg width="1em" height="1em" class="text-xl" data-icon="material-symbols:tag-rounded">   <symbol id="ai:material-symbols:tag-rounded" viewBox="0 0 24 24"><path fill="currentColor" d="m9 16l-.825 3.275q-.075.325-.325.525t-.6.2q-.475 0-.775-.375T6.3 18.8L7 16H4.275q-.5 0-.8-.387T3.3 14.75q.075-.35.35-.55t.625-.2H7.5l1-4H5.775q-.5 0-.8-.387T4.8 8.75q.075-.35.35-.55t.625-.2H9l.825-3.275Q9.9 4.4 10.15 4.2t.6-.2q.475 0 .775.375t.175.825L11 8h4l.825-3.275q.075-.325.325-.525t.6-.2q.475 0 .775.375t.175.825L17 8h2.725q.5 0 .8.387t.175.863q-.075.35-.35.55t-.625.2H16.5l-1 4h2.725q.5 0 .8.388t.175.862q-.075.35-.35.55t-.625.2H15l-.825 3.275q-.075.325-.325.525t-.6.2q-.475 0-.775-.375T12.3 18.8L13 16zm.5-2h4l1-4h-4z"/></symbol><use href="#ai:material-symbols:tag-rounded"></use>  </svg> </div> <div class="flex flex-row flex-nowrap items-center"> <div class="hidden mx-1.5 text-[var(--meta-divider)] text-sm">/</div>
+                <a href="/archive/?tag=datasec" aria-label="View all posts with the datasec tag" class="link-lg transition text-50 text-sm font-medium
+                                hover:text-[var(--primary)] dark:hover:text-[var(--primary)] whitespace-nowrap"> datasec </a><div class="mx-1.5 text-[var(--meta-divider)] text-sm">/</div>
+                <a href="/archive/?tag=%E6%B3%95%E5%BE%8B%E6%B3%95%E8%A7%84" aria-label="View all posts with the 法律法规 tag" class="link-lg transition text-50 text-sm font-medium
+                                hover:text-[var(--primary)] dark:hover:text-[var(--primary)] whitespace-nowrap"> 法律法规 </a><div class="mx-1.5 text-[var(--meta-divider)] text-sm">/</div>
+                <a href="/archive/?tag=%E8%A7%A3%E8%AF%BB" aria-label="View all posts with the 解读 tag" class="link-lg transition text-50 text-sm font-medium
+                                hover:text-[var(--primary)] dark:hover:text-[var(--primary)] whitespace-nowrap"> 解读 </a><div class="mx-1.5 text-[var(--meta-divider)] text-sm">/</div>
+                <a href="/archive/?tag=%E9%A3%8E%E9%99%A9%E8%AF%84%E4%BC%B0" aria-label="View all posts with the 风险评估 tag" class="link-lg transition text-50 text-sm font-medium
+                                hover:text-[var(--primary)] dark:hover:text-[var(--primary)] whitespace-nowrap"> 风险评估 </a>  </div> </div> </div> <div class="border-[var(--line-divider)] border-dashed border-b-[1px] mb-5"></div> </div> <!-- always show cover as long as it has one -->  <div data-pagefind-body class="prose dark:prose-invert prose-base !max-w-none custom-md mb-6 markdown-content onload-animation"> <!--<div class="prose dark:prose-invert max-w-none custom-md">--> <!--<div class="max-w-none custom-md">-->  <section><h1 id="01-管理机构与评估机构">01 管理机构与评估机构<a class="anchor" href="#01-管理机构与评估机构"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h1><p>2024年5月24日工业和信息化部发布，于2024年6月1日执行
+基于《数据安全法》、《网络安全法》、《工业和信息化领域数据安全管理办法（试行）》</p><ul>
+<li>对应细则第一条、第二条、第十九条</li>
+</ul><section><h2 id="1-管理机构">1. 管理机构<a class="anchor" href="#1-管理机构"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h2><p>工业和信息化部统一管理，地方行为监管部门按职责监督管理</p><ul>
+<li>对应细则第三条</li>
+</ul></section><section><h2 id="2-工作原则">2. 工作原则<a class="anchor" href="#2-工作原则"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h2><p>按照及时、客观、有效的原则开展数据安全风险评估</p><blockquote>
+<ul>
+<li>重要数据和核心数据处理者</li>
+<li>按照及时、客观、有效的原则</li>
+<li>开展数据安全风险评估评估报告</li>
+<li>对评估结果负责</li>
+</ul>
+</blockquote><ul>
+<li>对应细则第四条</li>
+</ul></section><section><h2 id="3-评估方式">3. 评估方式<a class="anchor" href="#3-评估方式"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h2><p>自行或委托具有工业和信息化数据安全工作经验的第三方评估机构开展
+重要数据和核心数据处理者通过自评估或第三方评估的方式建立专业评估团队（组织管理、专业运营、技术保障、安全合规），制定完整的评估工作方案，配备有效的技术评测工具完成评估。</p><ul>
+<li>对应细则第七条</li>
+</ul></section><section><h2 id="4-委托评估">4. 委托评估<a class="anchor" href="#4-委托评估"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h2><p>通过订立合同或其他具有法律效力文件明确权利和责任</p><blockquote>
+<ul>
+<li>订立合同</li>
+<li>向第三方提供必要的材料的条件</li>
+</ul>
+</blockquote><ul>
+<li>对应细则第八条</li>
+</ul></section><section><h2 id="5-评估机构认定">5. 评估机构认定<a class="anchor" href="#5-评估机构认定"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h2><p>鼓励具有工业和信息化领域数据安全工作经验的认证机构开展第三方评估机构的能力认证</p><blockquote>
+<ul>
+<li>配备相应的人员和技术保障能力</li>
+<li>建立第三方评估机构能力认证制度</li>
+<li>明确第三方评估机构在管理体系、人员能力、工具设施、评估领域等方面的规范要求</li>
+<li>跟踪第三方评估机构的服务质量</li>
+<li>督促第三方评估机构独立、公正、客观、科学的开展数据安安全风下评估工作</li>
+</ul>
+</blockquote><ul>
+<li>对应细则第十二条</li>
+</ul></section><section><h2 id="6-评估机构义务">6. 评估机构义务<a class="anchor" href="#6-评估机构义务"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h2><p>明确第三方评估机构应当履行三项义务</p><blockquote>
+<ul>
+<li>对评估中知悉的国家秘密、重要数据和核心数据的目录与内容、商业秘密、个人隐私、以及与数据处理者签署的保密协议中约定的保密信息等严格保密</li>
+<li>严格按照国家法律法规、行业监管部门有关规定以及评估标准，公正、独立的开展评估并出具评估报告，全面、准确、客观的反映重要数据和核心数据处理者的数据安全风险状况，提供务实有效的风险整改建议措施</li>
+<li>除重要数据和核心数据处理者书面同意或法律、行政犯规另外规定外，不得向其他组织或个人提供评估中收集掌握的相关信息</li>
+</ul>
+</blockquote><ul>
+<li>对应细则第十三条</li>
+</ul></section><section><h2 id="7-监督检查">7. 监督检查<a class="anchor" href="#7-监督检查"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h2><p>工业和信息化部建立数据安全风险评估支撑机构库</p><ol>
+<li>行业监管部门
+<ol>
+<li>工业和信息化部
+根据技术能力、人员配备、信誉资质等情况，择优选认证机构
+建立工业和信息化数据安全风险评估支撑机构库</li>
+<li>地方行业监管部门
+参照建立本地区数据安全风险评估支撑机构库</li>
+</ol>
+</li>
+<li>重要数据和核心数据处理者
+对行业监管部门发起的专项风险评估及监督检查予以配合，并对评估发现的相关问题及时进行改正</li>
+</ol><ul>
+<li>对应细则第十四条</li>
+</ul></section><section><h2 id="8-机构监管及保密要求">8. 机构监管及保密要求<a class="anchor" href="#8-机构监管及保密要求"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h2><p>行业监管部门及委托支撑机构执行保密义务</p><blockquote>
+<ul>
+<li>机构监管</li>
+<li>行政处罚</li>
+<li>保密要求</li>
+</ul>
+</blockquote><ul>
+<li>对应细则第十五条、第十六条、第十七条</li>
+</ul></section></section>
+<section><h1 id="02-评估内容与评估流程">02 评估内容与评估流程<a class="anchor" href="#02-评估内容与评估流程"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h1><section><h2 id="1-评估内容">1. 评估内容<a class="anchor" href="#1-评估内容"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h2><p>对数据处理活动的目的和方式、业务场景、安全保障措施、风险影响等要素开展
+重点评估内容：</p><ol>
+<li>数据处理目的、方式、范围是否合法、正当、必要</li>
+<li>数据安全管理制度、流程策略的制定和落实情况</li>
+<li>数据安全组织架构、岗位配备和职责履行情况</li>
+<li>数据安全技术防护能力建设及应用情况</li>
+<li>数据处理活动相关人员是否熟悉数据安全相关政策法规、是否具备数据安全知识技能、是否接收数据安全相关教育培训等情况</li>
+<li>发生数据遭到篡改、破坏、泄漏、丢失或被非法获取、非法利用等安全事件，对国家安全、公共利益的影响范围、程度等风险</li>
+<li>涉及数据提供、委托处理、转移的，数据获取方或委托方的安全保障能力、责任义务约束和履行情况</li>
+<li>涉及国家法律法规中规定需要申报的数据出境安全评估情形，履行数据出境安全评估要求情况</li>
+</ol><ul>
+<li>对应细则第五条</li>
+</ul></section><section><h2 id="2-评估期限">2. 评估期限<a class="anchor" href="#2-评估期限"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h2><p>数据安全风险评估结果有效期为一年
+重要数据和核心数据处理者每年至少开展一次数据安全风险评估，已评估报告首次出具日期计算。评估报告应当包括数据处理者基本情况、评估团队基本情况、重要数据的种类和数量、开展数据处理活动的情况、数据安全风险评估环境，以及数据处理活动分析、合规性评估、安全风险分析、评估结论及应对措施等
+在有效期内出现下面情形之一的，对发生变化及影响的部分开展风险评估</p><ol>
+<li>新增跨主体提供、委托处理、转移核心数据</li>
+<li>重要数据、核心数据安全状态发生变化对数据安全造成不利影响，包括但不限于数据处理目的、方式、适用范围和安全制度策略等发生重大调整</li>
+<li>发生涉及重要数据、核心数据安全事件</li>
+<li>重要数据和核心数据目录备案内容发生重大变化</li>
+<li>行业监管部门要求进行评估的其他情形</li>
+</ol><ul>
+<li>对应细则第六条</li>
+</ul></section><section><h2 id="3-评估思路">3. 评估思路<a class="anchor" href="#3-评估思路"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h2><p>以预防为主、主动发现、积极防范为原则</p><ol>
+<li>评估思路，原则目的
+<ol>
+<li>做评估：对数据处理者数据安全保护和数据处理活动进行风险评估</li>
+<li>寻隐患：掌握数据安全总体状况，发现数据安全隐患</li>
+<li>提建议：提出数据安全管理和技术防护措施建议</li>
+<li>强安全：提升数据安全防攻击、防破坏、防窃取、防泄漏、防滥用能力</li>
+</ol>
+</li>
+<li>切入点
+<ol>
+<li>围绕数据处理活动</li>
+<li>聚焦可能影响数据的保密性、完整性、可用性和数据处理合理性的安全风险</li>
+</ol>
+</li>
+<li>实现路径
+<ol>
+<li>识别要素：通过信息调研识别数据处理者，业务和信息系统，数据资产、数据处理活动、安全措施等相关要素</li>
+<li>识别隐患：从数据安全管理、数据处理活动、数据安全技术、个人信息保护等方面识别风险隐患</li>
+<li>提出建议：梳理问题清单，分析数据安全风险、视情屏见风险，并给出整改建议</li>
+</ol>
+</li>
+</ol><ul>
+<li>对应政策要点为《网络数据安全风险评估指引》</li>
+</ul></section><section><h2 id="4-评估内容">4. 评估内容<a class="anchor" href="#4-评估内容"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h2><p>围绕数据安全管理、数据处理活动安全、数据安全技术、个人信息保护开展</p><ol>
+<li>信息调研：数据处理者基本情况、业务和信息系统、数据资产情况、数据处理活动、安去防护措施</li>
+<li>数据安全管理：制度流程、组织机构、分类分级、人员管理、合作外包管理、安全威胁和应急管理、开发运维、云数据安全</li>
+<li>数据处理活动安全：数据收集、数据存储、数据传输、数据使用和加工、数据提供、数据公开、数据删除销毁</li>
+<li>数据安全技术：网络安全防护、身份鉴别与访问控制、监测预警、数据脱敏、数据防泄漏、接口安全、备份恢复、安全审计</li>
+<li>个人信息保护：基本原则、告知同意、保护义务、主体权利、投诉举报、个人信息处理、敏感个人信息保护、大型网络平台</li>
+</ol><ul>
+<li>对应政策要点为《网络数据安全风险评估指引》</li>
+</ul></section><section><h2 id="5-评估流程">5. 评估流程<a class="anchor" href="#5-评估流程"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h2><p>明确数据安全风险评估五个阶段的具体工作与主要产出物</p><ol>
+<li>评估准备
+<ol>
+<li>确定评估目标、确定评估范围、组建评估团队、开展前期准备、制定评估方案</li>
+<li>调研表、评估方案</li>
+</ol>
+</li>
+<li>信息调研
+<ol>
+<li>数据处理者调研、业务和信息系统调研、数据资产调研、数据处理活动调研、安全措施调研</li>
+<li>处理者基本情况、业务清单、信息系统清单、数据资产清单、数据处理活动清单、数据流转图、安全措施情况</li>
+</ol>
+</li>
+<li>风险识别
+<ol>
+<li>数据安全管理、数据处理活动、数据安全技术、个人信息处理</li>
+<li>文档查阅记录文档、人员访谈记录文档、安全核查记录文档、技术检测报告</li>
+</ol>
+</li>
+<li>综合分析
+<ol>
+<li>梳理问题清单、风险分析与评价、提出整改建议</li>
+<li>数据安全问题清单、数据安全风险、整改建议</li>
+</ol>
+</li>
+<li>评估总结
+<ol>
+<li>风险评估报告、安全风险处置</li>
+<li>风险评估报告</li>
+</ol>
+</li>
+</ol><ul>
+<li>对应政策要点为《网络数据安全风险评估指引》</li>
+</ul></section><section><h2 id="6-自评估流程">6. 自评估流程<a class="anchor" href="#6-自评估流程"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h2><p>明确自评估主要实施流程</p><ol>
+<li>评估准备
+<ol>
+<li>从提高数据安全治理能力、落实法规和主管监管部门要求、高风险数据处理活动、安全态势等方面，确定评估目标</li>
+<li>根据评估目标确定评估对象、范围和边界，明确涉及的数据资产、数据处理活动、业务等</li>
+<li>组建自评估团队或委托第三方机构，组织业务、安全、法务、合规、运维、研发等相关部门参与</li>
+<li>开展前期准备，制定工作计划，确定评估依据，确定评估内容，建立评估文档</li>
+<li>制定评估方案，并获得本单位负责人支持，认可</li>
+</ol>
+</li>
+<li>评估实施
+<ol>
+<li>信息调研：数据处理者识别、业务和信息系统识别、数据资产识别、数据处理活动识别、安全防护措施识别</li>
+<li>风险识别：从数据安全管理、数据处理活动、数据安全技术、个人信息保护等方面识别识别安全风险</li>
+</ol>
+</li>
+<li>分析总结
+<ol>
+<li>综合分析：形成风险清单、提出整改建议</li>
+<li>评估结果：编制评估报告、进行风险处置</li>
+</ol>
+</li>
+</ol><ul>
+<li>对应政策要点为《网络数据安全风险评估指引》</li>
+</ul></section><section><h2 id="7-检查评估流程">7. 检查评估流程<a class="anchor" href="#7-检查评估流程"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h2><p>进行检查评估时，参考实施</p><ol>
+<li>评估准备
+<ol>
+<li>根据掌握的数据安全态势和安全监管，确定评估目标</li>
+<li>根据评估目标确定评估对象、范围和边界，明确涉及的数据资产、数据处理活动、业务等</li>
+<li>组建检查评估团队，组织评估队伍制定工作计划、确定评估依据、确定评估内容、建立评估文档</li>
+<li>组织评估团队制定评估方案</li>
+<li>必要时，组织专家对评估方案、人员安排、评估文档等进行评审</li>
+</ol>
+</li>
+<li>评估实施
+<ol>
+<li>信息调研：处理处理者基本情况、业务和信息系统、数据资产、数据处理活动、安全防护措施</li>
+<li>风险识别：数据安全管理、数据处理活动、数据安全技术、个人信息保护等方面</li>
+</ol>
+</li>
+<li>分析总结
+<ol>
+<li>综合分析：问题清单、整改建议、分析评价安全风险</li>
+<li>评估结果：评估报告、风险处置</li>
+</ol>
+</li>
+</ol><ul>
+<li>对应政策要点为《网络数据安全风险评估指引》</li>
+</ul></section><section><h2 id="8-评估手段">8. 评估手段<a class="anchor" href="#8-评估手段"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h2><p>人员访谈、安全核查、文档查验、技术测试四种手段</p><ol>
+<li>人员访谈：对相关人员进行访谈、核查制度规章、防护措施、安全责任落实情况</li>
+<li>文档核查：查验安全管理制度、风险评估报告、等保测评报告等有关材料及制度落实情况的证明材料</li>
+<li>安全核查：检查网络环境、数据库和大数据平台等相关系统和设备安全策略、配置、防护措施等</li>
+<li>技术测试：应用技术工具、渗透测试等手段查看数据资产情况、检查防护措施有效性</li>
+</ol><ul>
+<li>对应政策要点为《网络数据安全风险评估指引》</li>
+</ul></section></section>
+<section><h1 id="03-评估准备与信息调研">03 评估准备与信息调研<a class="anchor" href="#03-评估准备与信息调研"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h1><section><h2 id="1-评估准备-明确评估目标">1. 评估准备-明确评估目标<a class="anchor" href="#1-评估准备-明确评估目标"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h2><ol>
+<li>摸清数据种类、规模、分布等情况</li>
+<li>摸清数据处理活动情况</li>
+<li>发现可能影响国家安全、公共利益或者个人、组织合法权益的数据安全问题和风险</li>
+<li>发现共享、交易、委托处理、向境外提供重要数据等处理活动的数据安全问题和风险</li>
+<li>促进完善数据安全保护措施，提示数据安全保护能力</li>
+</ol><ul>
+<li>对应政策要点为《网络数据安全风险评估指引》【评估准备】</li>
+</ul></section><section><h2 id="2-评估准备-确定评估范围">2. 评估准备-确定评估范围<a class="anchor" href="#2-评估准备-确定评估范围"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h2><p>确定组织全部的数据和数据处理活动的评估范围
+根据工作需要和评估目标，确定数据安全风险评估的对象、范围和边界，明确评估涉及的数据资产、数据处理活动、业务和信息系统、人员和内外部组织等</p><ol>
+<li>组织全部的数据和数据处理活动
+<ol>
+<li>全面摸排：被评估方数据安全整体情况，摸清其数据资产、数据处理活动、数据分类分级等情况</li>
+<li>重点评估：结合数据分类分级选择重点评估对象，将涉及个人信息、重要数据、核心数据的所有数据处理活动，以及抽样选择的其他典型一般数据的处理活动作为重点评估对象开展评估；未开展分类分级工作，结合业务、信息系统的重要性和敏感性，选择核心业务或重要信息系统和数据处理活动作为重点评估对象开展评估</li>
+</ol>
+</li>
+</ol><ul>
+<li>对应政策要点为《网络数据安全风险评估指引》【评估准备】</li>
+</ul></section><section><h2 id="3-评估准备-组建评估团队">3. 评估准备-组建评估团队<a class="anchor" href="#3-评估准备-组建评估团队"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h2><ol>
+<li>组建自评估团队
+<ol>
+<li>组织业务、安全、法务、合规、运维、研发等相关部门参与，评估组长为数据安全负责人或授权代表担任，委托第三方专业机构评估</li>
+</ol>
+</li>
+<li>组建检查评估团队
+<ol>
+<li>根据评估范围、涉及的行业特征、专业需求，选择具备相关专业能力的评估人员</li>
+<li>提前完成风险评估文档、检测工具等各项准备工作，并签署保密协议</li>
+<li>被评估方建立专项工作团队，包括数据安全负责人和安全、法务、合规、运维、、研发、业务、数据、风险等相关人员</li>
+</ol>
+</li>
+</ol><ul>
+<li>对应政策要点为《网络数据安全风险评估指引》【评估准备】</li>
+</ul></section><section><h2 id="4-评估准备-开展前期准备">4. 评估准备-开展前期准备<a class="anchor" href="#4-评估准备-开展前期准备"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h2><ol>
+<li>制定工作计划
+<ol>
+<li>工作目的</li>
+<li>工作要求</li>
+<li>工作内容</li>
+<li>工作流程</li>
+<li>调研安排</li>
+<li>评估总体进度安排</li>
+</ol>
+</li>
+<li>确定评估依据
+<ol>
+<li>法律：《网络安全法》《数据安全法》《个人信息保护法》等</li>
+<li>部门规章：网信部门及监管部门相关数据安全规章、规范性文件</li>
+<li>地方政策</li>
+<li>相关标准</li>
+</ol>
+</li>
+<li>确定评估内容
+<ol>
+<li>结合评估目标、范围、依据，针对被评估方的实际情况，确定被评估方每个评估对象适用的评估内容</li>
+<li>数据处理者应针对数据处理活动、数据安全管理、数据安全技术等方面进行风险评估</li>
+<li>涉及处理个人信息应在上面的基础上，对个人信息保护开展风险评估，评估过程中，根据任务要求、评估重点、监管需要、评估依据等完善评估内容</li>
+</ol>
+</li>
+<li>建立评估文档
+<ol>
+<li>针对评估目标、范围、依据和内容，准备风险评估调研表、技术测试工具等</li>
+<li>评估过程中，对相关文件统一编号，并规范管理</li>
+</ol>
+</li>
+</ol><ul>
+<li>对应政策要点为《网络数据安全风险评估指引》【评估准备】</li>
+</ul></section><section><h2 id="5-评估准备-制定评估方案">5. 评估准备-制定评估方案<a class="anchor" href="#5-评估准备-制定评估方案"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h2><p>评估团队编制评估工作方案，包括但不限于</p><ol>
+<li>评估概述：包括评估目标、评估依据等内容</li>
+<li>评估范围：包括评估对象选择方法、评估对象描述、评估范围等</li>
+<li>评估内容和方法：包括评估内容、评估准则、评估方法等内容</li>
+<li>评估人员：包括评估队伍的组织结构、负责人、成员、职责分工等内容</li>
+<li>实施计划：包括时间进度安排、人员安排等内容</li>
+<li>工作要求：包括评估工作要求，被评估方保障等</li>
+<li>测试方案：开展技术测试前应明确方案，包括采用的工具、测试内容、测试环境、应急措施等</li>
+</ol><ul>
+<li>对应政策要点为《网络数据安全风险评估指引》【评估准备】</li>
+</ul></section><section><h2 id="6-信息调研-数据处理者调研">6. 信息调研-数据处理者调研<a class="anchor" href="#6-信息调研-数据处理者调研"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h2><ol>
+<li>基本信息：单位名称、组织机构代码、办公地址、法定代表人信息、人员规模、经营范围、数据安全负责人及其职务、联系方式等基本信息</li>
+<li>单位性质：例如党政机关、事业单位、企业、社会团体等</li>
+<li>是否属于特定类型数据处理者：例如政务数据处理者、大型网络平台运营者、关键信息基础设施运营者等</li>
+<li>所属行业领域</li>
+<li>业务运营地区：开展数据处理活动所在国家和地区等</li>
+<li>主要业务范围、业务规模等</li>
+<li>许可证获取：数据处理相关服务取得行政许可的情况</li>
+<li>资本/实际控制人：被评估单位的资本组成和实际控制人情况</li>
+<li>境外资本参与：是否境外上市或计划赴境外上市及境外资本参与情况，或以协议控制（VIE）架构等方式实质性境外上市</li>
+</ol><ul>
+<li>对应政策要点为《网络数据安全风险评估指引》【信息调研】</li>
+</ul></section><section><h2 id="7-信息调研-业务和信息系统调研">7. 信息调研-业务和信息系统调研<a class="anchor" href="#7-信息调研-业务和信息系统调研"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h2><ol>
+<li>网络和信息系统基本情况：包括网络规模、拓扑结构、信息系统等情况和对外连接、运营维护等情况以及是否为关键信息基础设施等情况</li>
+<li>业务基本信息：包括业务描述、业务类型、服务对象、业务流程、用户规模、覆盖地域、相关部门等基本信息</li>
+<li>业务涉及个人信息：重要数据和核心数据处理情况</li>
+<li>业务为政务部门或境外用户提供服务情况</li>
+<li>信息系统、APP和小程序情况：包括系统功能、网络安全等级保护备案和测评结论、入口地址、系统连接关系、数据库接口、APP及小程序名称和版本等</li>
+<li>数据中心和使用云平台情况</li>
+<li>接入的外部第三方产品、服务或SDK情况：包括名称、版本、提供方、使用目的、合同协议等</li>
+</ol><ul>
+<li>对应政策要点为《网络数据安全风险评估指引》【信息调研】</li>
+</ul></section><section><h2 id="8-信息调研-数据资产调研">8. 信息调研-数据资产调研<a class="anchor" href="#8-信息调研-数据资产调研"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h2><p>梳理结构化数据（如数据库表等）和非结构化数据（如图表文件），摸清数据底数，输出数据资产清单</p><ol>
+<li>数据资产情况：包括数据资产类型、数据范围、数据规模、数据形态、数据存储分布、元数据等</li>
+<li>数据分类分级情况：包括数据分类分级规则、数据类别、数据级别、重要数据和核心数据目录情况等</li>
+<li>个人信息情况：包括个人信息种类、规模、敏感程度、数据来源、业务流转及与信息系统的对应关系等</li>
+<li>重要数据：包括重要数据种类、规模、行业领域、敏感程度、数据来源、业务流转及与信息系统的对应关系等</li>
+<li>核心数据：包括核心数据种类、规模、行业领域、敏感程度、数据来源、业务流转及与信息系统的对应关系等</li>
+<li>其他一般数据情况</li>
+</ol><ul>
+<li>对应政策要点为《网络数据安全风险评估指引》【信息调研】</li>
+</ul></section><section><h2 id="9-信息调研-数据处理活动调研">9. 信息调研-数据处理活动调研<a class="anchor" href="#9-信息调研-数据处理活动调研"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h2><p>针对评估对象和范围，梳理数据处理活动清单，验证或绘制数据流转图</p><ol>
+<li>数据收集情况：如数据收集渠道、收集方式、数据范围、收集目的、收集频率、外部数据源、合同协议、相关系统，以及在被评估方外部公共场所安装图像采集、个人身份识别设备的情况等</li>
+<li>数据存储情况：如数据存储方式、数据中心、存储系统（如数据库、大数据平台、云存储、网盘、存储介质等）、外部存储机构、存储地点、存储期限、备份冗余策略等</li>
+<li>数据传输情况：如数据传输途径和方式（如互联网、VPN、物理专线等在线通道情况、采用介质或离线传输情况）、传输协议、内部数据共享、数据接口等</li>
+<li>数据使用和加工情况：如数据使用目的、方式、范围、场景、算法规则、相关系统和部门，数据清洗、转换、标注等加工情况，应用算法推荐技术提供互联网信息服务的情况，核心数据、重要数据或个人信息委托处理、共同处理的情况等</li>
+<li>数据提供情况：如数据提供（数据共享、数据交易，因合并、分立、解散、被宣告破产等原因需要转移数据等）的目的、方式、范围、数据接收方、合同协议、对外提供的个人信息和重要数据的种类、数量、范围、敏感程度、保存期限等</li>
+<li>数据公开情况：如数据公开的目的、方式、对象范围、受众数量、行业、组织、地域等</li>
+<li>数据删除情况：如数据删除情形、删除方式、数据归档、介质销毁等</li>
+<li>数据出境情况：是否存在个人信息或重要数据出境，如跨境业务，跨境办公，跨境上市，使用境外云服务器或数据中心，国际交流合作等场景的数据出境情况</li>
+</ol><ul>
+<li>对应政策要点为《网络数据安全风险评估指引》【信息调研】</li>
+</ul></section><section><h2 id="10-信息调研-安全措施调研">10. 信息调研-安全措施调研<a class="anchor" href="#10-信息调研-安全措施调研"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h2><ol>
+<li>已有评估：已开展的等级保护测评、商用密码应用安全性评估、安全检测、风险评估、安全认证、合规审计情况，及发现问题的整改情况</li>
+<li>组织人员：数据安全管理组织、人员及制度情况</li>
+<li>安全设备：防火墙、入侵检测、入侵防御等网络安全设备及策略情况</li>
+<li>身份鉴别：身份鉴别与访问控制情况</li>
+<li>漏洞管理修复：网络安全漏洞管理及修复情况</li>
+<li>远程管理：VPN等远程管理软件的用户及管理情况</li>
+<li>口令管理：设备、系统及用户的帐号口令管理情况</li>
+<li>安全技术：加密、脱敏、去标识化等安全技术应用情况</li>
+<li>安全事件：3年内发生的网络和数据安全事件、攻击威胁情况。如事件名称、数据类型和数量、发生原因、级别、处置措施、整改措施，重大事件需要提供事件调查报告；</li>
+</ol><ul>
+<li>对应政策要点为《网络数据安全风险评估指引》【信息调研】</li>
+</ul></section></section>
+<section><h1 id="04-风险识别与风险控制">04 风险识别与风险控制<a class="anchor" href="#04-风险识别与风险控制"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h1><section><h2 id="1-风险识别-安全管理制度">1. 风险识别-安全管理制度<a class="anchor" href="#1-风险识别-安全管理制度"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h2><p>针对数据安全制度体系建设情况重点评估：</p><ol>
+<li>总体制定情况：数据安全总体策略、方针、目标和原则制定情况</li>
+<li>工作规划方案：数据安全管理工作规划或工作方案制定情况</li>
+<li>体系重点内容：数据分类分级、数据安全评估、数据访问权限管理、数据全生命周期管理、数据安全应急响应、数据合作方管理、数据脱敏、数据加密、数据安全审计、数据资产管理、大数据平台安全制度建设情况</li>
+<li>关键岗位规程：关键岗位数据安全管理操作规程建设情况</li>
+<li>合规监管：制度内容与国家和行业数据安全法律法规和监管要求的符合情况
+针对被评估方数据安全制度落实情况重点评估：</li>
+<li>责任制：网络安全责任制、数据安全责任制落实情况，网络安全和数据安全事件责任查处情况</li>
+<li>制度建设：数据安全制度的制定、评审、发布流程建设情况</li>
+<li>审核更新：数据安全制度定期审核和更新情况</li>
+<li>制度发布：制度发布范围是否覆盖全面，发布方式是否正规、有效</li>
+<li>制度落实：数据安全制度落实情况，是否具备操作规程、记录表单等制度落实证明材料</li>
+<li>监督检查机制：制度落实监督检查机制</li>
+<li>重要数据处理者风险评估：对数据处理活动定期开展数据安全风险评估的情况</li>
+<li>重要数据处理者评估报告：向有关部门报送评估报告情况，风险评估报告至少包含处理的数据数据的种类、数量、开展数据处理活动的情况，面临的数据安全风险及其对应措施等</li>
+</ol><ul>
+<li>对应政策要点为《网络数据安全风险评估指引》【风险识别】</li>
+</ul></section><section><h2 id="2-风险识别-安全组织机构">2. 风险识别-安全组织机构<a class="anchor" href="#2-风险识别-安全组织机构"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h2><p>针对被评估方数据安全组织架构建设情况重点评估：</p><ol>
+<li>机构职能：数据安全管理机构和职能设置情况</li>
+<li>负责人职能：数据安全负责人和职能设置情况</li>
+<li>高层人员决策：单位高层人员参与数据安全决策情况</li>
+<li>内部安全监督：对组织内的数据安全管理执行情况、数据操作行为等进行安全监督的情况</li>
+<li>需求适应性：数据安全人员和资源投入情况与组织数据安全保护需求适应性
+针对被评估方数据安全岗位设置情况重点评估：</li>
+<li>关键岗位设置和原则落实：数据库管理员、操作员及安全审计人员、安全运维人员、数据备份管理人员、数据恢复管理人员等数据安全关键岗位设置情况，及职责分离、专人专岗等原则落实情况</li>
+<li>相关部门人员设置和管理执行：业务部门、信息系统建设部门、信息系统运维部门数据安全人员设置情况，数据安全管理要求执行情况</li>
+<li>关键岗位双人双岗情况：特权账户所有者、关键数据处理岗位等数据安全关键岗位设立双人双岗情况</li>
+</ol><ul>
+<li>对应政策要点为《网络数据安全风险评估指引》【风险识别】</li>
+</ul></section><section><h2 id="3-风险识别-分类分级管理">3. 风险识别-分类分级管理<a class="anchor" href="#3-风险识别-分类分级管理"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h2><p>针对数据资产管理情况重点评估：</p><ol>
+<li>数据资产台帐：数据资产台帐建设、更新、维护情况</li>
+<li>数据资产梳理全面性：数据资产梳理是否全面，是否能够覆盖数据库、大数据存储组件、云上对象存储或网盘等存储工具及办公计算机、U盘、光盘等存储介质中的数据</li>
+<li>数据资产清单：通过数据资产管理等工具对数据资产清单及时更新、维护的情况</li>
+<li>技术扫描识别：采用技术手段定期对数据资产进行扫描的情况，及及时发现识别个人信息、重要数据的能力
+针对数据分类分级制度建设情况重点评估</li>
+<li>分类分级保护制度：数据分类分级保护制度建设情况，是否符合国家、行业和地方的数据分类分级规范要求</li>
+<li>分类分级管理和目录建设：数据分类分级管理情况，及核心数据和重要数据目录建立及维护情况</li>
+<li>制度明确和措施落实：是否在相关制度中明确了数据分类管理、分级保护策略，数据分类分级保护措施是否落实在数据访问权限申请、保护措施部署等方面</li>
+<li>变更和审核：数据分类分级变更和审核流程情况</li>
+<li>个人信息分类分级：个人信息分类分级管理情况
+针对数据分类分级保护情况重点评估：</li>
+<li>明确标识：是否对处理的个人信息和重要数据进行明确标识</li>
+<li>数据级别覆盖：按照数据级别建设覆盖全流程数据处理活动的安全措施情况</li>
+<li>工具建设：数据分类分级标识或资产管理工具建设情况，是否具有自动化标识能力，是否具有数据标识结果发布、审核等能力</li>
+<li>重要数据评估：按照相关重要数据目录或规定，评估重要数据并进行重点保护的情况</li>
+<li>核心数据评估：按照相关核心数据目录或规定，评估核心数据并进行重点保护的情况</li>
+</ol><ul>
+<li>对应政策要点为《网络数据安全风险评估指引》【风险识别】</li>
+</ul></section><section><h2 id="4-风险识别-人员安全管理">4. 风险识别-人员安全管理<a class="anchor" href="#4-风险识别-人员安全管理"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h2><p>针对人员录用情况重点评估：</p><ol>
+<li>背景调查：重要岗位人员录用前背景调查情况</li>
+<li>录用考核：数据处理关键岗位人员录用，对其数据安全意识或专业能力进行考核的情况
+针对保密协议签订情况重点评估：</li>
+<li>明确禁止行为：员工工作纪律和工作要求中是否明确规定员工禁止的数据安全相关行为</li>
+<li>签订人员覆盖面：是否与所有涉及数据服务的人员签订安全责任承诺书或保密协议，与数据安全关键岗位人员签订数据安全岗位责任协议</li>
+<li>明确调离或终止劳动合同保密义务：在重要岗位人员调离或终止劳动合同前，是否明确并告知其继续履行有关信息的保密义务要求，并签订保密承诺书
+针对人员转岗离岗管理情况重点评估：</li>
+<li>转岗离岗权限终止或变更：在人员转岗或离岗时，是否及时终止或变更完成相关人员数据操作权限，并明确有关人员后续的数据管理权限和保密责任</li>
+<li>离岗权限收回并告知保密义务：对终止劳动合同的人员，是否及时终止并收回其系统权限及数据权限，明确告知其继续履行有关信息的保密义务要求
+针对人员数据安全培训情况重点评估：</li>
+<li>培训制定更新：数据安全配置制定、更新情况</li>
+<li>安全意识教育培训：开展数据安全意识教育培训，并保留相关记录情况</li>
+<li>数据安全专项培训：是否对数据安全岗位人员每年至少开展1次数据安全专项培训，对关键岗位人员进行定期数据安全技能考核情况</li>
+</ol><ul>
+<li>对应政策要点为《网络数据安全风险评估指引》【风险识别】</li>
+</ul></section><section><h2 id="5-风险识别-合作外包管理">5. 风险识别-合作外包管理<a class="anchor" href="#5-风险识别-合作外包管理"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h2><p>针对合作方管理机制建设情况重点评估：</p><ol>
+<li>合作方管理机制：数据合作方安全管理机制建设情况，如对合作方或外包服务机构的选择、评价、管理、监督机制</li>
+<li>合作方安全能力评估：是否对数据合作方或外包服务机构的安全能力进行评估</li>
+<li>外包安全监督检查：对外包服务机构、人员履行安全责任义务的监督检查情况</li>
+<li>外包现场服务安全：外包人员现场服务安全管理情况</li>
+<li>外包技术依赖：对外包服务商的技术依赖程度，对委托处理数据的控制和管理能力
+针对合作协议约束情况重点评估：</li>
+<li>数据使用行为约束：服务合同、承诺及安全保密协议情况，是否通过合同协议等方式对接收、使用本单位数据的合作方的数据使用行为进行约束</li>
+<li>合作协议重点内容明确：是否在合作协议中明确了数据处理目的、方式、范围、安全保护责任、数据返还或销毁要求、保密约定及违约责任和处罚条款等</li>
+<li>数据安全责任界定：合同、协议中，数据处理者与合作方、外包服务商间的数据安全责任界定情况
+针对外包人员访问权限管理情况重点评估：</li>
+<li>最小必要范围：对数据与系统访问、修改权限是否限于最小必要范围</li>
+<li>环境权限和数据开放程度：能够在测试环境下或使用测试数据完成的，是否向外包人员开放了生产环境权限或真实数据</li>
+<li>数据导出或外发监督管理：外包人员数据导出操作或数据外发操作的管理监督情况</li>
+<li>敏感数据检测：外包人员对敏感数据的访问及操作能否被实时监督或监测</li>
+<li>帐号及访问权限管理：数据外包服务帐号及访问权限管理情况</li>
+<li>远程访问操作：外包人员远程访问操作系统或数据的情况
+针对第三方接入与数据回收的情况重点评估：</li>
+<li>技术检测或评估报告：是否对合作方接入的系统、使用的技术工具进行了技术检测，或合作方提供专业第三方机构评估的数据安全报告，避免木马、后门等</li>
+<li>合作结束数据回收和删除：合作结束后是否进行了数据回收，是否要求合作方对数据进行删除</li>
+<li>外包到期帐号数据管理：服务到期后，帐号注销、数据回收、数据删除销毁等管理情况</li>
+<li>合作结束系统权限接口管理：为完成技术或服务目的向合作方提供的系统权限和接口，在合作结束后是否进行了停用或下线
+涉及政务部门或针对法律、法规授权的具有管理公共事务职能的组织委托处理政务数据的情况重点评估：</li>
+<li>审批程序和合同监督：委托他人建设、维护电子政务系统，存储、加工政务数据，是否经过严格的批准程序，是否以合同等手段监督受托方履行相应的数据安全保护义务</li>
+<li>数据安全保护义务履行：政务数据受托方依照法律、法规的规定和合同约定履行数据安全保护义务的情况，是否擅自留存、使用、泄露或者向他人提供政务数据</li>
+<li>安全措施符合要求：支撑电子政务相关系统运行的相关服务或系统的安全措施，是否满足电子政务系统管理和相关安全要求</li>
+</ol><ul>
+<li>对应政策要点为《网络数据安全风险评估指引》【风险识别】</li>
+</ul></section><section><h2 id="6-风险识别-安全威胁和应急管理">6. 风险识别-安全威胁和应急管理<a class="anchor" href="#6-风险识别-安全威胁和应急管理"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h2><p>识别安全威胁和安全事件情况重点评估：</p><ol>
+<li>安全事件信息及处理情况：近3年发生的网络安全或数据安全事件信息及其处置、记录、整改和上报情况，如事件名称、影晌对象、发生时问和频次、发生原因、外部威胁、事件级别、处置措施、整改措施等，重大事件需提供事件调查评估报告</li>
+<li>安全威胁、违规行为统计：近1年通过安全工具、日志申计、安全测评、合规自查等发现的安全威胁、违规行为及其频率统计</li>
+<li>攻击威胁情况：实际环境中通过监测系统、检测工具等发现的攻击威胁情况</li>
+<li>威胁事件公布或曝光：近期公布或曝光的同行业、类似业务模式的威胁事件、威胁预警
+针对数据安全应急管理情况重点评估：</li>
+<li>应急预案制定和修订：数据安全事件应急预案制定和修订情况，是否定义数据安全事件类型，明确不同类别级别事件的处置流程和方法</li>
+<li>应急响应及处置机制：数据安全应急响应及处置机制建设情况，发生数据安全事件时是否立即采取处置措施，是否按照规定及时告知用户并向有关主管部门报告</li>
+<li>应急演练：数据安全事件应急演练情况</li>
+<li>安全风险监测：数据处理活动安全风险监测情况，发现数据安全缺陷、漏洞等风险时，是否立即采取补救措施</li>
+<li>安全事件危害告知：安全事件对个人、其他组织造成危害的，是否将安全事件和风险情况、危害后果、已经采取的补救措施等通知利害关系人，无法通知的是否采取公告等其他方式告知</li>
+<li>投诉举报渠道：面向社会提供服务的数据处理者是否建立便捷的数据安全相关投诉举报渠道，以及近3年的数据安全投诉举报处置、记录和整改情况，是否存在侵害用户个人信息合法权益的情况</li>
+</ol><ul>
+<li>对应政策要点为《网络数据安全风险评估指引》【风险识别】</li>
+</ul></section><section><h2 id="7-风险识别-开发运维管理">7. 风险识别-开发运维管理<a class="anchor" href="#7-风险识别-开发运维管理"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h2><p>针对开发运维管理情况重点评估：</p><ol>
+<li>新应用开发申核流程：新应用开发审核流程建 设情况，进行数据处理需求安全合规申核情况</li>
+<li>开发程序流程：开发程序的修改、更新、发布的批准授权和版本控制流程</li>
+<li>工程安全管理：工程实施、验收、交付的安全管理情况</li>
+<li>代码和测试数据安全管理：对开发代码、测试数据的安全管理情况</li>
+<li>上线安全评估：产品或业务上线前进行安全评估的情况</li>
+<li>开发环境和实际环境控制：开发测试环境和实际运行环境的隔离情况、测试数据和测试结果的控制情况</li>
+<li>开发测试数据去标识化：开发测试中使用真实个人信息、核心数据、重要数据情况，开发测试前对相关数据进行去标识化、脱敏处理（测试确需信息除外）情况</li>
+<li>人员监督申计：对开发和运维人员行为的监督和审计情况</li>
+<li>远程运维安全防护：远程运维的申批、管理和安全防护措施</li>
+<li>开源技术资料完备性：第三方SDK或开源软件的远行维护、二次开发等技术资料完备性</li>
+</ol><ul>
+<li>对应政策要点为《网络数据安全风险评估指引》【风险识别】</li>
+</ul></section><section><h2 id="8-风险识别-云数据安全">8. 风险识别-云数据安全<a class="anchor" href="#8-风险识别-云数据安全"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h2><p>针对被评估对象使用云计算服务时重点评估：</p><ol>
+<li>安全责任划分：云服务提供者、第三方厂商、云租户的安全责任划分和落实情况</li>
+<li>上云数据安全：上云数据的安全审核和管理情况</li>
+<li>云安全产品服务：云安全产品服务的使用和配置情况</li>
+<li>云上操作安全申计：对云上操作行为的安全审计情况</li>
+<li>云用户账号和权限：云用户账号和权限管理情况</li>
+<li>私有云远程运维安全：私有云远程运维安全管理情况</li>
+<li>云上用户个人信息安全：云上承载用户个人信息、重要数据、核心数据情况，是否对重要数据、敏感个人信息实施增强的安全防护
+针对被评估对象是云计算服务提供者时重点评估：</li>
+<li>云平台间边界防护：公有云、社区云等不同类型云平台间边界防护情況</li>
+<li>数据传输安全：租户与云平台、数据中心间数据传输安全防护情况</li>
+<li>安全责任界面划定：针对不同服务模式、部署模式、产品和服务，云平台对相关方的数据安全责任界面划定情况及合法合规性</li>
+<li>与租户划清责任边界：是否通过合同协议等方式，与租户划清云数据安全责任边界，并履行相应数据安全责任</li>
+<li>提供保障措施：发生数据安全风险或事件时，为租户提供事件报告、应急处置等协同保障措施情况</li>
+<li>租户数据收集：收集租户数据情况，是否识别重要数据、个人信息，收集方式是否安全合理，是否存在超范围收集</li>
+<li>产品安全配置：计算、存储、网络、数据库、安全等产品安全配置情况</li>
+<li>第三方组件：第三方组件安全核查、漏洞修复情况</li>
+<li>云产品漏洞更新推送：云产品漏洞更新和推送情况，是否会及时提供补丁推送、跟进用户漏洞更新等情况</li>
+<li>云平台基础安全防护：云平台提供的基础安全防护能力情况</li>
+<li>高风险操作提示：云产品对用户高风险操作的提示情况</li>
+<li>身份管理和访问控制：对云租户的身份管理和访问控制情況</li>
+<li>数据安全制度措施：云平台保障租户数据安全的相关制度和安全措施</li>
+<li>云数据删除：约定服务到期、欠费、提前终止等情形下，云数据删除和个人信息权益保障等情况</li>
+<li>云数据备份恢复机制：云数据备份和恢复机制是否完善，数据备份策路、备份周期、备份存储、数据恢复策略，恢复验证等是否符合安全需要</li>
+<li>风险和安全评估：云平台开展数据安全风险评估、云计算服务安全评估等情况</li>
+<li>云平台基础设施：云平台基础设施部署和运维情况</li>
+<li>云安全管理中心管控：云安全管理中心管控情况</li>
+<li>云数据迁移安全：云数据迁移安全保障情况</li>
+<li>云平台数据出境：云平台数据出境安全情況</li>
+</ol><ul>
+<li>对应政策要点为《网络数据安全风险评估指引》【风险识别】</li>
+</ul></section><section><h2 id="9-典型数据安全风险类别">9. 典型数据安全风险类别<a class="anchor" href="#9-典型数据安全风险类别"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h2><ol>
+<li>数据泄漏风险：由于数据窃取、爬取、脱库、撞库等安全威胁，或者缺饭有效的安全措施、人员操作失误或有意盗取等，导致数据泄露、恶意窃取、未授权访问等影响数据保密性的风险</li>
+<li>数据篡改风险：由于数据注入、中问人攻击等安全威胁，或者缺失有效的安全措施、人员有意或无意操作等，导致数据被末授板篡改等影响数据完整性的风险</li>
+<li>数据破坏风险：由于拒绝服务攻击、自然灾害、嵌入恶意代码、数据污染、设备故障等安全威胁，或者缺失有效的安全措施、人员有意或无意操作等，导致数据被破坏、毁损、数据质量下降等影响数据可用性的风险</li>
+<li>数据丢失风险：由于数据过载、软硬件故障、备份失效、链路过载等问题，或者缺乏有效的安全措施、人员有意或无意操作等，导致数据丢失、难以恢复等安全风险</li>
+<li>数据滥用风险：由于缺乏授权访问控制、权限管控等有效的安全管控措施、人员有意或无意操作等，导致数据被未授权或超出授权范围使用、加工的风险</li>
+<li>数据伪造风险：由于数据源欺骗、深度伪造等安全威胁，或者缺乏有效的安全措施、人员有意或无意操作等，导致数据或数据源被伪造、数据主体被仿冒等安全风险</li>
+<li>违法违规获取数据：违反法律、行政法规等有关规定，非法或违规获取、收集数据的风险</li>
+<li>违法违规出售数据：违反法律、行政法规等有关规定，非法或违规向他人出售、交易数据的风险</li>
+<li>违法违规保存数据：违反法律、行政法规等有关规定，非法或违规留存数据的风险，如逾期留存、违规境外存储等</li>
+<li>违法违规利用数据：违反法律、行政法规等有关规定，非法或违规使用、加工、委托处理数据的风险</li>
+<li>违法违规提供数据：违反法律、行政法规等有关规定，非法或违规向他人提供、共享、交换，转移数据的风险</li>
+<li>违法违规公开数据：违反法律、行政法规等有关规定，非法或违规公开数据的风险</li>
+<li>违法违规购买数据：违反法律，行政法规等有关规定，非法或违规购买、收受数据的风险</li>
+<li>违法违规出境数据：违反法律、行政法规等有关规定，非法或违规向境外提供数据的风险</li>
+<li>超范围处理数据：数据处理活动违反必要性原则，超范围或过度收集使用个人信息或重要数据的风险</li>
+<li>数据处理缺乏正当性：违反正当性原则，数据处理活动缺乏明确、合理的处理目的</li>
+<li>未有效保障个人信息主体权利：由于未采取有效的个人信息保护措施、人员操作或外部威胁等，导致未能有效保障个人信息主体的知情权、决定权、限制或者拒绝个人信息处理等个人信息主体合法权利</li>
+<li>APP违法违规收集使用个人信息：App违反个人信息监管政策或标准规范，存在违法违规收集使用个人信息行为的风险</li>
+<li>数据处理缺乏公平公正：由于缺乏安全管控措施、人员有意或无意操作等，导致数据处理违反公平公正、诚实守信原则，侵犯其他组织或个人合法权益的风险</li>
+<li>数据处理抵赖风险：由于外部攻击威胁、缺乏有效安全管控措施、人员有意或无意操作等，导致处理者或第三方否认数据处理行为或绕过数据安全措施等风险</li>
+<li>数据不可控风险：由于第三方数据安全能力不足、缺乏有效的第三方管控措施、合同协议缺失、外包人员操作等，导致委托处理或合作的第三方违反法律法规或合同协议约定处理数据，造成第三方超范围处理数据，逾期留存数据，违规再转移等数据不可控风险</li>
+<li>数据推断风险：由于未考虑数据之间的关联关系，导致从公开数据可推断出核心数据、重要数据、未公开的个人数据等，包括但不限于面向人工智能模型的推理攻击、面向基础设施的跨域推断攻击等</li>
+<li>其他风险：其他可能影响国家安全、公共利益或组织、个人合法权益的数据安全风险</li>
+</ol><ul>
+<li>对应政策要点为《网络数据安全风险评估指引》【风险识别】</li>
+</ul></section></section>
+<section><h1 id="05-评估总结与评估报送">05 评估总结与评估报送<a class="anchor" href="#05-评估总结与评估报送"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h1><section><h2 id="1-综合分析">1. 综合分析<a class="anchor" href="#1-综合分析"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h2><p>在数据安全问题清单的基础上，进行风险分级与评价并提出整改建议</p><ol>
+<li>风险分析：基于数据安全问题清单，分析可能存在的数据安全风险，多项数据安全问题可能造成同样数据安全风险，可以合并进行风险分析</li>
+<li>风险评价：主要考虑风险一旦发生可能对本单位、本行业以及对国家安全、社会公共利益、其他组织或者个人合法权益造成影响，以及风险发生的可能性进行综合评价</li>
+<li>分析与评价注意事项：方法可参考数据安全风险评估方法国家标准，针对分析出的每一项风险给出风险评价等级，或对每个评估对象给出综合风险等级</li>
+<li>整改建议：结合实际情况，针对发现的数据安全问题或风险，提出管理、技术等方面或风险处置建议</li>
+</ol><ul>
+<li>对应政策要点为《网络数据安全风险评估指引》【综合分析】</li>
+</ul></section><section><h2 id="2-评估总结">2. 评估总结<a class="anchor" href="#2-评估总结"><span class="anchor-icon" data-pagefind-ignore="">#</span></a></h2><p>评估报告需要提出可操作性的整改措施对策建议</p><ol>
+<li>评估概述：包括评估目的及依据、评估对象和范围、评估结论等</li>
+<li>评估工作情况：包括评估人员、评估时间安排、评估工具和环境情况等</li>
+<li>信息调研情况：包括数据处理者、业务和信息系统、数据资产、数据处理活动、安全措施等情况，形成的数据资产清单，数据处理活动清单，数据流转图等文件等</li>
+<li>数据安全风险识别：包括数据安全管理、数据处理活动、数据安全技术、个人信息保护等方面识别的风险隐患和问题情况</li>
+<li>风险综合分析：对数据安全问题可能带来的安全风险进行综合分析，视情从风险对国家安全，公共利益、行业、组织或者个人的合法权益造成的影响程度、风险发生可能性等角度对风险进行评价</li>
+<li>整改建议：针对发现的数据安全问题或风险，提出整改措施或风险处置建议</li>
+<li>数据安全问题清单：列出完整的数据安全问题清单，并附上关键记录和证据，若证据无法在附录中完整列出，应列出证据关键信息和序号，在提交评估报告时作为附件提交</li>
+</ol></section></section>  </div> <script type="module">document.addEventListener("click",function(s){const t=s.target;if(t&&t.classList.contains("copy-btn")){const c=t.closest("pre")?.querySelector("code"),i=Array.from(c?.querySelectorAll(".code:not(summary *)")??[]).map(e=>e.textContent).map(e=>e===`
+`?"":e).join(`
+`);navigator.clipboard.writeText(i);const o=t.getAttribute("data-timeout-id");o&&clearTimeout(parseInt(o)),t.classList.add("success");const n=setTimeout(()=>{t.classList.remove("success")},1e3);t.setAttribute("data-timeout-id",n.toString())}});</script> <div class="relative transition overflow-hidden bg-[var(--license-block-bg)] py-5 px-6 mb-6 rounded-xl license-container onload-animation"> <div class="transition font-bold text-black/75 dark:text-white/75"> 工业和信息化领域数据安全风险评估 </div> <a href="https://acidzang.github.io/posts/sjaqfxpg/" class="link text-[var(--primary)]"> https://acidzang.github.io/posts/sjaqfxpg/ </a> <div class="flex gap-6 mt-2"> <div> <div class="transition text-black/30 dark:text-white/30 text-sm">作者</div> <div class="transition text-black/75 dark:text-white/75 line-clamp-2">Frank</div> </div> <div> <div class="transition text-black/30 dark:text-white/30 text-sm">发布于</div> <div class="transition text-black/75 dark:text-white/75 line-clamp-2">2025-10-30</div> </div> <div> <div class="transition text-black/30 dark:text-white/30 text-sm">许可协议</div> <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" class="link text-[var(--primary)] line-clamp-2">CC BY-NC-SA 4.0</a> </div> </div> <svg width="0.97em" height="1em" class="transition text-[15rem] absolute pointer-events-none right-6 top-1/2 -translate-y-1/2 text-black/5 dark:text-white/5" data-icon="fa6-brands:creative-commons">   <symbol id="ai:fa6-brands:creative-commons" viewBox="0 0 496 512"><path fill="currentColor" d="m245.83 214.87l-33.22 17.28c-9.43-19.58-25.24-19.93-27.46-19.93c-22.13 0-33.22 14.61-33.22 43.84c0 23.57 9.21 43.84 33.22 43.84c14.47 0 24.65-7.09 30.57-21.26l30.55 15.5c-6.17 11.51-25.69 38.98-65.1 38.98c-22.6 0-73.96-10.32-73.96-77.05c0-58.69 43-77.06 72.63-77.06c30.72-.01 52.7 11.95 65.99 35.86m143.05 0l-32.78 17.28c-9.5-19.77-25.72-19.93-27.9-19.93c-22.14 0-33.22 14.61-33.22 43.84c0 23.55 9.23 43.84 33.22 43.84c14.45 0 24.65-7.09 30.54-21.26l31 15.5c-2.1 3.75-21.39 38.98-65.09 38.98c-22.69 0-73.96-9.87-73.96-77.05c0-58.67 42.97-77.06 72.63-77.06c30.71-.01 52.58 11.95 65.56 35.86M247.56 8.05C104.74 8.05 0 123.11 0 256.05c0 138.49 113.6 248 247.56 248c129.93 0 248.44-100.87 248.44-248c0-137.87-106.62-248-248.44-248m.87 450.81c-112.54 0-203.7-93.04-203.7-202.81c0-105.42 85.43-203.27 203.72-203.27c112.53 0 202.82 89.46 202.82 203.26c-.01 121.69-99.68 202.82-202.84 202.82"/></symbol><use href="#ai:fa6-brands:creative-commons"></use>  </svg> </div> </div> </div> <div class="flex flex-col md:flex-row justify-between mb-4 gap-4 overflow-hidden w-full"> <a href="/posts/sjtm/" class="w-full font-bold overflow-hidden active:scale-95"> <div class="btn-card rounded-2xl w-full h-[3.75rem] max-w-full px-4 flex items-center !justify-start gap-4"> <svg width="1em" height="1em" class="text-[2rem] text-[var(--primary)]" data-icon="material-symbols:chevron-left-rounded">   <symbol id="ai:material-symbols:chevron-left-rounded" viewBox="0 0 24 24"><path fill="currentColor" d="m10.8 12l3.9 3.9q.275.275.275.7t-.275.7t-.7.275t-.7-.275l-4.6-4.6q-.15-.15-.212-.325T8.425 12t.063-.375t.212-.325l4.6-4.6q.275-.275.7-.275t.7.275t.275.7t-.275.7z"/></symbol><use href="#ai:material-symbols:chevron-left-rounded"></use>  </svg> <div class="overflow-hidden transition overflow-ellipsis whitespace-nowrap max-w-[calc(100%_-_3rem)] text-black/75 dark:text-white/75"> 数据脱敏 </div> </div> </a> <a href="#" class="w-full font-bold overflow-hidden active:scale-95 pointer-events-none">  </a> </div>  <div class="footer col-span-2 onload-animation hidden lg:block"> <!--<div class="border-t border-[var(&#45;&#45;primary)] mx-16 border-dashed py-8 max-w-[var(&#45;&#45;page-width)] flex flex-col items-center justify-center px-6">--><div class="transition border-t border-black/10 dark:border-white/15 my-10 border-dashed mx-32"></div> <!--<div class="transition bg-[oklch(92%_0.01_var(&#45;&#45;hue))] dark:bg-black rounded-2xl py-8 mt-4 mb-8 flex flex-col items-center justify-center px-6">--> <div class="transition border-dashed border-[oklch(85%_0.01_var(--hue))] dark:border-white/15 rounded-2xl mb-12 flex flex-col items-center justify-center px-6"> <div class="transition text-50 text-sm text-center">
+&copy; <span id="copyright-year">2026</span> Frank. All Rights Reserved. /
+<a class="transition link text-[var(--primary)] font-medium" target="_blank" href="/rss.xml">RSS</a> /
+<a class="transition link text-[var(--primary)] font-medium" target="_blank" href="/sitemap-index.xml">Sitemap</a><br>
+Powered by
+<a class="transition link text-[var(--primary)] font-medium" target="_blank" href="https://astro.build">Astro</a> &
+<a class="transition link text-[var(--primary)] font-medium" target="_blank" href="https://github.com/saicaca/fuwari">Fuwari</a> </div> </div> </div> </div> </main> <div class="footer col-span-2 onload-animation block lg:hidden"> <!--<div class="border-t border-[var(&#45;&#45;primary)] mx-16 border-dashed py-8 max-w-[var(&#45;&#45;page-width)] flex flex-col items-center justify-center px-6">--><div class="transition border-t border-black/10 dark:border-white/15 my-10 border-dashed mx-32"></div> <!--<div class="transition bg-[oklch(92%_0.01_var(&#45;&#45;hue))] dark:bg-black rounded-2xl py-8 mt-4 mb-8 flex flex-col items-center justify-center px-6">--> <div class="transition border-dashed border-[oklch(85%_0.01_var(--hue))] dark:border-white/15 rounded-2xl mb-12 flex flex-col items-center justify-center px-6"> <div class="transition text-50 text-sm text-center">
+&copy; <span id="copyright-year">2026</span> Frank. All Rights Reserved. /
+<a class="transition link text-[var(--primary)] font-medium" target="_blank" href="/rss.xml">RSS</a> /
+<a class="transition link text-[var(--primary)] font-medium" target="_blank" href="/sitemap-index.xml">Sitemap</a><br>
+Powered by
+<a class="transition link text-[var(--primary)] font-medium" target="_blank" href="https://astro.build">Astro</a> &
+<a class="transition link text-[var(--primary)] font-medium" target="_blank" href="https://github.com/saicaca/fuwari">Fuwari</a> </div> </div> </div> </div> <!-- There can't be a filter on parent element, or it will break `fixed` --><div class="back-to-top-wrapper hidden lg:block" data-astro-cid-eymb5ayk> <div id="back-to-top-btn" class="back-to-top-btn hide flex items-center rounded-2xl overflow-hidden transition" onclick="backToTop()" data-astro-cid-eymb5ayk> <button aria-label="Back to Top" class="btn-card h-[3.75rem] w-[3.75rem]" data-astro-cid-eymb5ayk> <svg width="1em" height="1em" class="mx-auto" data-astro-cid-eymb5ayk="true" data-icon="material-symbols:keyboard-arrow-up-rounded">   <symbol id="ai:material-symbols:keyboard-arrow-up-rounded" viewBox="0 0 24 24"><path fill="currentColor" d="m12 10.8l-3.9 3.9q-.275.275-.7.275t-.7-.275t-.275-.7t.275-.7l4.6-4.6q.3-.3.7-.3t.7.3l4.6 4.6q.275.275.275.7t-.275.7t-.7.275t-.7-.275z"/></symbol><use href="#ai:material-symbols:keyboard-arrow-up-rounded"></use>  </svg> </button> </div> </div>  <script>
+function backToTop() {
+    window.scroll({ top: 0, behavior: 'smooth' });
+}
+</script> </div> </div>  <div class="absolute w-full z-0 hidden 2xl:block"> <div class="relative max-w-[var(--page-width)] mx-auto"> <!-- TOC component --> <div id="toc-wrapper" class="hidden lg:block transition absolute top-0 -right-[var(--toc-width)] w-[var(--toc-width)] items-center toc-hide"> <div id="toc-inner-wrapper" class="fixed top-14 w-[var(--toc-width)] h-[calc(100vh_-_20rem)] overflow-y-scroll overflow-x-hidden hide-scrollbar"> <div id="toc" class="w-full h-full transition-swup-fade "> <div class="h-8 w-full"></div> <table-of-contents class="group"><a href="#01-管理机构与评估机构" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold bg-[var(--toc-badge-bg)] text-[var(--btn-content)]">1</div><div class="transition text-sm text-50">01 管理机构与评估机构</div></a><a href="#1-管理机构" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">1. 管理机构</div></a><a href="#2-工作原则" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">2. 工作原则</div></a><a href="#3-评估方式" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">3. 评估方式</div></a><a href="#4-委托评估" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">4. 委托评估</div></a><a href="#5-评估机构认定" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">5. 评估机构认定</div></a><a href="#6-评估机构义务" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">6. 评估机构义务</div></a><a href="#7-监督检查" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">7. 监督检查</div></a><a href="#8-机构监管及保密要求" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">8. 机构监管及保密要求</div></a><a href="#02-评估内容与评估流程" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold bg-[var(--toc-badge-bg)] text-[var(--btn-content)]">2</div><div class="transition text-sm text-50">02 评估内容与评估流程</div></a><a href="#1-评估内容" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">1. 评估内容</div></a><a href="#2-评估期限" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">2. 评估期限</div></a><a href="#3-评估思路" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">3. 评估思路</div></a><a href="#4-评估内容" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">4. 评估内容</div></a><a href="#5-评估流程" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">5. 评估流程</div></a><a href="#6-自评估流程" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">6. 自评估流程</div></a><a href="#7-检查评估流程" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">7. 检查评估流程</div></a><a href="#8-评估手段" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">8. 评估手段</div></a><a href="#03-评估准备与信息调研" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold bg-[var(--toc-badge-bg)] text-[var(--btn-content)]">3</div><div class="transition text-sm text-50">03 评估准备与信息调研</div></a><a href="#1-评估准备-明确评估目标" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">1. 评估准备-明确评估目标</div></a><a href="#2-评估准备-确定评估范围" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">2. 评估准备-确定评估范围</div></a><a href="#3-评估准备-组建评估团队" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">3. 评估准备-组建评估团队</div></a><a href="#4-评估准备-开展前期准备" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">4. 评估准备-开展前期准备</div></a><a href="#5-评估准备-制定评估方案" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">5. 评估准备-制定评估方案</div></a><a href="#6-信息调研-数据处理者调研" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">6. 信息调研-数据处理者调研</div></a><a href="#7-信息调研-业务和信息系统调研" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">7. 信息调研-业务和信息系统调研</div></a><a href="#8-信息调研-数据资产调研" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">8. 信息调研-数据资产调研</div></a><a href="#9-信息调研-数据处理活动调研" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">9. 信息调研-数据处理活动调研</div></a><a href="#10-信息调研-安全措施调研" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">10. 信息调研-安全措施调研</div></a><a href="#04-风险识别与风险控制" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold bg-[var(--toc-badge-bg)] text-[var(--btn-content)]">4</div><div class="transition text-sm text-50">04 风险识别与风险控制</div></a><a href="#1-风险识别-安全管理制度" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">1. 风险识别-安全管理制度</div></a><a href="#2-风险识别-安全组织机构" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">2. 风险识别-安全组织机构</div></a><a href="#3-风险识别-分类分级管理" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">3. 风险识别-分类分级管理</div></a><a href="#4-风险识别-人员安全管理" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">4. 风险识别-人员安全管理</div></a><a href="#5-风险识别-合作外包管理" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">5. 风险识别-合作外包管理</div></a><a href="#6-风险识别-安全威胁和应急管理" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">6. 风险识别-安全威胁和应急管理</div></a><a href="#7-风险识别-开发运维管理" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">7. 风险识别-开发运维管理</div></a><a href="#8-风险识别-云数据安全" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">8. 风险识别-云数据安全</div></a><a href="#9-典型数据安全风险类别" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">9. 典型数据安全风险类别</div></a><a href="#05-评估总结与评估报送" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold bg-[var(--toc-badge-bg)] text-[var(--btn-content)]">5</div><div class="transition text-sm text-50">05 评估总结与评估报送</div></a><a href="#1-综合分析" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">1. 综合分析</div></a><a href="#2-评估总结" class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-2
+    "><div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div><div class="transition text-sm text-50">2. 评估总结</div></a><div id="active-indicator" style="opacity: 0" class="-z-10 absolute bg-[var(--toc-btn-hover)] left-0 right-0 rounded-xl transition-all group-hover:bg-transparent border-2 border-[var(--toc-btn-hover)] group-hover:border-[var(--toc-btn-active)] border-dashed"></div></table-of-contents><script type="module">class l extends HTMLElement{tocEl=null;visibleClass="visible";observer;anchorNavTarget=null;headingIdxMap=new Map;headings=[];sections=[];tocEntries=[];active=[];activeIndicator=null;constructor(){super(),this.observer=new IntersectionObserver(this.markVisibleSection,{threshold:0})}markVisibleSection=t=>{t.forEach(e=>{const i=e.target.children[0]?.getAttribute("id"),s=i?this.headingIdxMap.get(i):void 0;s!=null&&(this.active[s]=e.isIntersecting),e.isIntersecting&&this.anchorNavTarget==e.target.firstChild&&(this.anchorNavTarget=null)}),this.active.includes(!0)||this.fallback(),this.update()};toggleActiveHeading=()=>{let t=this.active.length-1,e=this.active.length-1,i=-1;for(;t>=0&&!this.active[t];)this.tocEntries[t].classList.remove(this.visibleClass),t--;for(;t>=0&&this.active[t];)this.tocEntries[t].classList.add(this.visibleClass),e=Math.min(e,t),i=Math.max(i,t),t--;for(;t>=0;)this.tocEntries[t].classList.remove(this.visibleClass),t--;if(e>i)this.activeIndicator?.setAttribute("style","opacity: 0");else{let s=this.tocEl?.getBoundingClientRect().top||0,n=this.tocEl?.scrollTop||0,o=this.tocEntries[e].getBoundingClientRect().top-s+n,c=this.tocEntries[i].getBoundingClientRect().bottom-s+n;this.activeIndicator?.setAttribute("style",`top: ${o}px; height: ${c-o}px`)}};scrollToActiveHeading=()=>{if(this.anchorNavTarget||!this.tocEl)return;const t=document.querySelectorAll(`#toc .${this.visibleClass}`);if(!t.length)return;const e=t[0],i=t[t.length-1],s=this.tocEl.clientHeight;let n;i.getBoundingClientRect().bottom-e.getBoundingClientRect().top<.9*s?n=e.offsetTop-32:n=i.offsetTop-s*.8,this.tocEl.scrollTo({top:n,left:0,behavior:"smooth"})};update=()=>{requestAnimationFrame(()=>{this.toggleActiveHeading(),this.scrollToActiveHeading()})};fallback=()=>{if(this.sections.length)for(let t=0;t<this.sections.length;t++){let e=this.sections[t].getBoundingClientRect().top,i=this.sections[t].getBoundingClientRect().bottom;if(this.isInRange(e,0,window.innerHeight)||this.isInRange(i,0,window.innerHeight)||e<0&&i>window.innerHeight)this.markActiveHeading(t);else if(e>window.innerHeight)break}};markActiveHeading=t=>{this.active[t]=!0};handleAnchorClick=t=>{const e=t.composedPath().find(i=>i instanceof HTMLAnchorElement);if(e){const i=decodeURIComponent(e.hash?.substring(1)),s=this.headingIdxMap.get(i);s!==void 0?this.anchorNavTarget=this.headings[s]:this.anchorNavTarget=null}};isInRange(t,e,i){return e<t&&t<i}connectedCallback(){const t=document.querySelector(".prose");t?t.addEventListener("animationend",()=>{this.init()},{once:!0}):console.debug("Animation element not found")}init(){if(this.tocEl=document.getElementById("toc-inner-wrapper"),!!this.tocEl&&(this.tocEl.addEventListener("click",this.handleAnchorClick,{capture:!0}),this.activeIndicator=document.getElementById("active-indicator"),this.tocEntries=Array.from(document.querySelectorAll("#toc a[href^='#']")),this.tocEntries.length!==0)){this.sections=new Array(this.tocEntries.length),this.headings=new Array(this.tocEntries.length);for(let t=0;t<this.tocEntries.length;t++){const e=decodeURIComponent(this.tocEntries[t].hash?.substring(1)),i=document.getElementById(e),s=i?.parentElement;i instanceof HTMLElement&&s instanceof HTMLElement&&(this.headings[t]=i,this.sections[t]=s,this.headingIdxMap.set(e,t))}this.active=new Array(this.tocEntries.length).fill(!1),this.sections.forEach(t=>this.observer.observe(t)),this.fallback(),this.update()}}disconnectedCallback(){this.sections.forEach(t=>this.observer.unobserve(t)),this.observer.disconnect(),this.tocEl?.removeEventListener("click",this.handleAnchorClick)}}customElements.get("table-of-contents")||customElements.define("table-of-contents",l);</script> <div class="h-8 w-full"></div> </div> </div> </div> <!-- #toc needs to exist for Swup to work normally -->  </div> </div>  <!-- increase the page height during page transition to prevent the scrolling animation from jumping --> <div id="page-height-extend" class="hidden h-[300vh]" data-astro-cid-sckkx6r4 style="--bannerOffset: 15vh;--banner-height-home: 65vh;--banner-height: 35vh;--configHue: 250;--page-width: 75rem;"></div>  <script type="module" src="/_astro/Layout.astro_astro_type_script_index_0_lang.DAHrxWCB.js"></script> <script type="module" src="/_astro/Layout.astro_astro_type_script_index_1_lang.B7BiOk3_.js"></script></body></html>

